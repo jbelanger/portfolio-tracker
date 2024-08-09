@@ -1,0 +1,2 @@
+2024-05-27 19:37:23.160 -04:00 [ERR] Unrecognized file samples/Account History_Funding Account20240522.csv with headers: UID,Account Type,Currency,Side,Amount,Fee,Time(UTC),Remark
+2024-05-27 19:59:47.586 -04:00 [ERR] Unrecognized file samples/Account History_Funding Account20240522.csv with headers: UID,Account Type,Currency,Side,Amount,Fee,Time(UTC),Remark

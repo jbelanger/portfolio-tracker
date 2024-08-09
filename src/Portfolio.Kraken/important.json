@@ -1,0 +1,21 @@
+{"Timestamp":"2024-07-03T20:13:38.1302010-04:00","Level":"Warning","MessageTemplate":"Ignoring small crypto conversions of 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T20:13:38.1524820-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: TSDEF5I-HNFS4-PZQ2KE"}
+{"Timestamp":"2024-07-03T20:45:16.5861750-04:00","Level":"Warning","MessageTemplate":"Ignoring small crypto conversions of 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T20:45:16.6107270-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: TSDEF5I-HNFS4-PZQ2KE"}
+{"Timestamp":"2024-07-03T21:03:18.6672920-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T21:35:21.4621130-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T21:41:22.3467050-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T21:42:58.1778680-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T21:47:12.7256210-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:00:14.6803840-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:01:53.7786280-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:04:05.8688240-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:16:21.6742870-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:17:53.2184630-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:20:42.1809480-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:22:56.5105370-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:24:38.4775420-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-07-03T22:25:56.7490000-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T12:00:42.3599810-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T12:02:06.6361390-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T12:03:48.3711990-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
