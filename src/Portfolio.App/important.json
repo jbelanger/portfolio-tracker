@@ -4,3 +4,1440 @@
 {"Timestamp":"2024-08-09T13:32:27.7105540-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
 {"Timestamp":"2024-08-09T13:33:35.0551060-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
 {"Timestamp":"2024-08-09T13:36:16.0011290-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T15:25:07.8977420-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T15:25:07.9232990-04:00","Level":"Warning","MessageTemplate":"ADA Balance is under zero: -0.00000004"}
+{"Timestamp":"2024-08-09T15:25:07.9234340-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.00000551"}
+{"Timestamp":"2024-08-09T15:25:07.9235010-04:00","Level":"Warning","MessageTemplate":"ADA Balance is under zero: -448.15490404"}
+{"Timestamp":"2024-08-09T15:25:07.9235320-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.01039935"}
+{"Timestamp":"2024-08-09T15:25:07.9235590-04:00","Level":"Warning","MessageTemplate":"ADA Balance is under zero: -1423.36229004"}
+{"Timestamp":"2024-08-09T15:25:07.9235870-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.02076935"}
+{"Timestamp":"2024-08-09T15:25:07.9236120-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.03344935"}
+{"Timestamp":"2024-08-09T15:25:07.9236360-04:00","Level":"Warning","MessageTemplate":"ADA Balance is under zero: -2636.68860804"}
+{"Timestamp":"2024-08-09T15:25:07.9236600-04:00","Level":"Warning","MessageTemplate":"ETH Balance is under zero: -0.09818"}
+{"Timestamp":"2024-08-09T15:25:07.9236840-04:00","Level":"Warning","MessageTemplate":"SOL Balance is under zero: -2.99"}
+{"Timestamp":"2024-08-09T15:25:07.9237080-04:00","Level":"Warning","MessageTemplate":"SOL Balance is under zero: -5.00"}
+{"Timestamp":"2024-08-09T15:25:07.9237320-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.03993199"}
+{"Timestamp":"2024-08-09T15:25:07.9237560-04:00","Level":"Warning","MessageTemplate":"ETH Balance is under zero: -0.22788935"}
+{"Timestamp":"2024-08-09T15:25:07.9237800-04:00","Level":"Warning","MessageTemplate":"XRP Balance is under zero: -10.000253"}
+{"Timestamp":"2024-08-09T15:25:07.9238060-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -568.637"}
+{"Timestamp":"2024-08-09T15:25:07.9238290-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.05676119"}
+{"Timestamp":"2024-08-09T15:25:07.9238520-04:00","Level":"Warning","MessageTemplate":"ETH Balance is under zero: -0.42356697"}
+{"Timestamp":"2024-08-09T15:25:07.9238770-04:00","Level":"Warning","MessageTemplate":"SOL Balance is under zero: -5.96935"}
+{"Timestamp":"2024-08-09T15:25:07.9239000-04:00","Level":"Warning","MessageTemplate":"DOT Balance is under zero: -50.26881048"}
+{"Timestamp":"2024-08-09T15:25:07.9239250-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -710.3117"}
+{"Timestamp":"2024-08-09T15:25:07.9239480-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -884.1656"}
+{"Timestamp":"2024-08-09T15:25:07.9239710-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -1236.1869"}
+{"Timestamp":"2024-08-09T15:25:07.9239960-04:00","Level":"Warning","MessageTemplate":"LINK Balance is under zero: -3.16055626"}
+{"Timestamp":"2024-08-09T15:25:07.9240320-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -1335.1869"}
+{"Timestamp":"2024-08-09T15:25:07.9240570-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -1434.1869"}
+{"Timestamp":"2024-08-09T15:25:07.9240790-04:00","Level":"Warning","MessageTemplate":"NEAR Balance is under zero: -63.364"}
+{"Timestamp":"2024-08-09T15:25:07.9241020-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -2099.3467"}
+{"Timestamp":"2024-08-09T15:25:07.9241250-04:00","Level":"Warning","MessageTemplate":"AVAX Balance is under zero: -13.20266"}
+{"Timestamp":"2024-08-09T15:25:07.9241490-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -2804.6044"}
+{"Timestamp":"2024-08-09T15:25:07.9241710-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -3075.3802064"}
+{"Timestamp":"2024-08-09T15:25:07.9241940-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -3200.3927064"}
+{"Timestamp":"2024-08-09T15:25:07.9242170-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -3549.3927064"}
+{"Timestamp":"2024-08-09T15:27:41.2868890-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T15:27:41.3121270-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -617"}
+{"Timestamp":"2024-08-09T15:27:41.3122950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -666.26"}
+{"Timestamp":"2024-08-09T15:27:41.3123330-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -726.59"}
+{"Timestamp":"2024-08-09T15:27:41.3123670-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -994.19"}
+{"Timestamp":"2024-08-09T15:27:41.3123960-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1043.45"}
+{"Timestamp":"2024-08-09T15:27:41.3124220-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1313.772"}
+{"Timestamp":"2024-08-09T15:27:41.3124470-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1627.594"}
+{"Timestamp":"2024-08-09T15:27:41.3124770-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1676.854"}
+{"Timestamp":"2024-08-09T15:27:41.3125020-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1828.974"}
+{"Timestamp":"2024-08-09T15:27:41.3125290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1878.234"}
+{"Timestamp":"2024-08-09T15:27:41.3125680-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1976.754"}
+{"Timestamp":"2024-08-09T15:27:41.3125940-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2026.014"}
+{"Timestamp":"2024-08-09T15:27:41.3126180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2075.274"}
+{"Timestamp":"2024-08-09T15:27:41.3126430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1964.724"}
+{"Timestamp":"2024-08-09T15:27:41.3126670-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2013.984"}
+{"Timestamp":"2024-08-09T15:27:41.3126900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2063.244"}
+{"Timestamp":"2024-08-09T15:27:41.3127140-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2082.944"}
+{"Timestamp":"2024-08-09T15:27:41.3127370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2217.3921"}
+{"Timestamp":"2024-08-09T15:27:41.3127620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2315.9121"}
+{"Timestamp":"2024-08-09T15:27:41.3127860-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2694.1221"}
+{"Timestamp":"2024-08-09T15:27:41.3128090-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2743.3821"}
+{"Timestamp":"2024-08-09T15:27:41.3128330-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2759.9321"}
+{"Timestamp":"2024-08-09T15:27:41.3128570-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2839.7321"}
+{"Timestamp":"2024-08-09T15:27:41.3128870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2888.9921"}
+{"Timestamp":"2024-08-09T15:27:41.3129130-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3418.0794"}
+{"Timestamp":"2024-08-09T15:27:41.3129400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3516.5994"}
+{"Timestamp":"2024-08-09T15:27:41.3129630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3615.1194"}
+{"Timestamp":"2024-08-09T15:27:41.3129850-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3865.1194"}
+{"Timestamp":"2024-08-09T15:27:41.3130080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4200.7944"}
+{"Timestamp":"2024-08-09T15:27:41.3130300-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4299.3144"}
+{"Timestamp":"2024-08-09T15:27:41.3130540-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4399.3141"}
+{"Timestamp":"2024-08-09T15:27:41.3130770-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4514.4144"}
+{"Timestamp":"2024-08-09T15:27:41.3130990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4549.3142"}
+{"Timestamp":"2024-08-09T15:27:41.3131230-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4601.8357"}
+{"Timestamp":"2024-08-09T15:27:41.3131460-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4703.2053"}
+{"Timestamp":"2024-08-09T15:27:41.3131710-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4803.2051"}
+{"Timestamp":"2024-08-09T15:27:41.3131930-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4901.7251"}
+{"Timestamp":"2024-08-09T15:27:41.3132150-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5101.7251"}
+{"Timestamp":"2024-08-09T15:27:41.3132420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5201.7251"}
+{"Timestamp":"2024-08-09T15:27:41.3132660-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5301.7251"}
+{"Timestamp":"2024-08-09T15:27:41.3132890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5351.7251"}
+{"Timestamp":"2024-08-09T15:27:41.3133120-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.8290"}
+{"Timestamp":"2024-08-09T15:27:41.3133350-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.2190"}
+{"Timestamp":"2024-08-09T15:27:41.3133590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.2192"}
+{"Timestamp":"2024-08-09T15:27:41.3133870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5243.1404"}
+{"Timestamp":"2024-08-09T15:27:41.3134150-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5262.8404"}
+{"Timestamp":"2024-08-09T15:27:41.3134380-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5312.1004"}
+{"Timestamp":"2024-08-09T15:27:41.3134600-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5412.1004"}
+{"Timestamp":"2024-08-09T15:27:41.3134820-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5545.6004"}
+{"Timestamp":"2024-08-09T15:27:41.3135040-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5565.3004"}
+{"Timestamp":"2024-08-09T15:27:41.3135260-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5585.0004"}
+{"Timestamp":"2024-08-09T15:27:41.3135480-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5548.7504"}
+{"Timestamp":"2024-08-09T15:27:41.3135710-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5568.4504"}
+{"Timestamp":"2024-08-09T15:27:41.3135920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5588.1504"}
+{"Timestamp":"2024-08-09T15:27:41.3136170-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5637.4104"}
+{"Timestamp":"2024-08-09T15:27:41.3136430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5696.9904"}
+{"Timestamp":"2024-08-09T15:27:41.3136650-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5751.0204"}
+{"Timestamp":"2024-08-09T15:27:41.3136870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5858.0304"}
+{"Timestamp":"2024-08-09T15:27:41.3137110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6124.0004"}
+{"Timestamp":"2024-08-09T15:27:41.3137350-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6222.5204"}
+{"Timestamp":"2024-08-09T15:27:41.3137580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6596.9004"}
+{"Timestamp":"2024-08-09T15:27:41.3137810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6843.2104"}
+{"Timestamp":"2024-08-09T15:27:41.3138060-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6892.4704"}
+{"Timestamp":"2024-08-09T15:27:41.3138280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7385.0804"}
+{"Timestamp":"2024-08-09T15:27:41.3138510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7483.6004"}
+{"Timestamp":"2024-08-09T15:27:41.3138760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7532.8604"}
+{"Timestamp":"2024-08-09T15:27:41.3138990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7582.1204"}
+{"Timestamp":"2024-08-09T15:27:41.3139210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7680.6404"}
+{"Timestamp":"2024-08-09T15:27:41.3139450-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7729.9004"}
+{"Timestamp":"2024-08-09T15:27:41.3139680-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7828.4204"}
+{"Timestamp":"2024-08-09T15:27:41.3139900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7877.6804"}
+{"Timestamp":"2024-08-09T15:27:41.3140120-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7976.2004"}
+{"Timestamp":"2024-08-09T15:27:41.3140340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8074.7204"}
+{"Timestamp":"2024-08-09T15:27:41.3140570-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8173.2404"}
+{"Timestamp":"2024-08-09T15:27:41.3140800-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8271.7604"}
+{"Timestamp":"2024-08-09T15:27:41.3141020-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8370.2804"}
+{"Timestamp":"2024-08-09T15:27:41.3141240-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8468.8004"}
+{"Timestamp":"2024-08-09T15:27:41.3141490-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8810.1604"}
+{"Timestamp":"2024-08-09T15:27:41.3141710-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8908.6804"}
+{"Timestamp":"2024-08-09T15:27:41.3141940-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9007.2004"}
+{"Timestamp":"2024-08-09T15:27:41.3142160-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9253.5104"}
+{"Timestamp":"2024-08-09T15:27:41.3142380-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9352.0304"}
+{"Timestamp":"2024-08-09T15:27:41.3142610-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9598.3404"}
+{"Timestamp":"2024-08-09T15:27:41.3142830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9696.8604"}
+{"Timestamp":"2024-08-09T15:27:41.3143060-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9943.1704"}
+{"Timestamp":"2024-08-09T15:27:41.3143290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -10928.3904"}
+{"Timestamp":"2024-08-09T15:27:41.3143530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11125.4304"}
+{"Timestamp":"2024-08-09T15:27:41.3143770-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11309.9604"}
+{"Timestamp":"2024-08-09T15:27:41.3144050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11408.4804"}
+{"Timestamp":"2024-08-09T15:27:41.3144290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11507.0004"}
+{"Timestamp":"2024-08-09T15:27:41.3144520-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11605.5204"}
+{"Timestamp":"2024-08-09T15:27:41.3144750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11704.0404"}
+{"Timestamp":"2024-08-09T15:27:41.3144970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11751.1004"}
+{"Timestamp":"2024-08-09T15:27:41.3145190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11997.4104"}
+{"Timestamp":"2024-08-09T15:27:41.3145430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12490.0204"}
+{"Timestamp":"2024-08-09T15:27:41.3145660-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12736.3304"}
+{"Timestamp":"2024-08-09T15:27:41.3145890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12933.3704"}
+{"Timestamp":"2024-08-09T15:27:41.3146110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13711.7304"}
+{"Timestamp":"2024-08-09T15:27:41.3146370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13805.7904"}
+{"Timestamp":"2024-08-09T15:27:41.3146600-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13904.3104"}
+{"Timestamp":"2024-08-09T15:27:41.3146820-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14103.8504"}
+{"Timestamp":"2024-08-09T15:27:41.3147050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14350.1604"}
+{"Timestamp":"2024-08-09T15:27:41.3147270-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14594.0104"}
+{"Timestamp":"2024-08-09T15:27:41.3147530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14791.0504"}
+{"Timestamp":"2024-08-09T15:27:41.3147760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14889.5704"}
+{"Timestamp":"2024-08-09T15:27:41.3147990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15382.1804"}
+{"Timestamp":"2024-08-09T15:27:41.3148240-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15579.2204"}
+{"Timestamp":"2024-08-09T15:27:41.3148470-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15672.3404"}
+{"Timestamp":"2024-08-09T15:27:41.3148690-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15869.3804"}
+{"Timestamp":"2024-08-09T15:27:41.3148920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16000.4104"}
+{"Timestamp":"2024-08-09T15:27:41.3149140-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16098.9304"}
+{"Timestamp":"2024-08-09T15:27:41.3149420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16197.4504"}
+{"Timestamp":"2024-08-09T15:27:41.3149650-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16295.9704"}
+{"Timestamp":"2024-08-09T15:27:41.3149870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16394.4904"}
+{"Timestamp":"2024-08-09T15:27:41.3150100-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16493.0104"}
+{"Timestamp":"2024-08-09T15:27:41.3150320-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16591.5304"}
+{"Timestamp":"2024-08-09T15:27:41.3150540-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16690.0504"}
+{"Timestamp":"2024-08-09T15:27:41.3150770-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16788.5704"}
+{"Timestamp":"2024-08-09T15:27:41.3150990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17034.8804"}
+{"Timestamp":"2024-08-09T15:27:41.3151250-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17133.4004"}
+{"Timestamp":"2024-08-09T15:27:41.3151520-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17231.9204"}
+{"Timestamp":"2024-08-09T15:27:41.3151760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17576.7504"}
+{"Timestamp":"2024-08-09T15:27:41.3151980-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17773.7904"}
+{"Timestamp":"2024-08-09T15:27:41.3152210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18266.4004"}
+{"Timestamp":"2024-08-09T15:27:41.3152530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18389.5504"}
+{"Timestamp":"2024-08-09T15:27:41.3152770-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18611.2204"}
+{"Timestamp":"2024-08-09T15:27:41.3152990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18832.8904"}
+{"Timestamp":"2024-08-09T15:27:41.3153210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18931.4104"}
+{"Timestamp":"2024-08-09T15:27:41.3153460-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19203.3104"}
+{"Timestamp":"2024-08-09T15:27:41.3153690-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19302.9504"}
+{"Timestamp":"2024-08-09T15:27:41.3154000-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20283.2704"}
+{"Timestamp":"2024-08-09T15:27:41.3154510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20406.4204"}
+{"Timestamp":"2024-08-09T15:27:41.3154740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20652.7304"}
+{"Timestamp":"2024-08-09T15:27:41.3154980-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20899.0404"}
+{"Timestamp":"2024-08-09T15:27:41.3155230-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20969.4904"}
+{"Timestamp":"2024-08-09T15:27:41.3155540-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21299.1904"}
+{"Timestamp":"2024-08-09T15:27:41.3155760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21792.8004"}
+{"Timestamp":"2024-08-09T15:27:41.3155990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21954.6504"}
+{"Timestamp":"2024-08-09T15:30:28.8180830-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T15:30:28.8421870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -617"}
+{"Timestamp":"2024-08-09T15:30:28.8423610-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -666.26"}
+{"Timestamp":"2024-08-09T15:30:28.8423980-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -726.59"}
+{"Timestamp":"2024-08-09T15:30:28.8424310-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -994.19"}
+{"Timestamp":"2024-08-09T15:30:28.8424570-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1043.45"}
+{"Timestamp":"2024-08-09T15:30:28.8424830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1313.772"}
+{"Timestamp":"2024-08-09T15:30:28.8425080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1627.594"}
+{"Timestamp":"2024-08-09T15:30:28.8425340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1676.854"}
+{"Timestamp":"2024-08-09T15:30:28.8425590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1828.974"}
+{"Timestamp":"2024-08-09T15:30:28.8425850-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1878.234"}
+{"Timestamp":"2024-08-09T15:30:28.8426110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1976.754"}
+{"Timestamp":"2024-08-09T15:30:28.8426370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2026.014"}
+{"Timestamp":"2024-08-09T15:30:28.8426610-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2075.274"}
+{"Timestamp":"2024-08-09T15:30:28.8426940-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1964.724"}
+{"Timestamp":"2024-08-09T15:30:28.8427200-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2013.984"}
+{"Timestamp":"2024-08-09T15:30:28.8427430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2063.244"}
+{"Timestamp":"2024-08-09T15:30:28.8427660-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2082.944"}
+{"Timestamp":"2024-08-09T15:30:28.8427890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2217.3921"}
+{"Timestamp":"2024-08-09T15:30:28.8428130-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2315.9121"}
+{"Timestamp":"2024-08-09T15:30:28.8428370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2694.1221"}
+{"Timestamp":"2024-08-09T15:30:28.8428600-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2743.3821"}
+{"Timestamp":"2024-08-09T15:30:28.8428830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2759.9321"}
+{"Timestamp":"2024-08-09T15:30:28.8429070-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2839.7321"}
+{"Timestamp":"2024-08-09T15:30:28.8429320-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2888.9921"}
+{"Timestamp":"2024-08-09T15:30:28.8429550-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3418.0794"}
+{"Timestamp":"2024-08-09T15:30:28.8429820-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3516.5994"}
+{"Timestamp":"2024-08-09T15:30:28.8430050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3615.1194"}
+{"Timestamp":"2024-08-09T15:30:28.8430280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3865.1194"}
+{"Timestamp":"2024-08-09T15:30:28.8430510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4200.7944"}
+{"Timestamp":"2024-08-09T15:30:28.8430730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4299.3144"}
+{"Timestamp":"2024-08-09T15:30:28.8430970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4399.3141"}
+{"Timestamp":"2024-08-09T15:30:28.8431210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4514.4144"}
+{"Timestamp":"2024-08-09T15:30:28.8431440-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4549.3142"}
+{"Timestamp":"2024-08-09T15:30:28.8431690-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4601.8357"}
+{"Timestamp":"2024-08-09T15:30:28.8432020-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4703.2053"}
+{"Timestamp":"2024-08-09T15:30:28.8432260-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4803.2051"}
+{"Timestamp":"2024-08-09T15:30:28.8432490-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4901.7251"}
+{"Timestamp":"2024-08-09T15:30:28.8432710-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5101.7251"}
+{"Timestamp":"2024-08-09T15:30:28.8432950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5201.7251"}
+{"Timestamp":"2024-08-09T15:30:28.8433180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5301.7251"}
+{"Timestamp":"2024-08-09T15:30:28.8433400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5351.7251"}
+{"Timestamp":"2024-08-09T15:30:28.8433630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.8290"}
+{"Timestamp":"2024-08-09T15:30:28.8433850-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.2190"}
+{"Timestamp":"2024-08-09T15:30:28.8434090-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.2192"}
+{"Timestamp":"2024-08-09T15:30:28.8434350-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5243.1404"}
+{"Timestamp":"2024-08-09T15:30:28.8434590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5262.8404"}
+{"Timestamp":"2024-08-09T15:30:28.8434850-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5312.1004"}
+{"Timestamp":"2024-08-09T15:30:28.8435070-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5412.1004"}
+{"Timestamp":"2024-08-09T15:30:28.8435290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5545.6004"}
+{"Timestamp":"2024-08-09T15:30:28.8435510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5565.3004"}
+{"Timestamp":"2024-08-09T15:30:28.8435730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5585.0004"}
+{"Timestamp":"2024-08-09T15:30:28.8435960-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5548.7504"}
+{"Timestamp":"2024-08-09T15:30:28.8436180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5568.4504"}
+{"Timestamp":"2024-08-09T15:30:28.8436400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5588.1504"}
+{"Timestamp":"2024-08-09T15:30:28.8436630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5637.4104"}
+{"Timestamp":"2024-08-09T15:30:28.8436850-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5696.9904"}
+{"Timestamp":"2024-08-09T15:30:28.8437070-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5751.0204"}
+{"Timestamp":"2024-08-09T15:30:28.8437290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5858.0304"}
+{"Timestamp":"2024-08-09T15:30:28.8437520-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6124.0004"}
+{"Timestamp":"2024-08-09T15:30:28.8437740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6222.5204"}
+{"Timestamp":"2024-08-09T15:30:28.8437970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6596.9004"}
+{"Timestamp":"2024-08-09T15:30:28.8438180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6843.2104"}
+{"Timestamp":"2024-08-09T15:30:28.8438420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6892.4704"}
+{"Timestamp":"2024-08-09T15:30:28.8439060-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7385.0804"}
+{"Timestamp":"2024-08-09T15:30:28.8439290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7483.6004"}
+{"Timestamp":"2024-08-09T15:30:28.8439510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7532.8604"}
+{"Timestamp":"2024-08-09T15:30:28.8439740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7582.1204"}
+{"Timestamp":"2024-08-09T15:30:28.8439960-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7680.6404"}
+{"Timestamp":"2024-08-09T15:30:28.8440200-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7729.9004"}
+{"Timestamp":"2024-08-09T15:30:28.8440420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7828.4204"}
+{"Timestamp":"2024-08-09T15:30:28.8440640-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7877.6804"}
+{"Timestamp":"2024-08-09T15:30:28.8440860-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7976.2004"}
+{"Timestamp":"2024-08-09T15:30:28.8441080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8074.7204"}
+{"Timestamp":"2024-08-09T15:30:28.8441300-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8173.2404"}
+{"Timestamp":"2024-08-09T15:30:28.8441530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8271.7604"}
+{"Timestamp":"2024-08-09T15:30:28.8441740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8370.2804"}
+{"Timestamp":"2024-08-09T15:30:28.8441970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8468.8004"}
+{"Timestamp":"2024-08-09T15:30:28.8442210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8810.1604"}
+{"Timestamp":"2024-08-09T15:30:28.8442470-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8908.6804"}
+{"Timestamp":"2024-08-09T15:30:28.8442700-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9007.2004"}
+{"Timestamp":"2024-08-09T15:30:28.8442920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9253.5104"}
+{"Timestamp":"2024-08-09T15:30:28.8443150-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9352.0304"}
+{"Timestamp":"2024-08-09T15:30:28.8443370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9598.3404"}
+{"Timestamp":"2024-08-09T15:30:28.8443590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9696.8604"}
+{"Timestamp":"2024-08-09T15:30:28.8443820-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9943.1704"}
+{"Timestamp":"2024-08-09T15:30:28.8444040-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -10928.3904"}
+{"Timestamp":"2024-08-09T15:30:28.8444290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11125.4304"}
+{"Timestamp":"2024-08-09T15:30:28.8444510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11309.9604"}
+{"Timestamp":"2024-08-09T15:30:28.8444730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11408.4804"}
+{"Timestamp":"2024-08-09T15:30:28.8444990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11507.0004"}
+{"Timestamp":"2024-08-09T15:30:28.8445220-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11605.5204"}
+{"Timestamp":"2024-08-09T15:30:28.8445450-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11704.0404"}
+{"Timestamp":"2024-08-09T15:30:28.8445670-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11751.1004"}
+{"Timestamp":"2024-08-09T15:30:28.8445890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11997.4104"}
+{"Timestamp":"2024-08-09T15:30:28.8446130-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12490.0204"}
+{"Timestamp":"2024-08-09T15:30:28.8446360-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12736.3304"}
+{"Timestamp":"2024-08-09T15:30:28.8446590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12933.3704"}
+{"Timestamp":"2024-08-09T15:30:28.8446810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13711.7304"}
+{"Timestamp":"2024-08-09T15:30:28.8447070-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13805.7904"}
+{"Timestamp":"2024-08-09T15:30:28.8447290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13904.3104"}
+{"Timestamp":"2024-08-09T15:30:28.8447510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14103.8504"}
+{"Timestamp":"2024-08-09T15:30:28.8447740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14350.1604"}
+{"Timestamp":"2024-08-09T15:30:28.8447960-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14594.0104"}
+{"Timestamp":"2024-08-09T15:30:28.8448700-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14791.0504"}
+{"Timestamp":"2024-08-09T15:30:28.8448940-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14889.5704"}
+{"Timestamp":"2024-08-09T15:30:28.8449160-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15382.1804"}
+{"Timestamp":"2024-08-09T15:30:28.8449410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15579.2204"}
+{"Timestamp":"2024-08-09T15:30:28.8449640-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15672.3404"}
+{"Timestamp":"2024-08-09T15:30:28.8449860-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15869.3804"}
+{"Timestamp":"2024-08-09T15:30:28.8450080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16000.4104"}
+{"Timestamp":"2024-08-09T15:30:28.8450310-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16098.9304"}
+{"Timestamp":"2024-08-09T15:30:28.8450580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16197.4504"}
+{"Timestamp":"2024-08-09T15:30:28.8450810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16295.9704"}
+{"Timestamp":"2024-08-09T15:30:28.8451030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16394.4904"}
+{"Timestamp":"2024-08-09T15:30:28.8451260-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16493.0104"}
+{"Timestamp":"2024-08-09T15:30:28.8451490-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16591.5304"}
+{"Timestamp":"2024-08-09T15:30:28.8451740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16690.0504"}
+{"Timestamp":"2024-08-09T15:30:28.8452030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16788.5704"}
+{"Timestamp":"2024-08-09T15:30:28.8452280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17034.8804"}
+{"Timestamp":"2024-08-09T15:30:28.8452500-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17133.4004"}
+{"Timestamp":"2024-08-09T15:30:28.8452750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17231.9204"}
+{"Timestamp":"2024-08-09T15:30:28.8452980-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17576.7504"}
+{"Timestamp":"2024-08-09T15:30:28.8453200-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17773.7904"}
+{"Timestamp":"2024-08-09T15:30:28.8453430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18266.4004"}
+{"Timestamp":"2024-08-09T15:30:28.8453740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18389.5504"}
+{"Timestamp":"2024-08-09T15:30:28.8453980-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18611.2204"}
+{"Timestamp":"2024-08-09T15:30:28.8454200-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18832.8904"}
+{"Timestamp":"2024-08-09T15:30:28.8454430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18931.4104"}
+{"Timestamp":"2024-08-09T15:30:28.8454670-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19203.3104"}
+{"Timestamp":"2024-08-09T15:30:28.8454900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19302.9504"}
+{"Timestamp":"2024-08-09T15:30:28.8455210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20283.2704"}
+{"Timestamp":"2024-08-09T15:30:28.8455730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20406.4204"}
+{"Timestamp":"2024-08-09T15:30:28.8455960-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20652.7304"}
+{"Timestamp":"2024-08-09T15:30:28.8456200-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20899.0404"}
+{"Timestamp":"2024-08-09T15:30:28.8456450-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20969.4904"}
+{"Timestamp":"2024-08-09T15:30:28.8456750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21299.1904"}
+{"Timestamp":"2024-08-09T15:30:28.8457000-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21792.8004"}
+{"Timestamp":"2024-08-09T15:30:28.8457220-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21954.6504"}
+{"Timestamp":"2024-08-09T15:30:47.3441850-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T15:30:47.3674890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -617"}
+{"Timestamp":"2024-08-09T15:30:47.3676210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -666.26"}
+{"Timestamp":"2024-08-09T15:30:47.3676580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -726.59"}
+{"Timestamp":"2024-08-09T15:30:47.3677030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -994.19"}
+{"Timestamp":"2024-08-09T15:30:47.3677330-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1043.45"}
+{"Timestamp":"2024-08-09T15:30:47.3677580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1313.772"}
+{"Timestamp":"2024-08-09T15:30:47.3677810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1627.594"}
+{"Timestamp":"2024-08-09T15:30:47.3678060-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1676.854"}
+{"Timestamp":"2024-08-09T15:30:47.3678290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1828.974"}
+{"Timestamp":"2024-08-09T15:30:47.3678540-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1878.234"}
+{"Timestamp":"2024-08-09T15:30:47.3678770-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1976.754"}
+{"Timestamp":"2024-08-09T15:30:47.3679000-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2026.014"}
+{"Timestamp":"2024-08-09T15:30:47.3679230-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2075.274"}
+{"Timestamp":"2024-08-09T15:30:47.3679460-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1964.724"}
+{"Timestamp":"2024-08-09T15:30:47.3679700-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2013.984"}
+{"Timestamp":"2024-08-09T15:30:47.3679920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2063.244"}
+{"Timestamp":"2024-08-09T15:30:47.3680140-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2082.944"}
+{"Timestamp":"2024-08-09T15:30:47.3680360-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2217.3921"}
+{"Timestamp":"2024-08-09T15:30:47.3680580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2315.9121"}
+{"Timestamp":"2024-08-09T15:30:47.3680810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2694.1221"}
+{"Timestamp":"2024-08-09T15:30:47.3681020-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2743.3821"}
+{"Timestamp":"2024-08-09T15:30:47.3681250-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2759.9321"}
+{"Timestamp":"2024-08-09T15:30:47.3681470-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2839.7321"}
+{"Timestamp":"2024-08-09T15:30:47.3681710-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2888.9921"}
+{"Timestamp":"2024-08-09T15:30:47.3681930-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3418.0794"}
+{"Timestamp":"2024-08-09T15:30:47.3682180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3516.5994"}
+{"Timestamp":"2024-08-09T15:30:47.3682400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3615.1194"}
+{"Timestamp":"2024-08-09T15:30:47.3682620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3865.1194"}
+{"Timestamp":"2024-08-09T15:30:47.3682840-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4200.7944"}
+{"Timestamp":"2024-08-09T15:30:47.3683060-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4299.3144"}
+{"Timestamp":"2024-08-09T15:30:47.3683290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4399.3141"}
+{"Timestamp":"2024-08-09T15:30:47.3683510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4514.4144"}
+{"Timestamp":"2024-08-09T15:30:47.3683730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4549.3142"}
+{"Timestamp":"2024-08-09T15:30:47.3683960-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4601.8357"}
+{"Timestamp":"2024-08-09T15:30:47.3684180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4703.2053"}
+{"Timestamp":"2024-08-09T15:30:47.3684420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4803.2051"}
+{"Timestamp":"2024-08-09T15:30:47.3684680-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4901.7251"}
+{"Timestamp":"2024-08-09T15:30:47.3684900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5101.7251"}
+{"Timestamp":"2024-08-09T15:30:47.3685140-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5201.7251"}
+{"Timestamp":"2024-08-09T15:30:47.3685370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5301.7251"}
+{"Timestamp":"2024-08-09T15:30:47.3685590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5351.7251"}
+{"Timestamp":"2024-08-09T15:30:47.3685820-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.8290"}
+{"Timestamp":"2024-08-09T15:30:47.3686040-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.2190"}
+{"Timestamp":"2024-08-09T15:30:47.3686270-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.2192"}
+{"Timestamp":"2024-08-09T15:30:47.3686530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5243.1404"}
+{"Timestamp":"2024-08-09T15:30:47.3686760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5262.8404"}
+{"Timestamp":"2024-08-09T15:30:47.3686980-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5312.1004"}
+{"Timestamp":"2024-08-09T15:30:47.3687190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5412.1004"}
+{"Timestamp":"2024-08-09T15:30:47.3687410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5545.6004"}
+{"Timestamp":"2024-08-09T15:30:47.3687630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5565.3004"}
+{"Timestamp":"2024-08-09T15:30:47.3687850-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5585.0004"}
+{"Timestamp":"2024-08-09T15:30:47.3688080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5548.7504"}
+{"Timestamp":"2024-08-09T15:30:47.3688300-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5568.4504"}
+{"Timestamp":"2024-08-09T15:30:47.3688510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5588.1504"}
+{"Timestamp":"2024-08-09T15:30:47.3688750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5637.4104"}
+{"Timestamp":"2024-08-09T15:30:47.3688970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5696.9904"}
+{"Timestamp":"2024-08-09T15:30:47.3689190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5751.0204"}
+{"Timestamp":"2024-08-09T15:30:47.3689400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5858.0304"}
+{"Timestamp":"2024-08-09T15:30:47.3689690-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6124.0004"}
+{"Timestamp":"2024-08-09T15:30:47.3689940-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6222.5204"}
+{"Timestamp":"2024-08-09T15:30:47.3690170-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6596.9004"}
+{"Timestamp":"2024-08-09T15:30:47.3690390-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6843.2104"}
+{"Timestamp":"2024-08-09T15:30:47.3690640-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6892.4704"}
+{"Timestamp":"2024-08-09T15:30:47.3690860-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7385.0804"}
+{"Timestamp":"2024-08-09T15:30:47.3691100-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7483.6004"}
+{"Timestamp":"2024-08-09T15:30:47.3691320-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7532.8604"}
+{"Timestamp":"2024-08-09T15:30:47.3691540-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7582.1204"}
+{"Timestamp":"2024-08-09T15:30:47.3691780-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7680.6404"}
+{"Timestamp":"2024-08-09T15:30:47.3692030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7729.9004"}
+{"Timestamp":"2024-08-09T15:30:47.3692300-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7828.4204"}
+{"Timestamp":"2024-08-09T15:30:47.3692520-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7877.6804"}
+{"Timestamp":"2024-08-09T15:30:47.3692750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7976.2004"}
+{"Timestamp":"2024-08-09T15:30:47.3692970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8074.7204"}
+{"Timestamp":"2024-08-09T15:30:47.3693190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8173.2404"}
+{"Timestamp":"2024-08-09T15:30:47.3693410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8271.7604"}
+{"Timestamp":"2024-08-09T15:30:47.3693630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8370.2804"}
+{"Timestamp":"2024-08-09T15:30:47.3693840-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8468.8004"}
+{"Timestamp":"2024-08-09T15:30:47.3694080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8810.1604"}
+{"Timestamp":"2024-08-09T15:30:47.3694300-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8908.6804"}
+{"Timestamp":"2024-08-09T15:30:47.3694610-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9007.2004"}
+{"Timestamp":"2024-08-09T15:30:47.3694830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9253.5104"}
+{"Timestamp":"2024-08-09T15:30:47.3695050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9352.0304"}
+{"Timestamp":"2024-08-09T15:30:47.3695280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9598.3404"}
+{"Timestamp":"2024-08-09T15:30:47.3695500-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9696.8604"}
+{"Timestamp":"2024-08-09T15:30:47.3695720-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9943.1704"}
+{"Timestamp":"2024-08-09T15:30:47.3695950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -10928.3904"}
+{"Timestamp":"2024-08-09T15:30:47.3696190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11125.4304"}
+{"Timestamp":"2024-08-09T15:30:47.3696420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11309.9604"}
+{"Timestamp":"2024-08-09T15:30:47.3696640-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11408.4804"}
+{"Timestamp":"2024-08-09T15:30:47.3696870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11507.0004"}
+{"Timestamp":"2024-08-09T15:30:47.3697110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11605.5204"}
+{"Timestamp":"2024-08-09T15:30:47.3697320-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11704.0404"}
+{"Timestamp":"2024-08-09T15:30:47.3697540-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11751.1004"}
+{"Timestamp":"2024-08-09T15:30:47.3697750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11997.4104"}
+{"Timestamp":"2024-08-09T15:30:47.3697990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12490.0204"}
+{"Timestamp":"2024-08-09T15:30:47.3700110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12736.3304"}
+{"Timestamp":"2024-08-09T15:30:47.3700460-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12933.3704"}
+{"Timestamp":"2024-08-09T15:30:47.3700750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13711.7304"}
+{"Timestamp":"2024-08-09T15:30:47.3701050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13805.7904"}
+{"Timestamp":"2024-08-09T15:30:47.3701300-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13904.3104"}
+{"Timestamp":"2024-08-09T15:30:47.3701540-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14103.8504"}
+{"Timestamp":"2024-08-09T15:30:47.3701840-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14350.1604"}
+{"Timestamp":"2024-08-09T15:30:47.3702080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14594.0104"}
+{"Timestamp":"2024-08-09T15:30:47.3702370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14791.0504"}
+{"Timestamp":"2024-08-09T15:30:47.3702600-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14889.5704"}
+{"Timestamp":"2024-08-09T15:30:47.3702830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15382.1804"}
+{"Timestamp":"2024-08-09T15:30:47.3703100-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15579.2204"}
+{"Timestamp":"2024-08-09T15:30:47.3703340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15672.3404"}
+{"Timestamp":"2024-08-09T15:30:47.3703580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15869.3804"}
+{"Timestamp":"2024-08-09T15:30:47.3703810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16000.4104"}
+{"Timestamp":"2024-08-09T15:30:47.3704040-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16098.9304"}
+{"Timestamp":"2024-08-09T15:30:47.3704340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16197.4504"}
+{"Timestamp":"2024-08-09T15:30:47.3704630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16295.9704"}
+{"Timestamp":"2024-08-09T15:30:47.3704870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16394.4904"}
+{"Timestamp":"2024-08-09T15:30:47.3705110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16493.0104"}
+{"Timestamp":"2024-08-09T15:30:47.3705340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16591.5304"}
+{"Timestamp":"2024-08-09T15:30:47.3705580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16690.0504"}
+{"Timestamp":"2024-08-09T15:30:47.3705810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16788.5704"}
+{"Timestamp":"2024-08-09T15:30:47.3706040-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17034.8804"}
+{"Timestamp":"2024-08-09T15:30:47.3706270-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17133.4004"}
+{"Timestamp":"2024-08-09T15:30:47.3706530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17231.9204"}
+{"Timestamp":"2024-08-09T15:30:47.3706760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17576.7504"}
+{"Timestamp":"2024-08-09T15:30:47.3706990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17773.7904"}
+{"Timestamp":"2024-08-09T15:30:47.3707220-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18266.4004"}
+{"Timestamp":"2024-08-09T15:30:47.3707540-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18389.5504"}
+{"Timestamp":"2024-08-09T15:30:47.3707790-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18611.2204"}
+{"Timestamp":"2024-08-09T15:30:47.3708020-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18832.8904"}
+{"Timestamp":"2024-08-09T15:30:47.3708250-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18931.4104"}
+{"Timestamp":"2024-08-09T15:30:47.3708500-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19203.3104"}
+{"Timestamp":"2024-08-09T15:30:47.3708730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19302.9504"}
+{"Timestamp":"2024-08-09T15:30:47.3709060-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20283.2704"}
+{"Timestamp":"2024-08-09T15:30:47.3709830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20406.4204"}
+{"Timestamp":"2024-08-09T15:30:47.3710460-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20652.7304"}
+{"Timestamp":"2024-08-09T15:30:47.3711050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20899.0404"}
+{"Timestamp":"2024-08-09T15:30:47.3711390-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20969.4904"}
+{"Timestamp":"2024-08-09T15:30:47.3711760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21299.1904"}
+{"Timestamp":"2024-08-09T15:30:47.3712020-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21792.8004"}
+{"Timestamp":"2024-08-09T15:30:47.3712270-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21954.6504"}
+{"Timestamp":"2024-08-09T15:32:11.6738350-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T15:32:11.6976210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -617"}
+{"Timestamp":"2024-08-09T15:32:11.6977700-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -666.26"}
+{"Timestamp":"2024-08-09T15:32:11.6978070-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -726.59"}
+{"Timestamp":"2024-08-09T15:32:11.6978410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -994.19"}
+{"Timestamp":"2024-08-09T15:32:11.6978670-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1043.45"}
+{"Timestamp":"2024-08-09T15:32:11.6978920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1313.772"}
+{"Timestamp":"2024-08-09T15:32:11.6979170-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1627.594"}
+{"Timestamp":"2024-08-09T15:32:11.6979430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1676.854"}
+{"Timestamp":"2024-08-09T15:32:11.6979690-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1828.974"}
+{"Timestamp":"2024-08-09T15:32:11.6979950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1878.234"}
+{"Timestamp":"2024-08-09T15:32:11.6980210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1976.754"}
+{"Timestamp":"2024-08-09T15:32:11.6980450-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2026.014"}
+{"Timestamp":"2024-08-09T15:32:11.6980680-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2075.274"}
+{"Timestamp":"2024-08-09T15:32:11.6980940-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1964.724"}
+{"Timestamp":"2024-08-09T15:32:11.6981190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2013.984"}
+{"Timestamp":"2024-08-09T15:32:11.6981430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2063.244"}
+{"Timestamp":"2024-08-09T15:32:11.6981660-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2082.944"}
+{"Timestamp":"2024-08-09T15:32:11.6981900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2217.3921"}
+{"Timestamp":"2024-08-09T15:32:11.6982140-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2315.9121"}
+{"Timestamp":"2024-08-09T15:32:11.6982380-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2694.1221"}
+{"Timestamp":"2024-08-09T15:32:11.6982620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2743.3821"}
+{"Timestamp":"2024-08-09T15:32:11.6982860-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2759.9321"}
+{"Timestamp":"2024-08-09T15:32:11.6983110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2839.7321"}
+{"Timestamp":"2024-08-09T15:32:11.6983360-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2888.9921"}
+{"Timestamp":"2024-08-09T15:32:11.6983600-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3418.0794"}
+{"Timestamp":"2024-08-09T15:32:11.6983870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3516.5994"}
+{"Timestamp":"2024-08-09T15:32:11.6984110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3615.1194"}
+{"Timestamp":"2024-08-09T15:32:11.6984420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3865.1194"}
+{"Timestamp":"2024-08-09T15:32:11.6984740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4200.7944"}
+{"Timestamp":"2024-08-09T15:32:11.6984960-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4299.3144"}
+{"Timestamp":"2024-08-09T15:32:11.6985190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4399.3141"}
+{"Timestamp":"2024-08-09T15:32:11.6985410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4514.4144"}
+{"Timestamp":"2024-08-09T15:32:11.6985620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4549.3142"}
+{"Timestamp":"2024-08-09T15:32:11.6985850-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4601.8357"}
+{"Timestamp":"2024-08-09T15:32:11.6986800-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4703.2053"}
+{"Timestamp":"2024-08-09T15:32:11.6987040-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4803.2051"}
+{"Timestamp":"2024-08-09T15:32:11.6987260-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4901.7251"}
+{"Timestamp":"2024-08-09T15:32:11.6987480-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5101.7251"}
+{"Timestamp":"2024-08-09T15:32:11.6987760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5201.7251"}
+{"Timestamp":"2024-08-09T15:32:11.6987990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5301.7251"}
+{"Timestamp":"2024-08-09T15:32:11.6988210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5351.7251"}
+{"Timestamp":"2024-08-09T15:32:11.6988440-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.8290"}
+{"Timestamp":"2024-08-09T15:32:11.6988670-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.2190"}
+{"Timestamp":"2024-08-09T15:32:11.6988900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5379.2192"}
+{"Timestamp":"2024-08-09T15:32:11.6989160-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5243.1404"}
+{"Timestamp":"2024-08-09T15:32:11.6989410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5262.8404"}
+{"Timestamp":"2024-08-09T15:32:11.6989620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5312.1004"}
+{"Timestamp":"2024-08-09T15:32:11.6989850-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5412.1004"}
+{"Timestamp":"2024-08-09T15:32:11.6990060-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5545.6004"}
+{"Timestamp":"2024-08-09T15:32:11.6990280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5565.3004"}
+{"Timestamp":"2024-08-09T15:32:11.6990510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5585.0004"}
+{"Timestamp":"2024-08-09T15:32:11.6990730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5548.7504"}
+{"Timestamp":"2024-08-09T15:32:11.6990950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5568.4504"}
+{"Timestamp":"2024-08-09T15:32:11.6991170-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5588.1504"}
+{"Timestamp":"2024-08-09T15:32:11.6991410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5637.4104"}
+{"Timestamp":"2024-08-09T15:32:11.6991630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5696.9904"}
+{"Timestamp":"2024-08-09T15:32:11.6991840-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5751.0204"}
+{"Timestamp":"2024-08-09T15:32:11.6992070-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5858.0304"}
+{"Timestamp":"2024-08-09T15:32:11.6992310-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6124.0004"}
+{"Timestamp":"2024-08-09T15:32:11.6992620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6222.5204"}
+{"Timestamp":"2024-08-09T15:32:11.6992860-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6596.9004"}
+{"Timestamp":"2024-08-09T15:32:11.6993080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6843.2104"}
+{"Timestamp":"2024-08-09T15:32:11.6993330-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6892.4704"}
+{"Timestamp":"2024-08-09T15:32:11.6993550-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7385.0804"}
+{"Timestamp":"2024-08-09T15:32:11.6993780-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7483.6004"}
+{"Timestamp":"2024-08-09T15:32:11.6994000-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7532.8604"}
+{"Timestamp":"2024-08-09T15:32:11.6994230-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7582.1204"}
+{"Timestamp":"2024-08-09T15:32:11.6994450-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7680.6404"}
+{"Timestamp":"2024-08-09T15:32:11.6994690-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7729.9004"}
+{"Timestamp":"2024-08-09T15:32:11.6994910-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7828.4204"}
+{"Timestamp":"2024-08-09T15:32:11.6995140-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7877.6804"}
+{"Timestamp":"2024-08-09T15:32:11.6995360-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7976.2004"}
+{"Timestamp":"2024-08-09T15:32:11.6995580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8074.7204"}
+{"Timestamp":"2024-08-09T15:32:11.6995800-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8173.2404"}
+{"Timestamp":"2024-08-09T15:32:11.6996030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8271.7604"}
+{"Timestamp":"2024-08-09T15:32:11.6996250-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8370.2804"}
+{"Timestamp":"2024-08-09T15:32:11.6996470-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8468.8004"}
+{"Timestamp":"2024-08-09T15:32:11.6996720-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8810.1604"}
+{"Timestamp":"2024-08-09T15:32:11.6996950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8908.6804"}
+{"Timestamp":"2024-08-09T15:32:11.6997170-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9007.2004"}
+{"Timestamp":"2024-08-09T15:32:11.6997390-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9253.5104"}
+{"Timestamp":"2024-08-09T15:32:11.6997610-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9352.0304"}
+{"Timestamp":"2024-08-09T15:32:11.6997870-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9598.3404"}
+{"Timestamp":"2024-08-09T15:32:11.6998090-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9696.8604"}
+{"Timestamp":"2024-08-09T15:32:11.6998320-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9943.1704"}
+{"Timestamp":"2024-08-09T15:32:11.6998590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -10928.3904"}
+{"Timestamp":"2024-08-09T15:32:11.6998830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11125.4304"}
+{"Timestamp":"2024-08-09T15:32:11.6999050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11309.9604"}
+{"Timestamp":"2024-08-09T15:32:11.6999280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11408.4804"}
+{"Timestamp":"2024-08-09T15:32:11.6999500-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11507.0004"}
+{"Timestamp":"2024-08-09T15:32:11.6999730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11605.5204"}
+{"Timestamp":"2024-08-09T15:32:11.6999950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11704.0404"}
+{"Timestamp":"2024-08-09T15:32:11.7000200-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11751.1004"}
+{"Timestamp":"2024-08-09T15:32:11.7000430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11997.4104"}
+{"Timestamp":"2024-08-09T15:32:11.7000700-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12490.0204"}
+{"Timestamp":"2024-08-09T15:32:11.7000930-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12736.3304"}
+{"Timestamp":"2024-08-09T15:32:11.7001150-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12933.3704"}
+{"Timestamp":"2024-08-09T15:32:11.7001380-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13711.7304"}
+{"Timestamp":"2024-08-09T15:32:11.7001630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13805.7904"}
+{"Timestamp":"2024-08-09T15:32:11.7001860-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13904.3104"}
+{"Timestamp":"2024-08-09T15:32:11.7002080-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14103.8504"}
+{"Timestamp":"2024-08-09T15:32:11.7002310-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14350.1604"}
+{"Timestamp":"2024-08-09T15:32:11.7002530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14594.0104"}
+{"Timestamp":"2024-08-09T15:32:11.7002790-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14791.0504"}
+{"Timestamp":"2024-08-09T15:32:11.7003010-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14889.5704"}
+{"Timestamp":"2024-08-09T15:32:11.7003240-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15382.1804"}
+{"Timestamp":"2024-08-09T15:32:11.7003500-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15579.2204"}
+{"Timestamp":"2024-08-09T15:32:11.7003730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15672.3404"}
+{"Timestamp":"2024-08-09T15:32:11.7003950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15869.3804"}
+{"Timestamp":"2024-08-09T15:32:11.7004180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16000.4104"}
+{"Timestamp":"2024-08-09T15:32:11.7004400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16098.9304"}
+{"Timestamp":"2024-08-09T15:32:11.7004670-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16197.4504"}
+{"Timestamp":"2024-08-09T15:32:11.7004900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16295.9704"}
+{"Timestamp":"2024-08-09T15:32:11.7005130-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16394.4904"}
+{"Timestamp":"2024-08-09T15:32:11.7005350-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16493.0104"}
+{"Timestamp":"2024-08-09T15:32:11.7005580-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16591.5304"}
+{"Timestamp":"2024-08-09T15:32:11.7005830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16690.0504"}
+{"Timestamp":"2024-08-09T15:32:11.7006100-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16788.5704"}
+{"Timestamp":"2024-08-09T15:32:11.7006320-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17034.8804"}
+{"Timestamp":"2024-08-09T15:32:11.7006550-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17133.4004"}
+{"Timestamp":"2024-08-09T15:32:11.7006820-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17231.9204"}
+{"Timestamp":"2024-08-09T15:32:11.7007050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17576.7504"}
+{"Timestamp":"2024-08-09T15:32:11.7007280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17773.7904"}
+{"Timestamp":"2024-08-09T15:32:11.7007500-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18266.4004"}
+{"Timestamp":"2024-08-09T15:32:11.7007820-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18389.5504"}
+{"Timestamp":"2024-08-09T15:32:11.7008050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18611.2204"}
+{"Timestamp":"2024-08-09T15:32:11.7008280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18832.8904"}
+{"Timestamp":"2024-08-09T15:32:11.7008500-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18931.4104"}
+{"Timestamp":"2024-08-09T15:32:11.7008740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19203.3104"}
+{"Timestamp":"2024-08-09T15:32:11.7008970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19302.9504"}
+{"Timestamp":"2024-08-09T15:32:11.7009290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20283.2704"}
+{"Timestamp":"2024-08-09T15:32:11.7009790-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20406.4204"}
+{"Timestamp":"2024-08-09T15:32:11.7010030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20652.7304"}
+{"Timestamp":"2024-08-09T15:32:11.7010370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20899.0404"}
+{"Timestamp":"2024-08-09T15:32:11.7010620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20969.4904"}
+{"Timestamp":"2024-08-09T15:32:11.7010920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21299.1904"}
+{"Timestamp":"2024-08-09T15:32:11.7011190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21792.8004"}
+{"Timestamp":"2024-08-09T15:32:11.7011420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21954.6504"}
+{"Timestamp":"2024-08-09T15:32:11.7012730-04:00","Level":"Warning","MessageTemplate":"BTC,0.00104906,0"}
+{"Timestamp":"2024-08-09T15:32:11.7012980-04:00","Level":"Warning","MessageTemplate":"CAD,284.7896,0"}
+{"Timestamp":"2024-08-09T15:32:11.7013190-04:00","Level":"Warning","MessageTemplate":"ADA,3.38836494,0"}
+{"Timestamp":"2024-08-09T15:32:11.7013440-04:00","Level":"Warning","MessageTemplate":"SOL,0.06025,0"}
+{"Timestamp":"2024-08-09T15:32:11.7013650-04:00","Level":"Warning","MessageTemplate":"USDC,27.37009360,0"}
+{"Timestamp":"2024-08-09T15:32:11.7013870-04:00","Level":"Warning","MessageTemplate":"KEY,0.00000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7014080-04:00","Level":"Warning","MessageTemplate":"USD,2091.6323,0"}
+{"Timestamp":"2024-08-09T15:32:11.7014290-04:00","Level":"Warning","MessageTemplate":"SHIB,0,0"}
+{"Timestamp":"2024-08-09T15:32:11.7014500-04:00","Level":"Warning","MessageTemplate":"ETH,0.00900000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7014710-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00,0"}
+{"Timestamp":"2024-08-09T15:32:11.7014920-04:00","Level":"Warning","MessageTemplate":"FIL,0.000000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7015150-04:00","Level":"Warning","MessageTemplate":"DOT,0.05000000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7015350-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T15:32:11.7015560-04:00","Level":"Warning","MessageTemplate":"XRP,0.2000000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7015770-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T15:32:11.7015980-04:00","Level":"Warning","MessageTemplate":"TIA,0.0000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7016190-04:00","Level":"Warning","MessageTemplate":"AVAX,3.65476707,0"}
+{"Timestamp":"2024-08-09T15:32:11.7016430-04:00","Level":"Warning","MessageTemplate":"LINK,106.85193540,0"}
+{"Timestamp":"2024-08-09T15:32:11.7016650-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7016860-04:00","Level":"Warning","MessageTemplate":"SEI,0.00,0"}
+{"Timestamp":"2024-08-09T15:32:11.7017070-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7017270-04:00","Level":"Warning","MessageTemplate":"ATOM,0.000000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7017480-04:00","Level":"Warning","MessageTemplate":"ARB,0.000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7017700-04:00","Level":"Warning","MessageTemplate":"ENS,0.00000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7017900-04:00","Level":"Warning","MessageTemplate":"IMX,0.44643,0"}
+{"Timestamp":"2024-08-09T15:32:11.7018100-04:00","Level":"Warning","MessageTemplate":"FET,2.24917822,0"}
+{"Timestamp":"2024-08-09T15:32:11.7018300-04:00","Level":"Warning","MessageTemplate":"GRT,950.15849,0"}
+{"Timestamp":"2024-08-09T15:32:11.7018510-04:00","Level":"Warning","MessageTemplate":"RNDR,65.70581287,0"}
+{"Timestamp":"2024-08-09T15:32:11.7018710-04:00","Level":"Warning","MessageTemplate":"UNI,34.37466,0"}
+{"Timestamp":"2024-08-09T15:32:11.7018910-04:00","Level":"Warning","MessageTemplate":"APT,0.0000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7023840-04:00","Level":"Warning","MessageTemplate":"STRK,0.0,0"}
+{"Timestamp":"2024-08-09T15:32:11.7024190-04:00","Level":"Warning","MessageTemplate":"NEAR,0.01000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7024440-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7024680-04:00","Level":"Warning","MessageTemplate":"AKT,1.49478087,0"}
+{"Timestamp":"2024-08-09T15:32:11.7024900-04:00","Level":"Warning","MessageTemplate":"ONDO,638.0039,0"}
+{"Timestamp":"2024-08-09T15:32:11.7025130-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865,0"}
+{"Timestamp":"2024-08-09T15:32:11.7025380-04:00","Level":"Warning","MessageTemplate":"AAVE,4.06683202,0"}
+{"Timestamp":"2024-08-09T15:32:11.7025600-04:00","Level":"Warning","MessageTemplate":"BEAM,135.8800,0"}
+{"Timestamp":"2024-08-09T15:32:11.7025830-04:00","Level":"Warning","MessageTemplate":"CFG,0.00000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7026050-04:00","Level":"Warning","MessageTemplate":"RLC,0.00000000,0"}
+{"Timestamp":"2024-08-09T15:32:11.7026260-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000,0"}
+{"Timestamp":"2024-08-09T15:35:47.0935210-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T15:37:08.5104170-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:16:13.3911030-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:16:13.4156930-04:00","Level":"Warning","MessageTemplate":"CAD,284.7896,0"}
+{"Timestamp":"2024-08-09T17:16:13.4158120-04:00","Level":"Warning","MessageTemplate":"BTC,0.00104906,0"}
+{"Timestamp":"2024-08-09T17:16:13.4158470-04:00","Level":"Warning","MessageTemplate":"ADA,3.38836494,0"}
+{"Timestamp":"2024-08-09T17:16:13.4158750-04:00","Level":"Warning","MessageTemplate":"SOL,0.06025,0"}
+{"Timestamp":"2024-08-09T17:16:13.4159020-04:00","Level":"Warning","MessageTemplate":"USDC,27.37009360,0"}
+{"Timestamp":"2024-08-09T17:16:13.4159280-04:00","Level":"Warning","MessageTemplate":"KEY,0.00000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4159530-04:00","Level":"Warning","MessageTemplate":"USD,2091.6323,0"}
+{"Timestamp":"2024-08-09T17:16:13.4159770-04:00","Level":"Warning","MessageTemplate":"SHIB,0,0"}
+{"Timestamp":"2024-08-09T17:16:13.4160020-04:00","Level":"Warning","MessageTemplate":"ETH,0.00900000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4160250-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00,0"}
+{"Timestamp":"2024-08-09T17:16:13.4160490-04:00","Level":"Warning","MessageTemplate":"FIL,0.000000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4160730-04:00","Level":"Warning","MessageTemplate":"DOT,0.05000000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4160970-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:16:13.4161200-04:00","Level":"Warning","MessageTemplate":"XRP,0.2000000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4161430-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:16:13.4161660-04:00","Level":"Warning","MessageTemplate":"TIA,0.0000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4161960-04:00","Level":"Warning","MessageTemplate":"AVAX,3.65476707,0"}
+{"Timestamp":"2024-08-09T17:16:13.4162210-04:00","Level":"Warning","MessageTemplate":"LINK,106.85193540,0"}
+{"Timestamp":"2024-08-09T17:16:13.4162450-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4162680-04:00","Level":"Warning","MessageTemplate":"SEI,0.00,0"}
+{"Timestamp":"2024-08-09T17:16:13.4162920-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4163150-04:00","Level":"Warning","MessageTemplate":"ATOM,0.000000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4163380-04:00","Level":"Warning","MessageTemplate":"ARB,0.000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4163610-04:00","Level":"Warning","MessageTemplate":"ENS,0.00000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4163850-04:00","Level":"Warning","MessageTemplate":"IMX,0.44643,0"}
+{"Timestamp":"2024-08-09T17:16:13.4164080-04:00","Level":"Warning","MessageTemplate":"FET,2.24917822,0"}
+{"Timestamp":"2024-08-09T17:16:13.4164310-04:00","Level":"Warning","MessageTemplate":"GRT,950.15849,0"}
+{"Timestamp":"2024-08-09T17:16:13.4164690-04:00","Level":"Warning","MessageTemplate":"RNDR,65.70581287,0"}
+{"Timestamp":"2024-08-09T17:16:13.4164940-04:00","Level":"Warning","MessageTemplate":"UNI,34.37466,0"}
+{"Timestamp":"2024-08-09T17:16:13.4165170-04:00","Level":"Warning","MessageTemplate":"APT,0.0000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4165390-04:00","Level":"Warning","MessageTemplate":"STRK,0.0,0"}
+{"Timestamp":"2024-08-09T17:16:13.4165610-04:00","Level":"Warning","MessageTemplate":"NEAR,0.01000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4165840-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4166060-04:00","Level":"Warning","MessageTemplate":"AKT,1.49478087,0"}
+{"Timestamp":"2024-08-09T17:16:13.4166290-04:00","Level":"Warning","MessageTemplate":"ONDO,638.0039,0"}
+{"Timestamp":"2024-08-09T17:16:13.4166510-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865,0"}
+{"Timestamp":"2024-08-09T17:16:13.4166730-04:00","Level":"Warning","MessageTemplate":"AAVE,4.06683202,0"}
+{"Timestamp":"2024-08-09T17:16:13.4166950-04:00","Level":"Warning","MessageTemplate":"BEAM,135.8800,0"}
+{"Timestamp":"2024-08-09T17:16:13.4167170-04:00","Level":"Warning","MessageTemplate":"CFG,0.00000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4167390-04:00","Level":"Warning","MessageTemplate":"RLC,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:16:13.4167630-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1297580-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:22:09.1527360-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:22:09.1539560-04:00","Level":"Warning","MessageTemplate":"CAD,284.7896,0"}
+{"Timestamp":"2024-08-09T17:22:09.1540030-04:00","Level":"Warning","MessageTemplate":"BTC,0.0010490600,0"}
+{"Timestamp":"2024-08-09T17:22:09.1540320-04:00","Level":"Warning","MessageTemplate":"ADA,3.38836497,0"}
+{"Timestamp":"2024-08-09T17:22:09.1540580-04:00","Level":"Warning","MessageTemplate":"SOL,0.0602500000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1540840-04:00","Level":"Warning","MessageTemplate":"USDC,27.37009360,0"}
+{"Timestamp":"2024-08-09T17:22:09.1541080-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1541320-04:00","Level":"Warning","MessageTemplate":"USD,1000.3823,0"}
+{"Timestamp":"2024-08-09T17:22:09.1541570-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1541810-04:00","Level":"Warning","MessageTemplate":"ETH,0.0090000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1542040-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1542270-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1542500-04:00","Level":"Warning","MessageTemplate":"DOT,0.0500000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1542740-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:22:09.1542960-04:00","Level":"Warning","MessageTemplate":"XRP,0.20000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1543200-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:22:09.1543430-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1543670-04:00","Level":"Warning","MessageTemplate":"AVAX,13.6547670700,0"}
+{"Timestamp":"2024-08-09T17:22:09.1543910-04:00","Level":"Warning","MessageTemplate":"LINK,126.8519354000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1544150-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1544400-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1544620-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1544850-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1545080-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1545310-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1545540-04:00","Level":"Warning","MessageTemplate":"IMX,0.4464300000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1545770-04:00","Level":"Warning","MessageTemplate":"FET,2.2491781800,0"}
+{"Timestamp":"2024-08-09T17:22:09.1546000-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1546230-04:00","Level":"Warning","MessageTemplate":"RNDR,65.7058128700,0"}
+{"Timestamp":"2024-08-09T17:22:09.1546450-04:00","Level":"Warning","MessageTemplate":"UNI,34.3746600000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1546700-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1546920-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1547150-04:00","Level":"Warning","MessageTemplate":"NEAR,0.01000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1547380-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1547600-04:00","Level":"Warning","MessageTemplate":"AKT,206.4947808800,0"}
+{"Timestamp":"2024-08-09T17:22:09.1547830-04:00","Level":"Warning","MessageTemplate":"ONDO,638.00390,0"}
+{"Timestamp":"2024-08-09T17:22:09.1548060-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1548280-04:00","Level":"Warning","MessageTemplate":"AAVE,4.0668320200,0"}
+{"Timestamp":"2024-08-09T17:22:09.1548510-04:00","Level":"Warning","MessageTemplate":"BEAM,20135.8800,0"}
+{"Timestamp":"2024-08-09T17:22:09.1548730-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1548960-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:22:09.1549180-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5348100-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:23:18.5590350-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:23:18.5602690-04:00","Level":"Warning","MessageTemplate":"CAD,284.7896,0"}
+{"Timestamp":"2024-08-09T17:23:18.5603150-04:00","Level":"Warning","MessageTemplate":"BTC,0.0010490600,0"}
+{"Timestamp":"2024-08-09T17:23:18.5603450-04:00","Level":"Warning","MessageTemplate":"ADA,3.38836497,0"}
+{"Timestamp":"2024-08-09T17:23:18.5603710-04:00","Level":"Warning","MessageTemplate":"SOL,0.0602500000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5603960-04:00","Level":"Warning","MessageTemplate":"USDC,27.37009360,0"}
+{"Timestamp":"2024-08-09T17:23:18.5604200-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5604440-04:00","Level":"Warning","MessageTemplate":"USD,1000.3823,0"}
+{"Timestamp":"2024-08-09T17:23:18.5604700-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5604950-04:00","Level":"Warning","MessageTemplate":"ETH,0.0090000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5605190-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5605420-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5605660-04:00","Level":"Warning","MessageTemplate":"DOT,0.0500000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5605990-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:23:18.5606230-04:00","Level":"Warning","MessageTemplate":"XRP,0.20000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5606460-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:23:18.5606680-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5606920-04:00","Level":"Warning","MessageTemplate":"AVAX,13.6547670700,0"}
+{"Timestamp":"2024-08-09T17:23:18.5607140-04:00","Level":"Warning","MessageTemplate":"LINK,126.8519354000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5607380-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5607600-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5607820-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5608040-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5608260-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5608480-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5608700-04:00","Level":"Warning","MessageTemplate":"IMX,0.4464300000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5608920-04:00","Level":"Warning","MessageTemplate":"FET,2.2491781800,0"}
+{"Timestamp":"2024-08-09T17:23:18.5609140-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5609360-04:00","Level":"Warning","MessageTemplate":"RNDR,65.7058128700,0"}
+{"Timestamp":"2024-08-09T17:23:18.5609580-04:00","Level":"Warning","MessageTemplate":"UNI,34.3746600000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5609810-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5610030-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5610250-04:00","Level":"Warning","MessageTemplate":"NEAR,0.01000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5610470-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5610690-04:00","Level":"Warning","MessageTemplate":"AKT,206.4947808800,0"}
+{"Timestamp":"2024-08-09T17:23:18.5610910-04:00","Level":"Warning","MessageTemplate":"ONDO,638.00390,0"}
+{"Timestamp":"2024-08-09T17:23:18.5611150-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5611780-04:00","Level":"Warning","MessageTemplate":"AAVE,4.0668320200,0"}
+{"Timestamp":"2024-08-09T17:23:18.5612120-04:00","Level":"Warning","MessageTemplate":"BEAM,20135.8800,0"}
+{"Timestamp":"2024-08-09T17:23:18.5612380-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5612630-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:23:18.5612870-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:23:24.2230790-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:23:24.2470420-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:25:34.4130210-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:25:34.4390260-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:25:40.0060620-04:00","Level":"Warning","MessageTemplate":"CAD,284.7896,0"}
+{"Timestamp":"2024-08-09T17:25:40.0064390-04:00","Level":"Warning","MessageTemplate":"BTC,0.0002190600,0"}
+{"Timestamp":"2024-08-09T17:25:40.0064980-04:00","Level":"Warning","MessageTemplate":"ADA,0.38836497,0"}
+{"Timestamp":"2024-08-09T17:25:40.0065320-04:00","Level":"Warning","MessageTemplate":"SOL,0.0302500000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0065690-04:00","Level":"Warning","MessageTemplate":"USDC,15.37009360,0"}
+{"Timestamp":"2024-08-09T17:25:40.0065990-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0066270-04:00","Level":"Warning","MessageTemplate":"USD,1000.3823,0"}
+{"Timestamp":"2024-08-09T17:25:40.0066550-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0066880-04:00","Level":"Warning","MessageTemplate":"ETH,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0067110-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0067470-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0067700-04:00","Level":"Warning","MessageTemplate":"DOT,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0067930-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:25:40.0068180-04:00","Level":"Warning","MessageTemplate":"XRP,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0068440-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:25:40.0068900-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0069290-04:00","Level":"Warning","MessageTemplate":"AVAX,13.6047670700,0"}
+{"Timestamp":"2024-08-09T17:25:40.0069570-04:00","Level":"Warning","MessageTemplate":"LINK,125.2919354000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0069780-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0070010-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0070250-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0070510-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0071400-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0071840-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0072100-04:00","Level":"Warning","MessageTemplate":"IMX,0.4464300000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0072400-04:00","Level":"Warning","MessageTemplate":"FET,2.2491781800,0"}
+{"Timestamp":"2024-08-09T17:25:40.0072610-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0072800-04:00","Level":"Warning","MessageTemplate":"RNDR,65.7058128700,0"}
+{"Timestamp":"2024-08-09T17:25:40.0073010-04:00","Level":"Warning","MessageTemplate":"UNI,32.4946600000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0073250-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0074150-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0074370-04:00","Level":"Warning","MessageTemplate":"NEAR,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0074600-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0074790-04:00","Level":"Warning","MessageTemplate":"AKT,206.4947808800,0"}
+{"Timestamp":"2024-08-09T17:25:40.0074970-04:00","Level":"Warning","MessageTemplate":"ONDO,637.00390,0"}
+{"Timestamp":"2024-08-09T17:25:40.0075140-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0075350-04:00","Level":"Warning","MessageTemplate":"AAVE,3.9938320200,0"}
+{"Timestamp":"2024-08-09T17:25:40.0075520-04:00","Level":"Warning","MessageTemplate":"BEAM,20135.8800,0"}
+{"Timestamp":"2024-08-09T17:25:40.0075930-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0076150-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:25:40.0076310-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8511060-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:27:46.8750220-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:27:46.8766120-04:00","Level":"Warning","MessageTemplate":"CAD,445.3576,0"}
+{"Timestamp":"2024-08-09T17:27:46.8767250-04:00","Level":"Warning","MessageTemplate":"BTC,0.0002190600,0"}
+{"Timestamp":"2024-08-09T17:27:46.8767570-04:00","Level":"Warning","MessageTemplate":"ADA,0.38836497,0"}
+{"Timestamp":"2024-08-09T17:27:46.8767840-04:00","Level":"Warning","MessageTemplate":"SOL,0.0302500000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8768100-04:00","Level":"Warning","MessageTemplate":"USDC,15.37009360,0"}
+{"Timestamp":"2024-08-09T17:27:46.8768380-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8768620-04:00","Level":"Warning","MessageTemplate":"USD,1000.3823,0"}
+{"Timestamp":"2024-08-09T17:27:46.8768870-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8769100-04:00","Level":"Warning","MessageTemplate":"ETH,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8769350-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8769580-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8769830-04:00","Level":"Warning","MessageTemplate":"DOT,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8770060-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:27:46.8770290-04:00","Level":"Warning","MessageTemplate":"XRP,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8770520-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:27:46.8770780-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8771150-04:00","Level":"Warning","MessageTemplate":"AVAX,13.6047670700,0"}
+{"Timestamp":"2024-08-09T17:27:46.8771460-04:00","Level":"Warning","MessageTemplate":"LINK,125.2919354000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8771700-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8771930-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8772160-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8772390-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8772620-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8772930-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8773170-04:00","Level":"Warning","MessageTemplate":"IMX,0.4464300000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8773400-04:00","Level":"Warning","MessageTemplate":"FET,2.2491781800,0"}
+{"Timestamp":"2024-08-09T17:27:46.8773640-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8773890-04:00","Level":"Warning","MessageTemplate":"RNDR,65.7058128700,0"}
+{"Timestamp":"2024-08-09T17:27:46.8774120-04:00","Level":"Warning","MessageTemplate":"UNI,32.4946600000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8774350-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8774580-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8774810-04:00","Level":"Warning","MessageTemplate":"NEAR,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8775050-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8775280-04:00","Level":"Warning","MessageTemplate":"AKT,206.4947808800,0"}
+{"Timestamp":"2024-08-09T17:27:46.8775510-04:00","Level":"Warning","MessageTemplate":"ONDO,637.00390,0"}
+{"Timestamp":"2024-08-09T17:27:46.8775750-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8775980-04:00","Level":"Warning","MessageTemplate":"AAVE,3.9938320200,0"}
+{"Timestamp":"2024-08-09T17:27:46.8776210-04:00","Level":"Warning","MessageTemplate":"BEAM,20135.8800,0"}
+{"Timestamp":"2024-08-09T17:27:46.8776440-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8776700-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:27:46.8776930-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9074620-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:31:25.9331680-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:31:25.9342310-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -298.0400"}
+{"Timestamp":"2024-08-09T17:31:25.9342600-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -407.6300"}
+{"Timestamp":"2024-08-09T17:31:25.9342770-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -67.2000"}
+{"Timestamp":"2024-08-09T17:31:25.9342940-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -386.7820"}
+{"Timestamp":"2024-08-09T17:31:25.9343070-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -970.9260"}
+{"Timestamp":"2024-08-09T17:31:25.9343190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1334.0080"}
+{"Timestamp":"2024-08-09T17:31:25.9343320-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1535.3880"}
+{"Timestamp":"2024-08-09T17:31:25.9343450-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -46.3000"}
+{"Timestamp":"2024-08-09T17:31:25.9343570-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -144.8200"}
+{"Timestamp":"2024-08-09T17:31:25.9343670-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1736.7680"}
+{"Timestamp":"2024-08-09T17:31:25.9344180-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -66.29470000"}
+{"Timestamp":"2024-08-09T17:31:25.9344420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -899.3280"}
+{"Timestamp":"2024-08-09T17:31:25.9344610-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1047.1080"}
+{"Timestamp":"2024-08-09T17:31:25.9344740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1145.6280"}
+{"Timestamp":"2024-08-09T17:31:25.9346550-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1084.3380"}
+{"Timestamp":"2024-08-09T17:31:25.9347030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1232.1180"}
+{"Timestamp":"2024-08-09T17:31:25.9347740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1330.6380"}
+{"Timestamp":"2024-08-09T17:31:25.9347890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1399.5980"}
+{"Timestamp":"2024-08-09T17:31:25.9348010-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1553.7461"}
+{"Timestamp":"2024-08-09T17:31:25.9348120-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -194.0800"}
+{"Timestamp":"2024-08-09T17:31:25.9348230-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1786.7142"}
+{"Timestamp":"2024-08-09T17:31:25.9348340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2263.4442"}
+{"Timestamp":"2024-08-09T17:31:25.9348900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2690.9142"}
+{"Timestamp":"2024-08-09T17:31:25.9349340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2756.7242"}
+{"Timestamp":"2024-08-09T17:31:25.9349510-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -180.16430000"}
+{"Timestamp":"2024-08-09T17:31:25.9349640-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2935.0442"}
+{"Timestamp":"2024-08-09T17:31:25.9349780-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2566.6042"}
+{"Timestamp":"2024-08-09T17:31:25.9349890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3144.9515"}
+{"Timestamp":"2024-08-09T17:31:25.9350150-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -99.0383"}
+{"Timestamp":"2024-08-09T17:31:25.9350560-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -367.0383"}
+{"Timestamp":"2024-08-09T17:31:25.9350750-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -535.7411"}
+{"Timestamp":"2024-08-09T17:31:25.9350900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1273.0315"}
+{"Timestamp":"2024-08-09T17:31:25.9351030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1470.0715"}
+{"Timestamp":"2024-08-09T17:31:25.9351150-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -1818.5915"}
+{"Timestamp":"2024-08-09T17:31:25.9351280-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2404.2665"}
+{"Timestamp":"2024-08-09T17:31:25.9351410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -2838.4615"}
+{"Timestamp":"2024-08-09T17:31:25.9351530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3036.9812"}
+{"Timestamp":"2024-08-09T17:31:25.9351640-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -194.08860000"}
+{"Timestamp":"2024-08-09T17:31:25.9351750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3252.0812"}
+{"Timestamp":"2024-08-09T17:31:25.9351840-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3402.0813"}
+{"Timestamp":"2024-08-09T17:31:25.9351950-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -361.8357"}
+{"Timestamp":"2024-08-09T17:31:25.9352070-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -512.4053"}
+{"Timestamp":"2024-08-09T17:31:25.9352360-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3489.5026"}
+{"Timestamp":"2024-08-09T17:31:25.9352460-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3643.3937"}
+{"Timestamp":"2024-08-09T17:31:25.9352560-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -620.7204"}
+{"Timestamp":"2024-08-09T17:31:25.9352670-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -670.9662"}
+{"Timestamp":"2024-08-09T17:31:25.9352770-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -736.2352"}
+{"Timestamp":"2024-08-09T17:31:25.9352890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -3844.7631"}
+{"Timestamp":"2024-08-09T17:31:25.9352990-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4043.2829"}
+{"Timestamp":"2024-08-09T17:31:25.9353090-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4341.8029"}
+{"Timestamp":"2024-08-09T17:31:25.9353190-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4641.8029"}
+{"Timestamp":"2024-08-09T17:31:25.9353300-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -660.8593"}
+{"Timestamp":"2024-08-09T17:31:25.9353390-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4841.8029"}
+{"Timestamp":"2024-08-09T17:31:25.9353490-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -772.8593"}
+{"Timestamp":"2024-08-09T17:31:25.9353600-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4991.8029"}
+{"Timestamp":"2024-08-09T17:31:25.9353700-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -847.3000"}
+{"Timestamp":"2024-08-09T17:31:25.9353800-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5069.9068"}
+{"Timestamp":"2024-08-09T17:31:25.9353920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5069.2968"}
+{"Timestamp":"2024-08-09T17:31:25.9354020-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -136.78570360"}
+{"Timestamp":"2024-08-09T17:31:25.9354290-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -194.08860000"}
+{"Timestamp":"2024-08-09T17:31:25.9354430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5109.6270"}
+{"Timestamp":"2024-08-09T17:31:25.9354590-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -856.9809"}
+{"Timestamp":"2024-08-09T17:31:25.9354850-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -933.8011"}
+{"Timestamp":"2024-08-09T17:31:25.9355050-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4973.5482"}
+{"Timestamp":"2024-08-09T17:31:25.9355210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5012.9482"}
+{"Timestamp":"2024-08-09T17:31:25.9355350-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5081.9082"}
+{"Timestamp":"2024-08-09T17:31:25.9355470-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4733.6582"}
+{"Timestamp":"2024-08-09T17:31:25.9355590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4967.1582"}
+{"Timestamp":"2024-08-09T17:31:25.9355950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5120.3582"}
+{"Timestamp":"2024-08-09T17:31:25.9356110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5159.7582"}
+{"Timestamp":"2024-08-09T17:31:25.9356250-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5143.2082"}
+{"Timestamp":"2024-08-09T17:31:25.9356420-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5182.6082"}
+{"Timestamp":"2024-08-09T17:31:25.9356530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5222.0082"}
+{"Timestamp":"2024-08-09T17:31:25.9356640-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5290.9682"}
+{"Timestamp":"2024-08-09T17:31:25.9356740-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5399.8082"}
+{"Timestamp":"2024-08-09T17:31:25.9356840-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5513.4182"}
+{"Timestamp":"2024-08-09T17:31:25.9356950-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5674.4582"}
+{"Timestamp":"2024-08-09T17:31:25.9357050-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -826.0433"}
+{"Timestamp":"2024-08-09T17:31:25.9357150-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -875.3033"}
+{"Timestamp":"2024-08-09T17:31:25.9357260-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5052.4182"}
+{"Timestamp":"2024-08-09T17:31:25.9357370-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -944.2733"}
+{"Timestamp":"2024-08-09T17:31:25.9357460-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5416.9082"}
+{"Timestamp":"2024-08-09T17:31:25.9357580-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1018.1633"}
+{"Timestamp":"2024-08-09T17:31:25.9357770-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5889.8082"}
+{"Timestamp":"2024-08-09T17:31:25.9358130-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6510.4982"}
+{"Timestamp":"2024-08-09T17:31:25.9358290-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -4816.0282"}
+{"Timestamp":"2024-08-09T17:31:25.9358400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5357.8982"}
+{"Timestamp":"2024-08-09T17:31:25.9358520-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5949.0282"}
+{"Timestamp":"2024-08-09T17:31:25.9358620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6096.8082"}
+{"Timestamp":"2024-08-09T17:31:25.9358720-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6195.3282"}
+{"Timestamp":"2024-08-09T17:31:25.9358830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6343.1082"}
+{"Timestamp":"2024-08-09T17:31:25.9358970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6490.8882"}
+{"Timestamp":"2024-08-09T17:31:25.9359060-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6638.6682"}
+{"Timestamp":"2024-08-09T17:31:25.9359160-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6786.4482"}
+{"Timestamp":"2024-08-09T17:31:25.9359270-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6934.2282"}
+{"Timestamp":"2024-08-09T17:31:25.9359370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7131.2682"}
+{"Timestamp":"2024-08-09T17:31:25.9359590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7328.3082"}
+{"Timestamp":"2024-08-09T17:31:25.9359710-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7525.3482"}
+{"Timestamp":"2024-08-09T17:31:25.9359810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7722.3882"}
+{"Timestamp":"2024-08-09T17:31:25.9359910-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7919.4282"}
+{"Timestamp":"2024-08-09T17:31:25.9360030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8359.3082"}
+{"Timestamp":"2024-08-09T17:31:25.9360130-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -5814.1182"}
+{"Timestamp":"2024-08-09T17:31:25.9360230-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6011.1582"}
+{"Timestamp":"2024-08-09T17:31:25.9360330-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6355.9882"}
+{"Timestamp":"2024-08-09T17:31:25.9360430-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -6700.8182"}
+{"Timestamp":"2024-08-09T17:31:25.9360680-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7045.6482"}
+{"Timestamp":"2024-08-09T17:31:25.9360900-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7390.4782"}
+{"Timestamp":"2024-08-09T17:31:25.9361210-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -7735.3082"}
+{"Timestamp":"2024-08-09T17:31:25.9361310-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -8966.8382"}
+{"Timestamp":"2024-08-09T17:31:25.9361410-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -10149.0982"}
+{"Timestamp":"2024-08-09T17:31:25.9361510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -10530.6682"}
+{"Timestamp":"2024-08-09T17:31:25.9361610-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -10813.7182"}
+{"Timestamp":"2024-08-09T17:31:25.9361720-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11010.7582"}
+{"Timestamp":"2024-08-09T17:31:25.9361810-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11207.7982"}
+{"Timestamp":"2024-08-09T17:31:25.9361910-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11404.8382"}
+{"Timestamp":"2024-08-09T17:31:25.9362020-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11550.4182"}
+{"Timestamp":"2024-08-09T17:31:25.9362120-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -9853.7482"}
+{"Timestamp":"2024-08-09T17:31:25.9362220-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -10592.6682"}
+{"Timestamp":"2024-08-09T17:31:25.9362340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11331.5882"}
+{"Timestamp":"2024-08-09T17:31:25.9362440-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -11774.9382"}
+{"Timestamp":"2024-08-09T17:31:25.9362550-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12750.3382"}
+{"Timestamp":"2024-08-09T17:31:25.9362650-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -194.08860000"}
+{"Timestamp":"2024-08-09T17:31:25.9362860-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1052.3432"}
+{"Timestamp":"2024-08-09T17:31:25.9363110-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13224.7582"}
+{"Timestamp":"2024-08-09T17:31:25.9363400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13417.3382"}
+{"Timestamp":"2024-08-09T17:31:25.9363630-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13715.3982"}
+{"Timestamp":"2024-08-09T17:31:25.9363770-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -194.08860000"}
+{"Timestamp":"2024-08-09T17:31:25.9363890-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13663.7382"}
+{"Timestamp":"2024-08-09T17:31:25.9364010-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14153.8982"}
+{"Timestamp":"2024-08-09T17:31:25.9364120-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -194.08860000"}
+{"Timestamp":"2024-08-09T17:31:25.9364260-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13997.7782"}
+{"Timestamp":"2024-08-09T17:31:25.9364370-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14293.3382"}
+{"Timestamp":"2024-08-09T17:31:25.9364470-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14386.9582"}
+{"Timestamp":"2024-08-09T17:31:25.9364590-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -194.08860000"}
+{"Timestamp":"2024-08-09T17:31:25.9364690-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1128.8432"}
+{"Timestamp":"2024-08-09T17:31:25.9364800-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1316.0332"}
+{"Timestamp":"2024-08-09T17:31:25.9364920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15076.6082"}
+{"Timestamp":"2024-08-09T17:31:25.9365030-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15366.7682"}
+{"Timestamp":"2024-08-09T17:31:25.9365140-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14960.4182"}
+{"Timestamp":"2024-08-09T17:31:25.9365250-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15288.4882"}
+{"Timestamp":"2024-08-09T17:31:25.9365400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12532.9682"}
+{"Timestamp":"2024-08-09T17:31:25.9365510-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12730.0082"}
+{"Timestamp":"2024-08-09T17:31:25.9365620-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -12927.0482"}
+{"Timestamp":"2024-08-09T17:31:25.9365730-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13124.0882"}
+{"Timestamp":"2024-08-09T17:31:25.9365830-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13321.1282"}
+{"Timestamp":"2024-08-09T17:31:25.9378750-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13518.1682"}
+{"Timestamp":"2024-08-09T17:31:25.9391700-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13715.2082"}
+{"Timestamp":"2024-08-09T17:31:25.9392590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -13912.2482"}
+{"Timestamp":"2024-08-09T17:31:25.9392920-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14257.0782"}
+{"Timestamp":"2024-08-09T17:31:25.9393240-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14601.9082"}
+{"Timestamp":"2024-08-09T17:31:25.9396180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -14798.9482"}
+{"Timestamp":"2024-08-09T17:31:25.9405490-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15242.2982"}
+{"Timestamp":"2024-08-09T17:31:25.9414180-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -15784.1682"}
+{"Timestamp":"2024-08-09T17:31:25.9415250-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -16473.8182"}
+{"Timestamp":"2024-08-09T17:31:25.9415530-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17089.5782"}
+{"Timestamp":"2024-08-09T17:31:25.9415650-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17434.3982"}
+{"Timestamp":"2024-08-09T17:31:25.9415760-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -17877.7382"}
+{"Timestamp":"2024-08-09T17:31:25.9426590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18197.9282"}
+{"Timestamp":"2024-08-09T17:31:25.9427790-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18568.3482"}
+{"Timestamp":"2024-08-09T17:31:25.9428240-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -94.08860000"}
+{"Timestamp":"2024-08-09T17:31:25.9428570-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -194.08860000"}
+{"Timestamp":"2024-08-09T17:31:25.9429720-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -18939.8882"}
+{"Timestamp":"2024-08-09T17:31:25.9430500-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1419.7732"}
+{"Timestamp":"2024-08-09T17:31:25.9431150-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1425.0028"}
+{"Timestamp":"2024-08-09T17:31:25.9431620-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -192.75160000"}
+{"Timestamp":"2024-08-09T17:31:25.9431970-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19024.8282"}
+{"Timestamp":"2024-08-09T17:31:25.9432260-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -192.75160000"}
+{"Timestamp":"2024-08-09T17:31:25.9432580-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.0071674700"}
+{"Timestamp":"2024-08-09T17:31:25.9432900-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1241.0280"}
+{"Timestamp":"2024-08-09T17:31:25.9433190-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1371.0280"}
+{"Timestamp":"2024-08-09T17:31:25.9433460-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1501.0280"}
+{"Timestamp":"2024-08-09T17:31:25.9433710-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1619.2228"}
+{"Timestamp":"2024-08-09T17:31:25.9433980-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.0143025900"}
+{"Timestamp":"2024-08-09T17:31:25.9434240-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -728.0016"}
+{"Timestamp":"2024-08-09T17:31:25.9434490-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -978.0016"}
+{"Timestamp":"2024-08-09T17:31:25.9435060-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1278.0016"}
+{"Timestamp":"2024-08-09T17:31:25.9435340-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1528.0016"}
+{"Timestamp":"2024-08-09T17:31:25.9436270-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1778.0016"}
+{"Timestamp":"2024-08-09T17:31:25.9436550-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2028.0016"}
+{"Timestamp":"2024-08-09T17:31:25.9436810-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2253.0017"}
+{"Timestamp":"2024-08-09T17:31:25.9437060-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2490.7229"}
+{"Timestamp":"2024-08-09T17:31:25.9437340-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19431.7882"}
+{"Timestamp":"2024-08-09T17:31:25.9437590-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -19801.2482"}
+{"Timestamp":"2024-08-09T17:31:25.9437940-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20293.8682"}
+{"Timestamp":"2024-08-09T17:31:25.9438220-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20610.6282"}
+{"Timestamp":"2024-08-09T17:31:25.9438580-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -190.03380640"}
+{"Timestamp":"2024-08-09T17:31:25.9438860-04:00","Level":"Warning","MessageTemplate":"BTC Balance is under zero: -0.0143025900"}
+{"Timestamp":"2024-08-09T17:31:25.9439140-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -181.67420640"}
+{"Timestamp":"2024-08-09T17:31:25.9439400-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20015.7582"}
+{"Timestamp":"2024-08-09T17:31:25.9439650-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -20839.0682"}
+{"Timestamp":"2024-08-09T17:31:25.9439880-04:00","Level":"Warning","MessageTemplate":"USDC Balance is under zero: -181.67420640"}
+{"Timestamp":"2024-08-09T17:31:25.9440130-04:00","Level":"Warning","MessageTemplate":"CAD Balance is under zero: -21494.5282"}
+{"Timestamp":"2024-08-09T17:31:25.9440740-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1910.9329"}
+{"Timestamp":"2024-08-09T17:31:25.9441010-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2123.6929"}
+{"Timestamp":"2024-08-09T17:31:25.9442600-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2147.8431"}
+{"Timestamp":"2024-08-09T17:31:25.9442980-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2212.6940"}
+{"Timestamp":"2024-08-09T17:31:25.9443240-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2325.8875"}
+{"Timestamp":"2024-08-09T17:31:25.9443500-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2435.2575"}
+{"Timestamp":"2024-08-09T17:31:25.9443780-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -2611.1475"}
+{"Timestamp":"2024-08-09T17:31:25.9444820-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -825.3739"}
+{"Timestamp":"2024-08-09T17:31:25.9445080-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1061.3739"}
+{"Timestamp":"2024-08-09T17:31:25.9445330-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1259.3739"}
+{"Timestamp":"2024-08-09T17:31:25.9445610-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -1720.6239"}
+{"Timestamp":"2024-08-09T17:31:25.9449330-04:00","Level":"Warning","MessageTemplate":"CAD,-21656.3782,0"}
+{"Timestamp":"2024-08-09T17:31:25.9451950-04:00","Level":"Warning","MessageTemplate":"BTC,-0.0143025900,0"}
+{"Timestamp":"2024-08-09T17:31:25.9452590-04:00","Level":"Warning","MessageTemplate":"ADA,0.38836497,0"}
+{"Timestamp":"2024-08-09T17:31:25.9453050-04:00","Level":"Warning","MessageTemplate":"SOL,0.0302500000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9453730-04:00","Level":"Warning","MessageTemplate":"USDC,-181.67420640,0"}
+{"Timestamp":"2024-08-09T17:31:25.9454560-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9454990-04:00","Level":"Warning","MessageTemplate":"USD,-1720.6239,0"}
+{"Timestamp":"2024-08-09T17:31:25.9455330-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9455590-04:00","Level":"Warning","MessageTemplate":"ETH,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9455840-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9456520-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9457160-04:00","Level":"Warning","MessageTemplate":"DOT,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9457680-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:31:25.9457940-04:00","Level":"Warning","MessageTemplate":"XRP,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9461900-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:31:25.9462840-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9463120-04:00","Level":"Warning","MessageTemplate":"AVAX,13.6047670700,0"}
+{"Timestamp":"2024-08-09T17:31:25.9463360-04:00","Level":"Warning","MessageTemplate":"LINK,125.2919354000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9463600-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9463840-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9464060-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9464280-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9464480-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9464770-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9464980-04:00","Level":"Warning","MessageTemplate":"IMX,0.4464300000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9465190-04:00","Level":"Warning","MessageTemplate":"FET,2.2491781800,0"}
+{"Timestamp":"2024-08-09T17:31:25.9465410-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9465630-04:00","Level":"Warning","MessageTemplate":"RNDR,65.7058128700,0"}
+{"Timestamp":"2024-08-09T17:31:25.9465840-04:00","Level":"Warning","MessageTemplate":"UNI,32.4946600000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9466260-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9466600-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9466840-04:00","Level":"Warning","MessageTemplate":"NEAR,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9467080-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9467300-04:00","Level":"Warning","MessageTemplate":"AKT,206.4947808800,0"}
+{"Timestamp":"2024-08-09T17:31:25.9467530-04:00","Level":"Warning","MessageTemplate":"ONDO,637.00390,0"}
+{"Timestamp":"2024-08-09T17:31:25.9467740-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9467960-04:00","Level":"Warning","MessageTemplate":"AAVE,3.9938320200,0"}
+{"Timestamp":"2024-08-09T17:31:25.9468180-04:00","Level":"Warning","MessageTemplate":"BEAM,20135.8800,0"}
+{"Timestamp":"2024-08-09T17:31:25.9469460-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9469870-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:31:25.9470100-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.7962910-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:32:33.8196800-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:32:33.8212670-04:00","Level":"Warning","MessageTemplate":"CAD,0.0080,0"}
+{"Timestamp":"2024-08-09T17:32:33.8213230-04:00","Level":"Warning","MessageTemplate":"BTC,0.0000012300,0"}
+{"Timestamp":"2024-08-09T17:32:33.8213560-04:00","Level":"Warning","MessageTemplate":"ADA,0.38836497,0"}
+{"Timestamp":"2024-08-09T17:32:33.8213830-04:00","Level":"Warning","MessageTemplate":"SOL,0.0302500000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8214080-04:00","Level":"Warning","MessageTemplate":"USDC,12.41439360,0"}
+{"Timestamp":"2024-08-09T17:32:33.8214320-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8214580-04:00","Level":"Warning","MessageTemplate":"USD,981.2231,0"}
+{"Timestamp":"2024-08-09T17:32:33.8214820-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8215050-04:00","Level":"Warning","MessageTemplate":"ETH,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8215420-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8215660-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8215900-04:00","Level":"Warning","MessageTemplate":"DOT,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8216120-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:32:33.8216340-04:00","Level":"Warning","MessageTemplate":"XRP,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8216560-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:32:33.8216790-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8217030-04:00","Level":"Warning","MessageTemplate":"AVAX,13.6047670700,0"}
+{"Timestamp":"2024-08-09T17:32:33.8217280-04:00","Level":"Warning","MessageTemplate":"LINK,125.2919354000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8217510-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8217730-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8217950-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8218170-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8218390-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8218600-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8218810-04:00","Level":"Warning","MessageTemplate":"IMX,0.4464300000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8219020-04:00","Level":"Warning","MessageTemplate":"FET,2.2491781800,0"}
+{"Timestamp":"2024-08-09T17:32:33.8219230-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8219440-04:00","Level":"Warning","MessageTemplate":"RNDR,65.7058128700,0"}
+{"Timestamp":"2024-08-09T17:32:33.8219680-04:00","Level":"Warning","MessageTemplate":"UNI,32.4946600000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8219900-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8220120-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8220340-04:00","Level":"Warning","MessageTemplate":"NEAR,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8220560-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8220770-04:00","Level":"Warning","MessageTemplate":"AKT,206.4947808800,0"}
+{"Timestamp":"2024-08-09T17:32:33.8220990-04:00","Level":"Warning","MessageTemplate":"ONDO,637.00390,0"}
+{"Timestamp":"2024-08-09T17:32:33.8221210-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8221420-04:00","Level":"Warning","MessageTemplate":"AAVE,3.9938320200,0"}
+{"Timestamp":"2024-08-09T17:32:33.8221640-04:00","Level":"Warning","MessageTemplate":"BEAM,20135.8800,0"}
+{"Timestamp":"2024-08-09T17:32:33.8221860-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8222080-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:32:33.8222310-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:35:02.8453640-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:35:02.8691900-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:45:01.8424840-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:45:01.8666450-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:45:01.8681030-04:00","Level":"Warning","MessageTemplate":"CAD,8.3525,0"}
+{"Timestamp":"2024-08-09T17:45:01.8681510-04:00","Level":"Warning","MessageTemplate":"BTC,0.0000012300,0"}
+{"Timestamp":"2024-08-09T17:45:01.8681830-04:00","Level":"Warning","MessageTemplate":"ADA,0.38836497,0"}
+{"Timestamp":"2024-08-09T17:45:01.8682110-04:00","Level":"Warning","MessageTemplate":"SOL,0.0302500000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8682370-04:00","Level":"Warning","MessageTemplate":"USDC,12.41439360,0"}
+{"Timestamp":"2024-08-09T17:45:01.8682610-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8682860-04:00","Level":"Warning","MessageTemplate":"USD,1009.6206,0"}
+{"Timestamp":"2024-08-09T17:45:01.8683100-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8683340-04:00","Level":"Warning","MessageTemplate":"ETH,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8683590-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8683820-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8684060-04:00","Level":"Warning","MessageTemplate":"DOT,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8684300-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:45:01.8684550-04:00","Level":"Warning","MessageTemplate":"XRP,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8684790-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:45:01.8685020-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8685280-04:00","Level":"Warning","MessageTemplate":"AVAX,13.6047670700,0"}
+{"Timestamp":"2024-08-09T17:45:01.8685520-04:00","Level":"Warning","MessageTemplate":"LINK,125.2919354000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8685760-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8686000-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8686230-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8686460-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8686710-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8686950-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8687180-04:00","Level":"Warning","MessageTemplate":"IMX,0.4464300000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8687440-04:00","Level":"Warning","MessageTemplate":"FET,2.2491781800,0"}
+{"Timestamp":"2024-08-09T17:45:01.8687670-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8687910-04:00","Level":"Warning","MessageTemplate":"RNDR,65.7058128700,0"}
+{"Timestamp":"2024-08-09T17:45:01.8688140-04:00","Level":"Warning","MessageTemplate":"UNI,32.4946600000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8688380-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8688610-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8688850-04:00","Level":"Warning","MessageTemplate":"NEAR,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8689080-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8689320-04:00","Level":"Warning","MessageTemplate":"AKT,206.4947808800,0"}
+{"Timestamp":"2024-08-09T17:45:01.8689550-04:00","Level":"Warning","MessageTemplate":"ONDO,637.00390,0"}
+{"Timestamp":"2024-08-09T17:45:01.8689800-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8690030-04:00","Level":"Warning","MessageTemplate":"AAVE,3.9938320200,0"}
+{"Timestamp":"2024-08-09T17:45:01.8690260-04:00","Level":"Warning","MessageTemplate":"BEAM,20135.8800,0"}
+{"Timestamp":"2024-08-09T17:45:01.8690490-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8690720-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:45:01.8690950-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1233910-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T17:49:04.1498630-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T17:49:04.1731410-04:00","Level":"Warning","MessageTemplate":"CAD,8.3525,0"}
+{"Timestamp":"2024-08-09T17:49:04.1731850-04:00","Level":"Warning","MessageTemplate":"BTC,0.0000012300,0"}
+{"Timestamp":"2024-08-09T17:49:04.1732110-04:00","Level":"Warning","MessageTemplate":"ADA,0.38836497,0"}
+{"Timestamp":"2024-08-09T17:49:04.1732360-04:00","Level":"Warning","MessageTemplate":"SOL,0.0302500000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1732590-04:00","Level":"Warning","MessageTemplate":"USDC,12.41439360,0"}
+{"Timestamp":"2024-08-09T17:49:04.1732820-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1733050-04:00","Level":"Warning","MessageTemplate":"USD,1009.6206,0"}
+{"Timestamp":"2024-08-09T17:49:04.1733280-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1733510-04:00","Level":"Warning","MessageTemplate":"ETH,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1733760-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1733990-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1734220-04:00","Level":"Warning","MessageTemplate":"DOT,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1734440-04:00","Level":"Warning","MessageTemplate":"STX,1.02079,0"}
+{"Timestamp":"2024-08-09T17:49:04.1736050-04:00","Level":"Warning","MessageTemplate":"XRP,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1737250-04:00","Level":"Warning","MessageTemplate":"USDT,0.05512049,0"}
+{"Timestamp":"2024-08-09T17:49:04.1737820-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1738610-04:00","Level":"Warning","MessageTemplate":"AVAX,13.6047670700,0"}
+{"Timestamp":"2024-08-09T17:49:04.1739590-04:00","Level":"Warning","MessageTemplate":"LINK,125.2919354000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1740160-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1740660-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1741170-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1741800-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1750100-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1750440-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1750690-04:00","Level":"Warning","MessageTemplate":"IMX,0.4464300000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1750930-04:00","Level":"Warning","MessageTemplate":"FET,2.2491781800,0"}
+{"Timestamp":"2024-08-09T17:49:04.1751580-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1752030-04:00","Level":"Warning","MessageTemplate":"RNDR,65.7058128700,0"}
+{"Timestamp":"2024-08-09T17:49:04.1753680-04:00","Level":"Warning","MessageTemplate":"UNI,32.4946600000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1754640-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1755280-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1755790-04:00","Level":"Warning","MessageTemplate":"NEAR,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1756510-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1756790-04:00","Level":"Warning","MessageTemplate":"AKT,206.4947808800,0"}
+{"Timestamp":"2024-08-09T17:49:04.1757060-04:00","Level":"Warning","MessageTemplate":"ONDO,637.00390,0"}
+{"Timestamp":"2024-08-09T17:49:04.1757370-04:00","Level":"Warning","MessageTemplate":"INJ,0.0219865000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1757610-04:00","Level":"Warning","MessageTemplate":"AAVE,3.9938320200,0"}
+{"Timestamp":"2024-08-09T17:49:04.1757940-04:00","Level":"Warning","MessageTemplate":"BEAM,20135.8800,0"}
+{"Timestamp":"2024-08-09T17:49:04.1758170-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1758480-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T17:49:04.1758710-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:06:27.4915470-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T18:06:27.5184080-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T18:07:55.4465140-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T18:07:55.4718710-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T18:12:42.9070600-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T18:12:42.9330340-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T18:13:50.4535540-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T18:13:50.4785440-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T18:17:05.7500600-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T18:17:05.7762580-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T18:47:21.6253950-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T18:47:21.6669630-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T18:48:52.9118340-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T18:48:52.9475050-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T18:58:34.8273110-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T18:58:34.8627170-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T18:58:34.8707200-04:00","Level":"Warning","MessageTemplate":"CAD,0.0080,0"}
+{"Timestamp":"2024-08-09T18:58:34.8707460-04:00","Level":"Warning","MessageTemplate":"BTC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8707580-04:00","Level":"Warning","MessageTemplate":"ADA,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8707680-04:00","Level":"Warning","MessageTemplate":"SOL,0.0302500000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8707800-04:00","Level":"Warning","MessageTemplate":"USDC,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8707900-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8707990-04:00","Level":"Warning","MessageTemplate":"USD,980.2790,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708080-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708180-04:00","Level":"Warning","MessageTemplate":"ETH,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708260-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708360-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708470-04:00","Level":"Warning","MessageTemplate":"DOT,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708570-04:00","Level":"Warning","MessageTemplate":"STX,0.00000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708660-04:00","Level":"Warning","MessageTemplate":"XRP,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708750-04:00","Level":"Warning","MessageTemplate":"USDT,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8708970-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8709070-04:00","Level":"Warning","MessageTemplate":"AVAX,13.5653481400,0"}
+{"Timestamp":"2024-08-09T18:58:34.8709160-04:00","Level":"Warning","MessageTemplate":"LINK,125.2191499800,0"}
+{"Timestamp":"2024-08-09T18:58:34.8709250-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8709640-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8709810-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8709930-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8710040-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8710150-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8710250-04:00","Level":"Warning","MessageTemplate":"IMX,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8710350-04:00","Level":"Warning","MessageTemplate":"FET,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8710460-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8710720-04:00","Level":"Warning","MessageTemplate":"RNDR,64.9875728700,0"}
+{"Timestamp":"2024-08-09T18:58:34.8710940-04:00","Level":"Warning","MessageTemplate":"UNI,32.4946600000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8711040-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8711380-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8711710-04:00","Level":"Warning","MessageTemplate":"NEAR,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8711850-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8711970-04:00","Level":"Warning","MessageTemplate":"AKT,204.4875000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8712070-04:00","Level":"Warning","MessageTemplate":"ONDO,637.00390,0"}
+{"Timestamp":"2024-08-09T18:58:34.8712200-04:00","Level":"Warning","MessageTemplate":"INJ,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8712300-04:00","Level":"Warning","MessageTemplate":"AAVE,3.9915406200,0"}
+{"Timestamp":"2024-08-09T18:58:34.8712390-04:00","Level":"Warning","MessageTemplate":"BEAM,19950.0000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8712490-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8712590-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T18:58:34.8712680-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7191570-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T19:05:05.7430970-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T19:05:05.7446050-04:00","Level":"Warning","MessageTemplate":"CAD,0.0080,0"}
+{"Timestamp":"2024-08-09T19:05:05.7446530-04:00","Level":"Warning","MessageTemplate":"BTC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7446830-04:00","Level":"Warning","MessageTemplate":"ADA,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7447100-04:00","Level":"Warning","MessageTemplate":"SOL,0.0302500000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7447370-04:00","Level":"Warning","MessageTemplate":"USDC,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7447620-04:00","Level":"Warning","MessageTemplate":"KEY,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7447860-04:00","Level":"Warning","MessageTemplate":"USD,980.2790,0"}
+{"Timestamp":"2024-08-09T19:05:05.7448100-04:00","Level":"Warning","MessageTemplate":"SHIB,0.00000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7448330-04:00","Level":"Warning","MessageTemplate":"ETH,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7448570-04:00","Level":"Warning","MessageTemplate":"DOGE,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7448810-04:00","Level":"Warning","MessageTemplate":"FIL,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7449040-04:00","Level":"Warning","MessageTemplate":"DOT,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7449270-04:00","Level":"Warning","MessageTemplate":"STX,0.00000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7449500-04:00","Level":"Warning","MessageTemplate":"XRP,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7449730-04:00","Level":"Warning","MessageTemplate":"USDT,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7449960-04:00","Level":"Warning","MessageTemplate":"TIA,0.000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7450230-04:00","Level":"Warning","MessageTemplate":"AVAX,13.5653481400,0"}
+{"Timestamp":"2024-08-09T19:05:05.7450460-04:00","Level":"Warning","MessageTemplate":"LINK,125.2191499800,0"}
+{"Timestamp":"2024-08-09T19:05:05.7450690-04:00","Level":"Warning","MessageTemplate":"XLM,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7450920-04:00","Level":"Warning","MessageTemplate":"SEI,0.0000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7451150-04:00","Level":"Warning","MessageTemplate":"ALGO,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7451380-04:00","Level":"Warning","MessageTemplate":"ATOM,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7451610-04:00","Level":"Warning","MessageTemplate":"ARB,0.00000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7451840-04:00","Level":"Warning","MessageTemplate":"ENS,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7452060-04:00","Level":"Warning","MessageTemplate":"IMX,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7452290-04:00","Level":"Warning","MessageTemplate":"FET,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7452540-04:00","Level":"Warning","MessageTemplate":"GRT,950.1584900000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7452780-04:00","Level":"Warning","MessageTemplate":"RNDR,64.9875728700,0"}
+{"Timestamp":"2024-08-09T19:05:05.7453010-04:00","Level":"Warning","MessageTemplate":"UNI,32.4946600000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7453240-04:00","Level":"Warning","MessageTemplate":"APT,0.000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7453470-04:00","Level":"Warning","MessageTemplate":"STRK,0.00000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7453700-04:00","Level":"Warning","MessageTemplate":"NEAR,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7453930-04:00","Level":"Warning","MessageTemplate":"FTM,0.00000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7454160-04:00","Level":"Warning","MessageTemplate":"AKT,204.4875000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7454390-04:00","Level":"Warning","MessageTemplate":"ONDO,637.00390,0"}
+{"Timestamp":"2024-08-09T19:05:05.7454620-04:00","Level":"Warning","MessageTemplate":"INJ,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7454850-04:00","Level":"Warning","MessageTemplate":"AAVE,3.9915406200,0"}
+{"Timestamp":"2024-08-09T19:05:05.7455080-04:00","Level":"Warning","MessageTemplate":"BEAM,19950.0000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7455330-04:00","Level":"Warning","MessageTemplate":"CFG,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7455570-04:00","Level":"Warning","MessageTemplate":"RLC,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:05:05.7455800-04:00","Level":"Warning","MessageTemplate":"MINA,0.0000000000,0"}
+{"Timestamp":"2024-08-09T19:13:57.0636430-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T19:13:57.0956490-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T19:52:21.6486450-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T19:52:21.6780890-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T19:52:21.6793480-04:00","Level":"Error","MessageTemplate":"Balances do not match"}
+{"Timestamp":"2024-08-09T19:54:51.4820850-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T19:54:51.5072860-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T19:54:51.5085650-04:00","Level":"Error","MessageTemplate":"Balances do not match"}
+{"Timestamp":"2024-08-09T19:56:21.4323670-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T19:56:21.4656490-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T19:57:08.2381470-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T19:57:08.2642210-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T19:58:47.2065270-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T19:58:47.2307770-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T19:59:49.9799850-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T19:59:50.0053740-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:00:17.9120100-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:00:17.9360490-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:01:37.5363990-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:01:37.5612810-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:02:24.4131540-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:02:24.4371590-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:07:48.3207930-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:07:48.3461590-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:16:11.6093690-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:16:11.6334940-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:17:05.6345430-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:17:05.6595570-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:21:05.5792030-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:21:05.6052810-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:21:43.9731820-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:21:43.9973020-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:32:23.7547990-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:32:23.7788850-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:32:36.8990630-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:32:36.9241760-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:39:06.3753520-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:39:06.4039830-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:52:36.2789450-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:52:36.3045900-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:52:49.1320630-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:52:49.1563070-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T20:56:32.8038930-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T20:56:32.8291880-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-09T21:00:40.4047440-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-09T21:00:40.4300030-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:00:50.8334490-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:00:50.8592420-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:01:26.3753740-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:01:26.4000810-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:02:25.7977220-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:02:25.8226770-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:32:46.3368140-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:32:46.3646200-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:35:17.7803320-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:35:17.8124110-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:35:58.0677540-04:00","Level":"Warning","MessageTemplate":"USD Balance is under zero: -440.71428571428571428571428571"}
+{"Timestamp":"2024-08-10T09:54:06.5646030-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:54:06.5888330-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:54:06.5909770-04:00","Level":"Error","MessageTemplate":"Balances do not match"}
+{"Timestamp":"2024-08-10T09:54:31.8352720-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:54:31.8627140-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:55:45.5865050-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:55:45.6131010-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:56:53.6099090-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:56:53.6343830-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:58:12.3978180-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:58:12.4238950-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T09:58:51.9221710-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T09:58:51.9459610-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:00:08.4176510-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:00:08.4428870-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:24:48.6671120-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:24:48.6916850-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:40:44.6245230-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:40:44.6646510-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:45:52.5899270-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:45:52.6263600-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:48:07.7839400-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:48:07.8237300-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:51:26.9001470-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:51:26.9390370-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:52:38.5688120-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:52:38.5950330-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:55:17.9242800-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:55:17.9501790-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T10:57:18.1417840-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T10:57:18.1710360-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:00:35.5204760-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:00:35.5563720-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:23:54.9120980-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:23:54.9503740-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:25:23.3044680-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:25:23.3374600-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:27:40.3020970-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:27:40.3295590-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:28:17.6584430-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:28:17.6841410-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:30:50.2732030-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:30:50.2974180-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:34:34.9745050-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:34:35.0013540-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:35:38.4142540-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:35:38.4398280-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:36:17.7770150-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:36:17.8029300-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:38:07.0145510-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:38:07.0386770-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:38:30.3565240-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:38:30.3816000-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-10T11:40:24.4354820-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-10T11:40:24.4597070-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
