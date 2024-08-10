@@ -1,6 +1,7 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Portfolio.Shared;
 using Serilog;
 
 namespace Portfolio.Kraken
@@ -9,7 +10,6 @@ namespace Portfolio.Kraken
     {
         private IEnumerable<string>? _refidsToIgnore = new List<string>();
         private string _filename;
-        private object t;
 
         public KrakenCsvParser(string filename, IEnumerable<string>? ignoreRefIds = null)
         {
@@ -17,12 +17,12 @@ namespace Portfolio.Kraken
             _refidsToIgnore = ignoreRefIds;
         }
 
-        public IEnumerable<CryptoCurrencyTransaction> ExtractTransactions()
+        public IEnumerable<ICryptoCurrencyTransaction> ExtractTransactions()
         {
             var csvLines = ReadCsvFile();
 
             var rawLedger = csvLines.Where(x => _refidsToIgnore == null || !_refidsToIgnore.Any() || !_refidsToIgnore.Contains(x.ReferenceId)).OrderBy(x => x.Date).ToList();
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
 
             // Trades
             var trades = ProcessTrades(rawLedger);
@@ -45,7 +45,7 @@ namespace Portfolio.Kraken
             transactions.AddRange(withdrawals);
 
             var notProcessed = rawLedger.Select(t => t.ReferenceId).Except(processedRefIds);
-            foreach(var tx in notProcessed)
+            foreach (var tx in notProcessed)
             {
                 Log.Warning($"Unprocessed transaction with refId: {tx}");
             }
@@ -69,9 +69,9 @@ namespace Portfolio.Kraken
             }
         }
 
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<KrakenCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var processedRefIds = new HashSet<string>();
             var withdrawals = rawLedger.Where(x => x.Type == "withdrawal");
 
@@ -84,21 +84,27 @@ namespace Portfolio.Kraken
 
             foreach (var withdraw in withdrawals)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateWithdrawal(
+                var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
                     date: withdraw.Date,
-                    sentAmount: withdraw.Amount.ToAbsoluteAmountMoney(),
+                    amount: withdraw.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
                     "kraken",
-                    transactionIds: [withdraw.ReferenceId]
-                    ));
+                    transactionIds: [withdraw.ReferenceId]);
+
+                if (withdrawResult.IsFailure)
+                    throw new ArgumentException(withdrawResult.Error);
+
+                withdrawResult.Value.State = new KrakenCsvEntry[] { withdraw };
+
+                transactions.Add(withdrawResult.Value);
             }
 
             return transactions;
         }
 
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessDeposits(IEnumerable<KrakenCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessDeposits(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var deposits = rawLedger.Where(x => x.Type == "deposit");
 
             // Ensure data is valid
@@ -110,13 +116,20 @@ namespace Portfolio.Kraken
 
             foreach (var deposit in deposits)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateDeposit(
+                var depositResult = CryptoCurrencyDepositTransaction.Create(
                     date: deposit.Date,
                     receivedAmount: deposit.Amount.ToAbsoluteAmountMoney().Subtract(deposit.Fee.ToAbsoluteAmountMoney()),
                     feeAmount: deposit.Fee.ToAbsoluteAmountMoney(),
                     "kraken",
-                    transactionIds: [deposit.ReferenceId]
-                    ));
+                    transactionIds: [deposit.ReferenceId]);
+
+                if (depositResult.IsFailure)
+                    throw new ArgumentException(depositResult.Error);
+
+                depositResult.Value.State = new KrakenCsvEntry[] { deposit };
+
+
+                transactions.Add(depositResult.Value);
             }
 
             return transactions;
@@ -158,45 +171,55 @@ namespace Portfolio.Kraken
         /// <param name="rawLedger"></param>
         /// <returns></returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessTrades(IEnumerable<KrakenCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessTrades(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var trades = new List<CryptoCurrencyTransaction>();
+            var trades = new List<ICryptoCurrencyTransaction>();
             var processedRefIds = new HashSet<string>();
             var txGroupsByRefid = rawLedger.GroupBy(x => x.ReferenceId).Where(group => group.Count() > 1);
             foreach (var group in txGroupsByRefid)
             {
 
-                if(group.Key == "TS5PSRF-EJ4SC-FQMLN2")
-;
+                if (group.Key == "TS5PSRF-EJ4SC-FQMLN2")
+                    ;
 
                 var receiveTx = group.Single(l => l.Amount.Amount > 0 && (l.Type == "receive" || l.Type == "trade"));
                 if (group.Count() > 2)
                 {
-                    // TODO: Log
                     // Kraken sometimes offer to convert small amounts to fiat currency.
                     // In those cases, we can see multiple "spend" for one "receive".
-                    // We have no way to know the proportion of each spend so
-                    // instead of guessing, we ignore these if the amount is very small (<1$).
                     if (receiveTx.Amount.Amount < 1)
                     {
-                        trades.Add(CryptoCurrencyTransaction.CreateDeposit(
+                        var depositResult = CryptoCurrencyDepositTransaction.Create(
                             date: receiveTx.Date,
                             receivedAmount: receiveTx.Amount.ToAbsoluteAmountMoney().Subtract(receiveTx.Fee.ToAbsoluteAmountMoney()),
                             feeAmount: receiveTx.Fee.ToAbsoluteAmountMoney(),
                             "kraken",
-                            transactionIds: group.Select(t => t.ReferenceId), 
+                            transactionIds: group.Select(t => t.ReferenceId),
                             "dustsweeping"
-                        ));
-                        foreach(var sTx in group.Where(t => t != receiveTx))
+                        );
+
+                        if (depositResult.IsFailure)
+                            throw new ArgumentException(depositResult.Error);
+
+                        depositResult.Value.State = new KrakenCsvEntry[] { receiveTx };
+                        trades.Add(depositResult.Value);
+
+                        foreach (var sTx in group.Where(t => t != receiveTx))
                         {
-                            trades.Add(CryptoCurrencyTransaction.CreateWithdrawal(
+                            var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
                                 date: sTx.Date,
-                                sentAmount: sTx.Amount.ToAbsoluteAmountMoney(),
+                                amount: sTx.Amount.ToAbsoluteAmountMoney(),
                                 feeAmount: sTx.Fee.ToAbsoluteAmountMoney(),
                                 "kraken",
-                                transactionIds: group.Select(t => t.ReferenceId), 
+                                transactionIds: group.Select(t => t.ReferenceId),
                                 "dustsweeping"
-                                ));
+                                );
+
+                            if (withdrawResult.IsFailure)
+                                throw new ArgumentException(withdrawResult.Error);
+
+                            withdrawResult.Value.State = new KrakenCsvEntry[] { sTx };
+                            trades.Add(withdrawResult.Value);
                         }
                         Log.Warning($"Dust sweeping found, deposit created for {receiveTx.Amount.Amount}{receiveTx.Amount.CurrencyCode}, refid {group.Key} ...");
                         continue;
@@ -207,25 +230,31 @@ namespace Portfolio.Kraken
                     }
                 }
 
+                                if(receiveTx.ReferenceId == "TDAVEN-Q5IGP-SR3WD4")
+                ;
                 var spendTx = group.Single(l => l.Amount.Amount < 0 && (l.Type == "spend" || l.Type == "trade"));
                 decimal receivedAmount = receiveTx.Amount.AbsoluteAmount;
                 Money fee = (spendTx.Fee.AbsoluteAmount > 0) ? spendTx.Fee.ToAbsoluteAmountMoney() : receiveTx.Fee.ToAbsoluteAmountMoney();
 
-                var isCryptoToFiat = (receiveTx.Amount?.IsFiatCurrency == true && spendTx.Amount?.IsFiatCurrency == false);
-                if (isCryptoToFiat)
-                {                
-                    receivedAmount -= fee.AbsoluteAmount;                    
-                }
+                var isSellTransaction = (receiveTx.Amount.IsFiatCurrency && !spendTx.Amount.IsFiatCurrency);
+                var isReceiveFee = (receiveTx.Amount.CurrencyCode == receiveTx.Fee.CurrencyCode && receiveTx.Fee.Amount > 0);                
+                if (isReceiveFee/* && isSellTransaction*/)
+                    receivedAmount -= fee.AbsoluteAmount;
 
-
-
-                trades.Add(CryptoCurrencyTransaction.CreateTrade(
+                var tradeResult = CryptoCurrencyTradeTransaction.Create(
                     date: receiveTx.Date,
                     receivedAmount: new Money(receivedAmount, receiveTx.Amount.CurrencyCode),
                     sentAmount: spendTx.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: fee.ToAbsoluteAmountMoney(),
                     "kraken",
-                    transactionIds: [spendTx.ReferenceId, receiveTx.ReferenceId]));
+                    transactionIds: [spendTx.ReferenceId, receiveTx.ReferenceId]);
+
+                if (tradeResult.IsFailure)
+                    throw new ArgumentException(tradeResult.Error);
+
+                tradeResult.Value.State = new KrakenCsvEntry[] { spendTx, receiveTx };
+
+                trades.Add(tradeResult.Value);
             }
 
             return trades;

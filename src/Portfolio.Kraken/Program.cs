@@ -23,20 +23,21 @@ namespace Portfolio
 
             var processor = new KrakenCsvParser(filename: "sample.csv");
             var transactions = processor.ExtractTransactions();
+            var genericTranscations = transactions.Select(tx => tx.ToGenericTransaction());
 
-            var koinlyExporter = new KoinlyCsvExporter(transactions);
+            var koinlyExporter = new KoinlyCsvExporter(genericTranscations);
             koinlyExporter.WriteToFile("kraken-koinly.csv");
             
-            var cointrackerExporter = new CoinTrackerCsvExporter(transactions);
+            var cointrackerExporter = new CoinTrackerCsvExporter(genericTranscations);
             cointrackerExporter.WriteToFile("kraken-cointracker.csv");
     
-            var cointrackingExporter = new CoinTrackingCsvExporter(transactions);
+            var cointrackingExporter = new CoinTrackingCsvExporter(genericTranscations);
             cointrackingExporter.WriteToFile("kraken-cointracking.csv");
 
-            var ctcExporter = new CryptoTaxCalculatorCsvExporter(transactions);
+            var ctcExporter = new CryptoTaxCalculatorCsvExporter(genericTranscations);
             ctcExporter.WriteToFile("kraken-ctc.csv");
 
-            var blockpitExporter = new BlockpitCsvExporter(transactions);
+            var blockpitExporter = new BlockpitCsvExporter(genericTranscations);
             blockpitExporter.WriteToFile("kraken-blockpit.csv");
 
             // PortfolioPerformance
