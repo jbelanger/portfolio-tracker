@@ -2,7 +2,8 @@
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Portfolio.Kraken;
-using Portfolio;
+
+namespace Portfolio.App;
 
 internal class Program
 {
@@ -20,44 +21,37 @@ internal class Program
                 .MinimumLevel.Debug()
                 .CreateLogger();
 
-            LoadCryptoDataStore();
+
+            // 1, Get list of all holdings, with the dates of the first and last transactions for each one.
+
+
+            // 2. From those holding and dates, fetch all quotes from Yahoo Finance
+
+            // 3. 
+
 
 
             var processor = new KrakenCsvParser(filename: "sample.csv");
             var transactions = processor.ExtractTransactions();
-            transactions = transactions.OrderBy(t => t.DateTime);
 
-            var portfolio = new Portfolio.Portfolio();
-            portfolio.AddTransactions(transactions);
+            var krakenWalletResult = Wallet.Create("kraken", transactions);
+            if(krakenWalletResult.IsFailure)
+                throw new Exception(krakenWalletResult.Error);
 
-            var holdings = await portfolio.GetHoldings();
+            var portfolio = new Portfolio(new YahooFinancePriceHistoryStoreFactory());
+            var addWalletResult = portfolio.AddWallet(krakenWalletResult.Value);
+            if(addWalletResult.IsFailure)
+                throw new Exception(addWalletResult.Error);
+            
+            var processResult = await portfolio.Process();
+            if(processResult.IsFailure)
+                throw new Exception(processResult.Error);
+                           
             portfolio.CheckForMissingTransactions();
 
-            foreach(var h in holdings)
+            foreach(var h in portfolio.Holdings)
             {
                 Log.Information($"{h.Asset},{h.Balance},{h.AverageBoughtPrice}");
             }
-    }
-
-        static void LoadCryptoDataStore()
-    {
-        string symbol = "CADUSD=X";
-        string csvFileName = $"{symbol}_history.csv";
-        DateTime startDate = new DateTime(2023, 1, 1);
-        DateTime endDate = DateTime.Now;
-
-        var dataStore = new HistoricalPriceDataStore(csvFileName, symbol, startDate, endDate);
-
-        DateTime queryDate = new DateTime(2023, 1, 1);
-        var priceData = dataStore.GetPriceData(queryDate);
-
-        if (priceData != null)
-        {
-            Console.WriteLine($"{queryDate:yyyy-MM-dd}: Open: {priceData.Open}, High: {priceData.High}, Low: {priceData.Low}, Close: {priceData.Close}, Volume: {priceData.Volume}");
-        }
-        else
-        {
-            Console.WriteLine("No data found for the specified date.");
-        }
     }
 }

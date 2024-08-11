@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
+namespace Portfolio.App;
+
 public class CurrencyExchangeService
 {
     private readonly string _apiKey;
