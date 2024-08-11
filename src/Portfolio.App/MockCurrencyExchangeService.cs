@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 
+namespace Portfolio.App;
+
 public class MockCurrencyExchangeService : ICurrencyExchangeService
 {
     public Task<decimal> GetExchangeRateAsync(string fromCurrency, string toCurrency, DateTime date)
