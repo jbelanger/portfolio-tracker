@@ -1,5 +1,3 @@
-using System;
-
 namespace Portfolio.App;
 
 public class CryptoPriceData

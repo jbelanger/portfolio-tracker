@@ -50,7 +50,7 @@ namespace Portfolio.Kraken
                 Log.Warning($"Unprocessed transaction with refId: {tx}");
             }
 
-            return transactions;
+            return transactions.OrderBy(t => t.DateTime);
         }
 
         private List<KrakenCsvEntry> ReadCsvFile()
@@ -252,7 +252,7 @@ namespace Portfolio.Kraken
                 if (tradeResult.IsFailure)
                     throw new ArgumentException(tradeResult.Error);
 
-                tradeResult.Value.State = new KrakenCsvEntry[] { spendTx, receiveTx };
+                tradeResult.Value.State = new KrakenCsvEntry[] { receiveTx, spendTx };
 
                 trades.Add(tradeResult.Value);
             }

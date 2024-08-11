@@ -1,9 +1,8 @@
-using System;
-using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 
 namespace Portfolio.App;
 
 public interface IPriceHistoryStore
 {
-    Task<CryptoPriceData> GetPriceDataAsync(DateTime date);
+    Task<Result<CryptoPriceData>> GetPriceDataAsync(DateTime date);
 }

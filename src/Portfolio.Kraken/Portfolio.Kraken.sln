@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portfolio.Shared", "..\Port
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portfolio.App", "..\Portfolio.App\Portfolio.App.csproj", "{C1FEE8DD-D359-4AC6-8116-353430AA63A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portfolio.App.Tests", "..\..\tests\Portfolio.App.Tests\Portfolio.App.Tests.csproj", "{58CA61AA-C780-4D9B-83A0-6956559E95DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{C1FEE8DD-D359-4AC6-8116-353430AA63A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1FEE8DD-D359-4AC6-8116-353430AA63A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1FEE8DD-D359-4AC6-8116-353430AA63A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58CA61AA-C780-4D9B-83A0-6956559E95DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58CA61AA-C780-4D9B-83A0-6956559E95DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58CA61AA-C780-4D9B-83A0-6956559E95DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58CA61AA-C780-4D9B-83A0-6956559E95DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
