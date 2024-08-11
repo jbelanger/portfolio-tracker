@@ -2,6 +2,7 @@
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Portfolio.Kraken;
+using Portfolio.Shared;
 
 namespace Portfolio.App;
 
@@ -9,49 +10,79 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-            Log.Logger = new LoggerConfiguration()
-                // add console as logging target
-                .WriteTo.Console()
-                // add a logging target for warnings and higher severity  logs
-                // structured in JSON format
-                .WriteTo.File(new JsonFormatter(), "important.json", restrictedToMinimumLevel: LogEventLevel.Warning)
-                // add a rolling file for all logs
-                .WriteTo.File("all-.logs", rollingInterval: RollingInterval.Day)
-                // set default minimum level
-                .MinimumLevel.Debug()
-                .CreateLogger();
+        Log.Logger = new LoggerConfiguration()
+            // add console as logging target
+            .WriteTo.Console()
+            // add a logging target for warnings and higher severity  logs
+            // structured in JSON format
+            .WriteTo.File(new JsonFormatter(), "important.json", restrictedToMinimumLevel: LogEventLevel.Warning)
+            // add a rolling file for all logs
+            .WriteTo.File("all-.logs", rollingInterval: RollingInterval.Day)
+            // set default minimum level
+            .MinimumLevel.Debug()
+            .CreateLogger();
 
+        var processor = new KrakenCsvParser(filename: "sample.csv");
+        var transactions = processor.ExtractTransactions();
 
-            // 1, Get list of all holdings, with the dates of the first and last transactions for each one.
+        var krakenWalletResult = Wallet.Create("kraken", transactions);
+        if (krakenWalletResult.IsFailure)
+            throw new Exception(krakenWalletResult.Error);
 
+        var portfolio = new Portfolio(new YahooFinancePriceHistoryStoreFactory());
+        portfolio.OnDepositAdded += CheckBalance;
+        portfolio.OnWithdrawAdded += CheckBalance;
+        portfolio.OnTradeAdded += CheckBalance;
 
-            // 2. From those holding and dates, fetch all quotes from Yahoo Finance
+        var addWalletResult = portfolio.AddWallet(krakenWalletResult.Value);
+        if (addWalletResult.IsFailure)
+            throw new Exception(addWalletResult.Error);
 
-            // 3. 
+        var processResult = await portfolio.Process();
+        if (processResult.IsFailure)
+            throw new Exception(processResult.Error);
 
+        portfolio.CheckForMissingTransactions();
 
+        foreach (var h in portfolio.Holdings.Where(h => h.Balance > 0))
+        {
+            Log.Information($"Currency:{h.Asset}    Balance:{h.Balance}     AvgPrice:{h.AverageBoughtPrice}     Cost:{h.Balance * h.AverageBoughtPrice}     Value:{h.Balance * h.CurrentPrice.Amount}");
+        }
+    }
 
-            var processor = new KrakenCsvParser(filename: "sample.csv");
-            var transactions = processor.ExtractTransactions();
+    private static void CheckBalance(CryptoCurrencyDepositTransaction transaction, CryptoCurrencyHolding holding)
+    {
+        var lines = transaction.State as KrakenCsvEntry[];
+        var line = lines.First();
 
-            var krakenWalletResult = Wallet.Create("kraken", transactions);
-            if(krakenWalletResult.IsFailure)
-                throw new Exception(krakenWalletResult.Error);
+        if (line.Balance.AbsoluteAmount != holding.Balance)
+            Log.Error($"{transaction.Amount.CurrencyCode} balances do not match. Deposit RefId={transaction.TransactionIds}");
+    }
 
-            var portfolio = new Portfolio(new YahooFinancePriceHistoryStoreFactory());
-            var addWalletResult = portfolio.AddWallet(krakenWalletResult.Value);
-            if(addWalletResult.IsFailure)
-                throw new Exception(addWalletResult.Error);
-            
-            var processResult = await portfolio.Process();
-            if(processResult.IsFailure)
-                throw new Exception(processResult.Error);
-                           
-            portfolio.CheckForMissingTransactions();
+    private static void CheckBalance(CryptoCurrencyWithdrawTransaction transaction, CryptoCurrencyHolding holding)
+    {
+        var lines = transaction.State as KrakenCsvEntry[];
+        var line = lines.First();
 
-            foreach(var h in portfolio.Holdings)
-            {
-                Log.Information($"{h.Asset},{h.Balance},{h.AverageBoughtPrice}");
-            }
+        if (line.Balance.AbsoluteAmount != holding.Balance)
+            Log.Error($"{transaction.Amount.CurrencyCode} balances do not match. Withdraw RefId={transaction.TransactionIds}");
+    }
+
+    private static void CheckBalance(CryptoCurrencyTradeTransaction transaction, CryptoCurrencyHolding holding)
+    {
+        var lines = transaction.State as KrakenCsvEntry[];
+        var receiveTx = lines.First();
+        var spendTx = lines.ElementAtOrDefault(1);
+
+        if (transaction.Amount.CurrencyCode == holding.Asset)
+        {
+            if (receiveTx.Balance.AbsoluteAmount != holding.Balance)
+                Log.Error($"{transaction.Amount.CurrencyCode} balances do not match. Withdraw RefId={transaction.TransactionIds}");
+        }
+        else if (transaction.TradeAmount.CurrencyCode == holding.Asset)
+        {
+            if (spendTx.Balance.AbsoluteAmount != holding.Balance)
+                Log.Error($"{transaction.Amount.CurrencyCode} balances do not match. Withdraw RefId={transaction.TransactionIds}");
+        }
     }
 }

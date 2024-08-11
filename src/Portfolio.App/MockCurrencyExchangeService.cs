@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace Portfolio.App;
 
 public class MockCurrencyExchangeService : ICurrencyExchangeService

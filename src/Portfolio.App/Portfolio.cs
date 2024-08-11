@@ -1,22 +1,22 @@
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Reflection;
-using System.Security;
 using CSharpFunctionalExtensions;
-using Flurl.Util;
-using Newtonsoft.Json.Linq;
-using Portfolio.Kraken;
 using Portfolio.Shared;
-using RestSharp;
 using Serilog;
 
 namespace Portfolio.App;
+
+public delegate void DepositAddedHandler(CryptoCurrencyDepositTransaction deposit, CryptoCurrencyHolding holding);
+public delegate void WithdrawAddedHandler(CryptoCurrencyWithdrawTransaction deposit, CryptoCurrencyHolding holding);
+public delegate void TradeAddedHandler(CryptoCurrencyTradeTransaction deposit, CryptoCurrencyHolding holding);
 
 public class Portfolio
 {
     private readonly IPriceHistoryStoreFactory _priceHistoryStoreFactory = null!;
     private Dictionary<string, IPriceHistoryStore> _priceHistoryStores = new();
     private List<CryptoCurrencyHolding> _holdings = new();
+
+    public event DepositAddedHandler OnDepositAdded;
+    public event WithdrawAddedHandler OnWithdrawAdded;
+    public event TradeAddedHandler OnTradeAdded;
 
     List<ICryptoCurrencyTransaction> _taxableEvents = new();
 
@@ -119,10 +119,6 @@ public class Portfolio
     {
         foreach (var tx in transactions)
         {
-            var lines = tx.State as KrakenCsvEntry[];
-            var line = lines.First();
-            var line2 = lines.ElementAtOrDefault(1);
-
             CryptoCurrencyHolding? sender = null;
             CryptoCurrencyHolding? receiver = null;
 
@@ -133,11 +129,31 @@ public class Portfolio
                 if (addTxResult.IsFailure)
                     throw new Exception(addTxResult.Error);
 
-                // TODO, for crypto coins, get value at the time of deposit. Required for PL calcs.
+                if (deposit.Amount.CurrencyCode == DefaultCurrency)
+                    receiver.AverageBoughtPrice = 1;
+                else
+                {
+                    if (!_priceHistoryStores.ContainsKey(deposit.Amount.CurrencyCode))
+                    {
+                        Log.Error($"No price history available for {receiver.Asset}.");
+                        continue;
+                    }
+
+                    var priceValueResult = await _priceHistoryStores[deposit.Amount.CurrencyCode].GetPriceDataAsync(deposit.DateTime);
+                    if (priceValueResult.IsFailure)
+                    {
+                        Log.Error(priceValueResult.Error);
+                        continue;
+                    }
+                    deposit.UnitValue = new Money(priceValueResult.Value.Close, DefaultCurrency);
+
+                    decimal newAverage = ((receiver.AverageBoughtPrice * (receiver.Balance - deposit.Amount.Amount)) + (deposit.Amount.Amount * priceValueResult.Value.Close)) / (receiver.Balance);
+                    receiver.AverageBoughtPrice = newAverage;
+                }
 
                 //Log.Debug($"Deposit [{string.Join("|", tx.TransactionIds)}: {receiver.Asset}: {receiver.Balance}");
-                if (line.Balance.AbsoluteAmount != receiver.Balance)
-                    Log.Error("Balances do not match");
+
+                OnDepositAdded?.Invoke(deposit, receiver);
             }
 
             if (tx is CryptoCurrencyWithdrawTransaction withdraw)
@@ -154,9 +170,9 @@ public class Portfolio
                     Log.Warning($"{sender.Asset} Balance is under zero: {sender.Balance}");
                 }
 
+                OnWithdrawAdded?.Invoke(withdraw, sender);
+
                 //Log.Debug($"Withdraw [{string.Join("|", tx.TransactionIds)}: {sender.Asset}: {sender.Balance}");
-                if (line.Balance.AbsoluteAmount != sender.Balance)
-                    Log.Error("Balances do not match");
             }
 
             if (tx is CryptoCurrencyTradeTransaction trade)
@@ -164,48 +180,60 @@ public class Portfolio
 
                 // TODO: Ensure to log whenever a trade amount comes from a currency not 
                 // owned in holdings. It would means the user spends money he doesn't have deposited or traded before.
-                if (line2.ReferenceId == "TDAVEN-Q5IGP-SR3WD4")
-                    ;
 
                 receiver = GetOrCreateHolding(trade.Amount.CurrencyCode);
+                sender = GetOrCreateHolding(trade.TradeAmount.CurrencyCode);
+
+                if (trade.Amount.CurrencyCode == DefaultCurrency)
+                    receiver.AverageBoughtPrice = 1;
+                else //if(!deposit.Amount.IsFiatCurrency)
+                {
+                    decimal tradedCost = trade.TradeAmount.Amount * sender.AverageBoughtPrice; // 0.04 * 25000 = 1000
+                    decimal boughtPrice = tradedCost / trade.Amount.Amount;
+
+                    //var priceValue = await _priceHistoryStores[trade.Amount.CurrencyCode].GetPriceDataAsync(trade.DateTime);
+                    //trade.UnitValue = new Money(priceValue.Close, DefaultCurrency);
+
+                    decimal newAverage = ((receiver.AverageBoughtPrice * receiver.Balance) + (trade.Amount.Amount * boughtPrice)) / (receiver.Balance + trade.Amount.Amount);
+                    receiver.AverageBoughtPrice = newAverage;
+                }
                 var addTxResult = receiver.AddTransaction(trade);
                 if (addTxResult.IsFailure)
                     throw new Exception(addTxResult.Error);
-                CheckBalance(line2.Balance.Amount, receiver.Balance);
+                OnTradeAdded?.Invoke(trade, receiver);
 
-                sender = GetOrCreateHolding(trade.TradeAmount.CurrencyCode);
                 var addTxResult2 = sender.AddTransaction(trade);
                 if (addTxResult2.IsFailure)
                     throw new Exception(addTxResult2.Error);
-                CheckBalance(line.Balance.Amount, sender.Balance);
+                OnTradeAdded?.Invoke(trade, sender);
 
-                var isBuyWithFiat = trade.TradeAmount.IsFiatCurrency;
-                if (isBuyWithFiat)
-                {
-                    if (!trade.Amount.IsFiatCurrency)
-                    {
-                        // Get all transactions involving this asset before this taxable event to calculate Average Buying Price.
-                        var previousTrades = sender.Transactions
-                            .Where(t => t is CryptoCurrencyTradeTransaction && t.Amount.CurrencyCode == trade.Amount.CurrencyCode)
-                            .Cast<CryptoCurrencyTradeTransaction>()
-                            .ToList();
+                // var isBuyWithFiat = trade.TradeAmount.IsFiatCurrency;
+                // if (isBuyWithFiat)
+                // {
+                //     if (!trade.Amount.IsFiatCurrency)
+                //     {
+                //         // Get all transactions involving this asset before this taxable event to calculate Average Buying Price.
+                //         var previousTrades = sender.Transactions
+                //             .Where(t => t is CryptoCurrencyTradeTransaction && t.Amount.CurrencyCode == trade.Amount.CurrencyCode)
+                //             .Cast<CryptoCurrencyTradeTransaction>()
+                //             .ToList();
 
-                        var totalQty = previousTrades.Sum(t => t.Amount.Amount);
+                //         var totalQty = previousTrades.Sum(t => t.Amount.Amount);
 
-                        decimal totalCost = 0;
-                        foreach (var t in previousTrades)
-                        {
-                            totalCost += await GetConvertedTradeAmountIfRequired(t);
-                        }
+                //         decimal totalCost = 0;
+                //         foreach (var t in previousTrades)
+                //         {
+                //             totalCost += await GetConvertedTradeAmountIfRequired(t);
+                //         }
 
-                        var averageBuyingPrice = totalCost / totalQty;
-                        var currentPrice = /* test */ averageBuyingPrice * (decimal)1.1;// GetHistoricalPriceAsync(sender.Asset, withdraw.DateTime, "usd").Result;
-                        var profitLoss = currentPrice - averageBuyingPrice;
-                        receiver.AverageBoughtPrice = averageBuyingPrice;
-                    }
-                }
-                else
-                    _taxableEvents.Add(trade);
+                //         var averageBuyingPrice = totalCost / totalQty;
+                //         // var currentPrice = await _priceHistoryStores[receiver.Asset].GetPriceDataAsync(trade.DateTime);
+                //         // var profitLoss = currentPrice.Close - averageBuyingPrice;
+                //         receiver.AverageBoughtPrice = averageBuyingPrice;
+                //     }
+                // }
+                // else
+                //     _taxableEvents.Add(trade);
 
                 if (sender.Balance < 0)
                 {
@@ -217,110 +245,35 @@ public class Portfolio
             }
         }
 
+        // Fetch latest prices...
+        foreach (var holding in _holdings)
+        {
+            if (holding.Asset == DefaultCurrency)
+            {
+                holding.CurrentPrice = new Money(1m, holding.Asset);
+            }
+            else
+            {
+                if (!_priceHistoryStores.ContainsKey(holding.Asset))
+                {
+                    Log.Error($"No price history available for {holding.Asset}.");
+                    holding.CurrentPrice = new Money(0m, holding.Asset);
+                    continue;
+                }
+
+                var priceValueResult = await _priceHistoryStores[holding.Asset].GetPriceDataAsync(DateTime.Now);
+                if (priceValueResult.IsFailure)
+                {
+                    Log.Error(priceValueResult.Error);
+                    holding.CurrentPrice = new Money(0m, holding.Asset);
+                    continue;
+                }
+                holding.CurrentPrice = new Money(priceValueResult.Value.Close, holding.Asset);
+            }
+        }
+
         return _holdings;
     }
-
-    // internal async Task<IEnumerable<CryptoCurrencyHolding>> GetHoldings2()
-    // {
-    //     foreach (var tx in _transactionsPerWallet)
-    //     {
-    //         var lines = tx.State as KrakenCsvEntry[];
-    //         var line = lines.First();
-    //         var line2 = lines.ElementAtOrDefault(1);
-
-    //         CryptoCurrencyHolding? sender = null;
-    //         CryptoCurrencyHolding? receiver = null;
-
-    //         if (tx is CryptoCurrencyDepositTransaction deposit)
-    //         {
-    //             receiver = GetOrCreateHolding(deposit.Amount.CurrencyCode);
-    //             var addTxResult = receiver.AddTransaction(deposit);
-    //             if (addTxResult.IsFailure)
-    //                 throw new Exception(addTxResult.Error);
-
-    //             // TODO, for crypto coins, get value at the time of deposit. Required for PL calcs.
-
-    //             //Log.Debug($"Deposit [{string.Join("|", tx.TransactionIds)}: {receiver.Asset}: {receiver.Balance}");
-    //             if (line.Balance.AbsoluteAmount != receiver.Balance)
-    //                 Log.Error("Balances do not match");
-    //         }
-
-    //         if (tx is CryptoCurrencyWithdrawTransaction withdraw)
-    //         {
-    //             sender = GetOrCreateHolding(withdraw.Amount.CurrencyCode);
-    //             var addTxResult = sender.AddTransaction(withdraw);
-    //             if (addTxResult.IsFailure)
-    //                 throw new Exception(addTxResult.Error);
-
-    //             _taxableEvents.Add(tx);
-
-    //             if (sender.Balance < 0)
-    //             {
-    //                 Log.Warning($"{sender.Asset} Balance is under zero: {sender.Balance}");
-    //             }
-
-    //             //Log.Debug($"Withdraw [{string.Join("|", tx.TransactionIds)}: {sender.Asset}: {sender.Balance}");
-    //             if (line.Balance.AbsoluteAmount != sender.Balance)
-    //                 Log.Error("Balances do not match");
-    //         }
-
-    //         if (tx is CryptoCurrencyTradeTransaction trade)
-    //         {
-    //             if (line2.ReferenceId == "TDAVEN-Q5IGP-SR3WD4")
-    //                 ;
-
-    //             receiver = GetOrCreateHolding(trade.Amount.CurrencyCode);
-    //             var addTxResult = receiver.AddTransaction(trade);
-    //             if (addTxResult.IsFailure)
-    //                 throw new Exception(addTxResult.Error);
-    //             CheckBalance(line2.Balance.Amount, receiver.Balance);
-
-    //             sender = GetOrCreateHolding(trade.TradeAmount.CurrencyCode);
-    //             var addTxResult2 = sender.AddTransaction(trade);
-    //             if (addTxResult2.IsFailure)
-    //                 throw new Exception(addTxResult2.Error);
-    //             CheckBalance(line.Balance.Amount, sender.Balance);
-
-    //             var isBuyWithFiat = trade.TradeAmount.IsFiatCurrency;
-    //             if (isBuyWithFiat)
-    //             {
-    //                 if (!trade.Amount.IsFiatCurrency)
-    //                 {
-    //                     // Get all transactions involving this asset before this taxable event to calculate Average Buying Price.
-    //                     var previousTrades = sender.Transactions
-    //                         .Where(t => t is CryptoCurrencyTradeTransaction && t.Amount.CurrencyCode == trade.Amount.CurrencyCode)
-    //                         .Cast<CryptoCurrencyTradeTransaction>()
-    //                         .ToList();
-
-    //                     var totalQty = previousTrades.Sum(t => t.Amount.Amount);
-
-    //                     decimal totalCost = 0;
-    //                     foreach (var t in previousTrades)
-    //                     {
-    //                         totalCost += await GetConvertedTradeAmountIfRequired(t);
-    //                     }
-
-    //                     var averageBuyingPrice = totalCost / totalQty;
-    //                     var currentPrice = /* test */ averageBuyingPrice * (decimal)1.1;// GetHistoricalPriceAsync(sender.Asset, withdraw.DateTime, "usd").Result;
-    //                     var profitLoss = currentPrice - averageBuyingPrice;
-    //                     receiver.AverageBoughtPrice = averageBuyingPrice;
-    //                 }
-    //             }
-    //             else
-    //                 _taxableEvents.Add(trade);
-
-    //             if (sender.Balance < 0)
-    //             {
-    //                 Log.Error($"{sender.Asset} Balance is under zero: {sender.Balance}");
-    //             }
-
-    //             // Log.Debug($"Trade Out [{string.Join("|", trade.TransactionIds)}: {sender.Asset}: {sender.Balance}");
-    //             // Log.Debug($"Trade In [{string.Join("|", trade.TransactionIds)}: {receiver.Asset}: {receiver.Balance}");
-    //         }
-    //     }
-
-    //     return Holdings;
-    // }
 
     public void CheckForMissingTransactions()
     {
@@ -364,25 +317,6 @@ public class Portfolio
 
     }
 
-    private async Task<decimal> GetConvertedTradeAmountIfRequired(CryptoCurrencyTradeTransaction trade)
-    {
-        // Before getting the sending holding, convert the trade amount to the user's chosen currency.                
-        if (trade.TradeAmount.CurrencyCode.ToUpper() != DefaultCurrency)
-        {
-            // Call an exchange rate service to convert to USD
-            MockCurrencyExchangeService exchangeRateService = new MockCurrencyExchangeService();
-            var exchangeRate = await exchangeRateService.GetExchangeRateAsync(trade.TradeAmount.CurrencyCode, DefaultCurrency, trade.DateTime);
-            return trade.TradeAmount.Amount / exchangeRate;
-        }
-        return trade.TradeAmount.Amount;
-    }
-
-    private static void CheckBalance(decimal csvLineBalance, decimal holdingBalance)
-    {
-        if (csvLineBalance != holdingBalance)
-            Log.Error("Balances do not match");
-    }
-
     internal CryptoCurrencyHolding GetOrCreateHolding(string currencyCode)
     {
         var holding = _holdings.SingleOrDefault(h => h.Asset == currencyCode);
@@ -393,62 +327,6 @@ public class Portfolio
         }
         return holding;
     }
-
-    static async Task<decimal?> GetHistoricalPriceAsync(string cryptoId, DateTime date, string vsCurrency)
-    {
-
-        var options = new RestClientOptions($"https://api.coingecko.com/api/v3/coins/bitcoin/history?date={date.ToString("dd-MM-yyyy")}&localization=false&x_cg_demo_api_key=CG-t63vc5f31tfZKMZSYfvY3e5x");
-        var client = new RestClient(options);
-        var request = new RestRequest("");
-        request.AddHeader("accept", "application/json");
-        request.AddHeader("x-cg-demo-api-key", "CG-t63vc5f31tfZKMZSYfvY3e5x");
-        var response = await client.GetAsync(request);
-        if (response.IsSuccessStatusCode)
-        {
-            string content = response.Content ?? string.Empty;
-            JObject json = JObject.Parse(content);
-
-            // Navigate through the JSON to get the price
-            var marketData = json["market_data"];
-            if (marketData != null)
-            {
-                var priceObject = marketData["current_price"];
-                if (priceObject != null)
-                {
-                    return priceObject[vsCurrency.ToLower()]?.Value<decimal>();
-                }
-            }
-        }
-
-        // string baseUrl = "https://api.coingecko.com/api/v3";
-        // string endpoint = $"/coins/{cryptoId}/history?date={date}&localization=false&x_cg_demo_api_key=CG-t63vc5f31tfZKMZSYfvY3e5x";
-
-        // using (HttpClient client = new HttpClient())
-        // {
-        //     client.BaseAddress = new Uri(baseUrl);
-
-        //     HttpResponseMessage response = await client.GetAsync(endpoint);
-        //     if (response.IsSuccessStatusCode)
-        //     {
-        //         string content = await response.Content.ReadAsStringAsync();
-        //         JObject json = JObject.Parse(content);
-
-        //         // Navigate through the JSON to get the price
-        //         var marketData = json["market_data"];
-        //         if (marketData != null)
-        //         {
-        //             var priceObject = marketData["current_price"];
-        //             if (priceObject != null)
-        //             {
-        //                 return priceObject[vsCurrency]?.Value<decimal>();
-        //             }
-        //         }
-        //     }
-        // }
-
-        return null; // Return null if the price could not be retrieved
-    }
-
 }
 
 internal class TaxableEvent

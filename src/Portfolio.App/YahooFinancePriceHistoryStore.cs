@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using CsvHelper;
 using Serilog;
@@ -16,38 +11,50 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
     private readonly Dictionary<DateTime, CryptoPriceData> _dataStore;
     private readonly string _csvFileName;
     private readonly string _symbol;
+    private readonly bool _isCryptoSymbol;
 
     private YahooFinancePriceHistoryStore(string symbol, string csvFileName, Dictionary<DateTime, CryptoPriceData> dataStore)
     {
         _csvFileName = csvFileName;
         _symbol = symbol;
         _dataStore = dataStore;
+
+        if (!_symbol.EndsWith("=X"))
+            _isCryptoSymbol = true;
     }
 
     public static async Task<Result<YahooFinancePriceHistoryStore>> Create(string symbolFrom, string symbolTo, DateTime startDate, DateTime endDate)
     {
         if (symbolFrom == symbolTo)
-            return Result.Failure<YahooFinancePriceHistoryStore>("Symbols must be of different currency/coin.");
+            return Result.Failure<YahooFinancePriceHistoryStore>($"Symbols must be of different currency/coin ({symbolFrom}-{symbolTo}).");
 
         var symbol = $"{symbolFrom}-{symbolTo}";
         if (FiatCurrencies.Codes.Contains(symbolFrom) && FiatCurrencies.Codes.Contains(symbolTo))
             symbol = $"{symbolFrom}{symbolTo}=X";
         else if (symbolFrom == "IMX")
             symbol = $"IMX10603-{symbolTo}";
+        else if (symbolFrom == "GRT")
+            symbol = $"GRT6719-{symbolTo}";
+        else if (symbolFrom == "RNDR")
+            symbol = $"RENDER-{symbolTo}";
+        else if (new string[] {"UNI", "BEAM"}.Contains(symbolFrom))
+            return Result.Failure<YahooFinancePriceHistoryStore>($"Yahoo Finance data is wrong for {symbolFrom}. Skipping ...");
 
         Dictionary<DateTime, CryptoPriceData> dataStore;
         var csvFileName = $"pricedata/{symbol}_history.csv";
 
         if (!File.Exists(csvFileName))
         {
+            if (!Directory.Exists("pricedata"))
+                Directory.CreateDirectory("pricedata");
             Console.WriteLine($"CSV file not found. Fetching data from Yahoo Finance for {symbol}...");
-            var candles = await FetchAndSaveDataAsync(csvFileName, symbol, startDate, endDate);
+            var candles = await FetchAndSaveDataAsync(csvFileName, symbol, startDate.Date, endDate.Date);
             dataStore = LoadDataFromCandles(candles);
         }
         else
             dataStore = LoadDataFromCsv(csvFileName);
 
-        if(!dataStore.Any())
+        if (!dataStore.Any())
             return Result.Failure<YahooFinancePriceHistoryStore>($"Could not get historical prices for symbol {symbol}.");
 
         return new YahooFinancePriceHistoryStore(symbol, csvFileName, dataStore);
@@ -59,10 +66,10 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
         using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
             IReadOnlyList<Candle> candles;
-            
+
             try
             {
-                candles = await Yahoo.GetHistoricalAsync(symbol, startDate, endDate, Period.Daily);              
+                candles = await Yahoo.GetHistoricalAsync(symbol, startDate, endDate, Period.Daily);
             }
             catch (Exception ex)
             {
@@ -82,7 +89,7 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
                 Close = candle.Close,
                 Volume = candle.Volume
             }));
-            
+
             return candles;
         }
     }
@@ -124,9 +131,9 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
         return dataStore;
     }
 
-    public async Task<CryptoPriceData> GetPriceDataAsync(DateTime date)
+    public async Task<Result<CryptoPriceData>> GetPriceDataAsync(DateTime date)
     {
-        if (_dataStore.TryGetValue(date, out var priceData))
+        if (_dataStore.TryGetValue(date.Date, out var priceData))
         {
             return priceData;
         }
@@ -134,9 +141,35 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
         {
             Console.WriteLine($"No data found for {date:yyyy-MM-dd}. Fetching missing data...");
 
-            var candle = await Yahoo.GetHistoricalAsync(_symbol, date, date, Period.Daily);
-            var fetchedData = candle.FirstOrDefault();
 
+            if (!_isCryptoSymbol && (date.DayOfWeek == DayOfWeek.Sunday || date.DayOfWeek == DayOfWeek.Saturday))
+            {
+                Console.WriteLine($"Missing data is for a fiat currency and on a weekend. Try to get data for Friday before...");
+
+                DateTime lastWeekDay;
+                if (date.DayOfWeek == DayOfWeek.Saturday)
+                    lastWeekDay = date.AddDays(-1);
+                else
+                    lastWeekDay = date.AddDays(-2);
+
+                if (_dataStore.TryGetValue(lastWeekDay.Date, out var priceData2))
+                {
+                    return priceData2;
+                }
+            }
+
+            IReadOnlyList<Candle> candles;
+            try
+            {
+                candles = await Yahoo.GetHistoricalAsync(_symbol, date, date, Period.Daily);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning($"Could not fetch historical prices for symbol {_symbol}.");
+                candles = new List<Candle>();
+            }
+
+            var fetchedData = candles.FirstOrDefault();
             if (fetchedData != null)
             {
                 priceData = new CryptoPriceData
@@ -155,11 +188,8 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
 
                 return priceData;
             }
-            else
-            {
-                Console.WriteLine($"No data available for {date:yyyy-MM-dd} from Yahoo Finance.");
-                return null;
-            }
+
+            return Result.Failure<CryptoPriceData>($"No data available for {_symbol} on {date:yyyy-MM-dd} from Yahoo Finance.");
         }
     }
 

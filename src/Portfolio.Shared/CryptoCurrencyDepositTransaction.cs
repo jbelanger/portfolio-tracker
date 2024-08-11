@@ -38,6 +38,8 @@ public class CryptoCurrencyDepositTransaction : ICryptoCurrencyTransaction
     public IEnumerable<string> TransactionIds { get; set; } = new List<string>();
     public object State {get; set;}
 
+    public Money UnitValue { get; set; }
+
     /// <summary>
     /// Private constructor used internally for factory methods.
     /// </summary>

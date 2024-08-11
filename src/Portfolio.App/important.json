@@ -1471,3 +1471,151 @@
 {"Timestamp":"2024-08-11T12:13:42.3903830-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin."}
 {"Timestamp":"2024-08-11T12:13:44.1993770-04:00","Level":"Error","MessageTemplate":"Could not get historical prices for symbol GRT-USD."}
 {"Timestamp":"2024-08-11T12:13:44.7834650-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin."}
+{"Timestamp":"2024-08-11T12:19:19.0616180-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T12:19:19.0876600-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T12:19:22.1387650-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin."}
+{"Timestamp":"2024-08-11T12:19:28.5847490-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin."}
+{"Timestamp":"2024-08-11T13:44:04.5412440-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T13:44:04.5662890-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T13:44:09.0774570-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin."}
+{"Timestamp":"2024-08-11T13:44:18.8352680-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin."}
+{"Timestamp":"2024-08-11T13:45:55.3550930-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T13:45:55.3806910-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T13:45:55.4044890-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin USD-USD."}
+{"Timestamp":"2024-08-11T13:45:55.4487150-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin USD-USD."}
+{"Timestamp":"2024-08-11T13:47:15.8854610-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T13:47:15.9094480-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T13:47:15.9310810-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T13:47:15.9729230-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T13:51:50.5073670-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T13:51:50.5341750-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T13:51:50.5585330-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T13:51:50.6045070-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T13:55:51.6793700-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T13:55:51.7046550-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T13:55:51.7274850-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T13:55:51.7703290-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:00:01.3168600-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:00:01.3408450-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:00:01.3634700-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:00:01.4057880-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:02:32.8996230-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:02:32.9268520-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:02:32.9517010-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:02:32.9982450-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:03:36.9564110-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:03:36.9833540-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:03:37.0079870-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:03:37.0525930-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:08:35.6613620-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:08:35.6883780-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:08:35.7121240-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:08:35.7568580-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:34:41.9909910-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:34:42.0161280-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:34:42.0401450-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:34:42.0852970-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:36:16.8545370-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:36:16.8797950-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:36:16.9053300-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:36:16.9501260-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:39:00.8662670-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:39:00.8932000-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:39:00.9167780-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:39:00.9615200-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:39:11.5966550-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:39:11.6230520-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:39:11.6440120-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:39:11.6801550-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:55:01.0136250-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T14:55:01.0402340-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T14:55:01.0637640-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T14:55:01.1062800-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T15:01:21.2503320-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T15:01:21.2760360-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T15:01:21.3018220-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T15:01:21.3509230-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T15:03:46.0909690-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T15:03:46.1181190-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T15:03:46.1416090-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T15:03:46.1861300-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:08:35.6041340-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:08:35.6285240-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:08:35.6543790-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:08:35.6967000-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:11:46.9080220-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:11:46.9314400-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:11:46.9515420-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:11:46.9952680-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:16:34.5306930-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:16:34.5549280-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:16:34.5766240-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:16:34.6188290-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:24:07.1190300-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:24:07.1456990-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:24:07.1673320-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:24:07.2103300-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:29:31.5542240-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:29:31.5805700-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:29:31.6037450-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:29:31.6472840-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:29:32.6935760-04:00","Level":"Warning","MessageTemplate":"Could not fetch historical prices for symbol RNDR-USD."}
+{"Timestamp":"2024-08-11T18:35:48.2427100-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:35:48.2670740-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:35:48.2880800-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:35:48.3310520-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:35:49.1490030-04:00","Level":"Warning","MessageTemplate":"Could not fetch historical prices for symbol RNDR-USD."}
+{"Timestamp":"2024-08-11T18:35:49.1493760-04:00","Level":"Error","MessageTemplate":"No data available for RNDR-USD on 2024-08-11 from Yahoo Finance."}
+{"Timestamp":"2024-08-11T18:39:40.1053440-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:39:40.1290100-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:39:40.1506100-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:39:40.1929900-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:39:40.8351330-04:00","Level":"Warning","MessageTemplate":"Could not fetch historical prices for symbol RNDR-USD."}
+{"Timestamp":"2024-08-11T18:39:40.8355070-04:00","Level":"Error","MessageTemplate":"No data available for RNDR-USD on 2024-08-11 from Yahoo Finance."}
+{"Timestamp":"2024-08-11T18:40:48.4810610-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:40:48.5050550-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:40:48.5261230-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:40:48.5682380-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:40:49.2698280-04:00","Level":"Warning","MessageTemplate":"Could not fetch historical prices for symbol RNDR-USD."}
+{"Timestamp":"2024-08-11T18:40:49.2701240-04:00","Level":"Error","MessageTemplate":"No data available for RNDR-USD on 2024-08-11 from Yahoo Finance."}
+{"Timestamp":"2024-08-11T18:46:10.0785990-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:46:10.1052140-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:46:10.1265360-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:46:11.0591170-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:53:47.6390980-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:53:47.6642380-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:53:47.6861570-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:53:47.7171650-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for UNI. Skipping ..."}
+{"Timestamp":"2024-08-11T18:53:47.7246800-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for BEAM. Skipping ..."}
+{"Timestamp":"2024-08-11T18:53:47.7277640-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:53:47.7279630-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for BEAM. Skipping ..."}
+{"Timestamp":"2024-08-11T18:57:03.0657520-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:57:03.0898400-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:57:03.1104330-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:57:03.1407160-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for UNI. Skipping ..."}
+{"Timestamp":"2024-08-11T18:57:03.1481460-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for BEAM. Skipping ..."}
+{"Timestamp":"2024-08-11T18:57:03.1512750-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:57:03.1513640-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for BEAM. Skipping ..."}
+{"Timestamp":"2024-08-11T18:57:03.1553010-04:00","Level":"Error","MessageTemplate":"No price history available for UNI."}
+{"Timestamp":"2024-08-11T18:57:03.1554470-04:00","Level":"Error","MessageTemplate":"No price history available for UNI."}
+{"Timestamp":"2024-08-11T18:57:03.1554880-04:00","Level":"Error","MessageTemplate":"No price history available for BEAM."}
+{"Timestamp":"2024-08-11T18:57:31.8281370-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:57:31.8520320-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:57:31.8728980-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:57:31.9044480-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for UNI. Skipping ..."}
+{"Timestamp":"2024-08-11T18:57:31.9116660-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for BEAM. Skipping ..."}
+{"Timestamp":"2024-08-11T18:57:31.9147210-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:57:31.9148190-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for BEAM. Skipping ..."}
+{"Timestamp":"2024-08-11T18:57:31.9185320-04:00","Level":"Error","MessageTemplate":"No price history available for UNI."}
+{"Timestamp":"2024-08-11T18:57:31.9186320-04:00","Level":"Error","MessageTemplate":"No price history available for UNI."}
+{"Timestamp":"2024-08-11T18:57:31.9186700-04:00","Level":"Error","MessageTemplate":"No price history available for BEAM."}
+{"Timestamp":"2024-08-11T18:59:10.2534690-04:00","Level":"Warning","MessageTemplate":"Dust sweeping found, deposit created for 0.2768CAD, refid TSDEF5I-HNFS4-PZQ2KE ..."}
+{"Timestamp":"2024-08-11T18:59:10.2776100-04:00","Level":"Warning","MessageTemplate":"Unprocessed transaction with refId: FTaa3eU-LFeQ98qGEwIddNrnp80hHG"}
+{"Timestamp":"2024-08-11T18:59:10.2988150-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:59:10.3299670-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for UNI. Skipping ..."}
+{"Timestamp":"2024-08-11T18:59:10.3389010-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for BEAM. Skipping ..."}
+{"Timestamp":"2024-08-11T18:59:10.3422230-04:00","Level":"Error","MessageTemplate":"Symbols must be of different currency/coin (USD-USD)."}
+{"Timestamp":"2024-08-11T18:59:10.3423150-04:00","Level":"Error","MessageTemplate":"Yahoo Finance data is wrong for BEAM. Skipping ..."}
+{"Timestamp":"2024-08-11T18:59:10.3459450-04:00","Level":"Error","MessageTemplate":"No price history available for UNI."}
+{"Timestamp":"2024-08-11T18:59:10.3460840-04:00","Level":"Error","MessageTemplate":"No price history available for UNI."}
+{"Timestamp":"2024-08-11T18:59:10.3461240-04:00","Level":"Error","MessageTemplate":"No price history available for BEAM."}

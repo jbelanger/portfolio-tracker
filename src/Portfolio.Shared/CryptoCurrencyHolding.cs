@@ -11,6 +11,7 @@ public class CryptoCurrencyHolding
     public decimal Balance { get; set; }
     public List<ICryptoCurrencyTransaction> Transactions { get; set; } = new();
     public decimal Fees { get; set; }
+    public Money CurrentPrice { get; set; }
 
     public CryptoCurrencyHolding(string asset)
     {
@@ -33,6 +34,9 @@ public class CryptoCurrencyHolding
         {
             Balance -= transaction.Amount.Add(transaction.FeeAmount).Amount;
             Fees += transaction.FeeAmount.Amount;
+
+            if (Balance == 0)
+                AverageBoughtPrice = 0;
         }
 
         if (transaction is CryptoCurrencyTradeTransaction trade)
@@ -49,11 +53,12 @@ public class CryptoCurrencyHolding
                     Balance -= trade.FeeAmount.Amount;
                     Fees += trade.FeeAmount.Amount;
                 }
+
+                if (Balance == 0)
+                    AverageBoughtPrice = 0;
             }
             else
                 return Result.Failure("Invalid transaction for this holding.");
-
-
         }
 
         Transactions.Add(transaction);
@@ -101,63 +106,4 @@ public class CryptoCurrencyHolding
 
         return Result.Success();
     }
-
-    // public decimal CalculateAverageBuyingPrice()
-    // {
-    //     decimal balance = 0;
-    //     decimal totalCost = 0;
-    //     decimal averageBoughtPrice = 0;
-    //     foreach(var tx in Transactions)
-    //     {
-    //         if(tx.ReceivedAmount != null && tx.ReceivedAmount.CurrencyCode == Asset)
-    //         {
-    //             totalCost += tx.ReceivedAmount.AbsoluteAmount; 
-
-    //             balance += tx.ReceivedAmount.AbsoluteAmount;
-    //             // averageBoughtPrice = totalCost / 
-    //         }
-    //     }
-
-    //     //         // Define the cryptocurrency, date, and currency you want to get the value for
-    //     // string cryptoId = "bitcoin"; // The ID for Bitcoin in CoinGecko API
-    //     // string date = "01-01-2023";  // The date in dd-mm-yyyy format
-    //     // string vsCurrency = "usd";   // The currency to compare against
-
-    //     // // Call the function to get the historical price
-    //     // decimal? price = await GetHistoricalPriceAsync(cryptoId, date, vsCurrency);
-
-
-    // }
-
-    //     static async Task<decimal?> GetHistoricalPriceAsync(string cryptoId, string date, string vsCurrency)
-    // {
-    //     string baseUrl = "https://api.coingecko.com/api/v3";
-    //     string endpoint = $"/coins/{cryptoId}/history?date={date}&localization=false";
-
-    //     using (HttpClient client = new HttpClient())
-    //     {
-    //         client.BaseAddress = new Uri(baseUrl);
-
-    //         HttpResponseMessage response = await client.GetAsync(endpoint);
-    //         if (response.IsSuccessStatusCode)
-    //         {
-    //             string content = await response.Content.ReadAsStringAsync();
-    //             JObject json = JObject.Parse(content);
-
-    //             // Navigate through the JSON to get the price
-    //             var marketData = json["market_data"];
-    //             if (marketData != null)
-    //             {
-    //                 var priceObject = marketData["current_price"];
-    //                 if (priceObject != null)
-    //                 {
-    //                     return priceObject[vsCurrency]?.Value<decimal>();
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     return null; // Return null if the price could not be retrieved
-    // }
-
 }
