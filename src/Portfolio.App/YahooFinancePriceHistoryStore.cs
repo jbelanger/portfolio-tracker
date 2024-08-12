@@ -37,8 +37,10 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
             symbol = $"GRT6719-{symbolTo}";
         else if (symbolFrom == "RNDR")
             symbol = $"RENDER-{symbolTo}";
-        else if (new string[] {"UNI", "BEAM"}.Contains(symbolFrom))
-            return Result.Failure<YahooFinancePriceHistoryStore>($"Yahoo Finance data is wrong for {symbolFrom}. Skipping ...");
+        else if (symbolFrom == "UNI")
+            symbol = $"UNI7083-{symbolTo}";
+        else if (symbolFrom == "BEAM")
+            symbol = $"BEAM28298-{symbolTo}";
 
         Dictionary<DateTime, CryptoPriceData> dataStore;
         var csvFileName = $"pricedata/{symbol}_history.csv";
@@ -132,7 +134,7 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
     }
 
     public async Task<Result<CryptoPriceData>> GetPriceDataAsync(DateTime date)
-    {
+    {                
         if (_dataStore.TryGetValue(date.Date, out var priceData))
         {
             return priceData;
@@ -161,7 +163,8 @@ public class YahooFinancePriceHistoryStore : IPriceHistoryStore
             IReadOnlyList<Candle> candles;
             try
             {
-                candles = await Yahoo.GetHistoricalAsync(_symbol, date, date, Period.Daily);
+                DateTime dt = date; // Since the Yahoo lib manipulates the date object passed to GetHistoricalAsync
+                candles = await Yahoo.GetHistoricalAsync(_symbol, dt, dt, Period.Daily);
             }
             catch (Exception ex)
             {
