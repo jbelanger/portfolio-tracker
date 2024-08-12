@@ -46,7 +46,7 @@ internal class Program
 
         foreach (var h in portfolio.Holdings.Where(h => h.Balance > 0))
         {
-            Log.Information($"Currency:{h.Asset}    Balance:{h.Balance}     AvgPrice:{h.AverageBoughtPrice}     Cost:{h.Balance * h.AverageBoughtPrice}     Value:{h.Balance * h.CurrentPrice.Amount}");
+            Log.Information($"Currency:{h.Asset}    Balance:{h.Balance:F2}     AvgPrice:{h.AverageBoughtPrice:F2}     Cost:{(h.Balance * h.AverageBoughtPrice):F2}     Value:{(h.Balance * h.CurrentPrice?.Amount):F2}");
         }
     }
 

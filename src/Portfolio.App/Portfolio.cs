@@ -207,34 +207,6 @@ public class Portfolio
                     throw new Exception(addTxResult2.Error);
                 OnTradeAdded?.Invoke(trade, sender);
 
-                // var isBuyWithFiat = trade.TradeAmount.IsFiatCurrency;
-                // if (isBuyWithFiat)
-                // {
-                //     if (!trade.Amount.IsFiatCurrency)
-                //     {
-                //         // Get all transactions involving this asset before this taxable event to calculate Average Buying Price.
-                //         var previousTrades = sender.Transactions
-                //             .Where(t => t is CryptoCurrencyTradeTransaction && t.Amount.CurrencyCode == trade.Amount.CurrencyCode)
-                //             .Cast<CryptoCurrencyTradeTransaction>()
-                //             .ToList();
-
-                //         var totalQty = previousTrades.Sum(t => t.Amount.Amount);
-
-                //         decimal totalCost = 0;
-                //         foreach (var t in previousTrades)
-                //         {
-                //             totalCost += await GetConvertedTradeAmountIfRequired(t);
-                //         }
-
-                //         var averageBuyingPrice = totalCost / totalQty;
-                //         // var currentPrice = await _priceHistoryStores[receiver.Asset].GetPriceDataAsync(trade.DateTime);
-                //         // var profitLoss = currentPrice.Close - averageBuyingPrice;
-                //         receiver.AverageBoughtPrice = averageBuyingPrice;
-                //     }
-                // }
-                // else
-                //     _taxableEvents.Add(trade);
-
                 if (sender.Balance < 0)
                 {
                     Log.Error($"{sender.Asset} Balance is under zero: {sender.Balance}");
@@ -248,6 +220,8 @@ public class Portfolio
         // Fetch latest prices...
         foreach (var holding in _holdings)
         {
+            if(holding.Asset == "UNI")
+            ;
             if (holding.Asset == DefaultCurrency)
             {
                 holding.CurrentPrice = new Money(1m, holding.Asset);
@@ -260,8 +234,14 @@ public class Portfolio
                     holding.CurrentPrice = new Money(0m, holding.Asset);
                     continue;
                 }
-
-                var priceValueResult = await _priceHistoryStores[holding.Asset].GetPriceDataAsync(DateTime.Now);
+                var coinGeckoResult = await new CoinGeckoPriceHistoryStoreFactory().Create(holding.Asset, DefaultCurrency, DateTime.Now, DateTime.Now);
+                if(coinGeckoResult.IsFailure)
+                {
+                    Log.Error(coinGeckoResult.Error);
+                    holding.CurrentPrice = new Money(0m, holding.Asset);
+                    continue;
+                }
+                var priceValueResult = await coinGeckoResult.Value.GetPriceDataAsync(DateTime.Now);
                 if (priceValueResult.IsFailure)
                 {
                     Log.Error(priceValueResult.Error);
