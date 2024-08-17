@@ -75,6 +75,9 @@ public class Portfolio
         foreach (var txByCurrency in transactionsByCurrency)
         {
             var currency = txByCurrency.Key;
+            
+            if(currency == DefaultCurrency) continue; 
+
             var earliestTransaction = txByCurrency.First();
             var storeResult = await priceHistoryStoreFactory.Create(currency, DefaultCurrency, earliestTransaction.DateTime, DateTime.Now);
             if (storeResult.IsFailure)
@@ -95,6 +98,9 @@ public class Portfolio
             if (!priceHistoryStores.Any(s => s.Key == txByCurrency.Key))
             {
                 var currency = txByCurrency.Key;
+
+                if(currency == DefaultCurrency) continue; 
+
                 var earliestTransaction = txByCurrency.First();
                 var storeResult = await priceHistoryStoreFactory.Create(currency, DefaultCurrency, earliestTransaction.DateTime, DateTime.Now);
                 if (storeResult.IsFailure)
@@ -220,12 +226,8 @@ public class Portfolio
         // Fetch latest prices...
         foreach (var holding in _holdings)
         {
-            if(holding.Asset == "UNI")
-            ;
             if (holding.Asset == DefaultCurrency)
-            {
                 holding.CurrentPrice = new Money(1m, holding.Asset);
-            }
             else
             {
                 if (!_priceHistoryStores.ContainsKey(holding.Asset))
@@ -234,14 +236,8 @@ public class Portfolio
                     holding.CurrentPrice = new Money(0m, holding.Asset);
                     continue;
                 }
-                var coinGeckoResult = await new CoinGeckoPriceHistoryStoreFactory().Create(holding.Asset, DefaultCurrency, DateTime.Now, DateTime.Now);
-                if(coinGeckoResult.IsFailure)
-                {
-                    Log.Error(coinGeckoResult.Error);
-                    holding.CurrentPrice = new Money(0m, holding.Asset);
-                    continue;
-                }
-                var priceValueResult = await coinGeckoResult.Value.GetPriceDataAsync(DateTime.Now);
+                
+                var priceValueResult = await _priceHistoryStores[holding.Asset].GetPriceDataAsync(DateTime.Now);            
                 if (priceValueResult.IsFailure)
                 {
                     Log.Error(priceValueResult.Error);
