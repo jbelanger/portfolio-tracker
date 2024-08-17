@@ -9,11 +9,11 @@ namespace Portfolio.App;
 
 public class CoinGeckoPriceHistoryStore : IPriceHistoryStore
 {
-    private readonly Dictionary<DateTime, CryptoPriceData> _dataStore;
+    private readonly Dictionary<string, CryptoPriceData> _dataStore;
     private readonly string _csvFileName;
     private readonly string _symbol;
 
-    private CoinGeckoPriceHistoryStore(string symbol, string csvFileName, Dictionary<DateTime, CryptoPriceData> dataStore)
+    private CoinGeckoPriceHistoryStore(string symbol, string csvFileName, Dictionary<string, CryptoPriceData> dataStore)
     {
         _csvFileName = csvFileName;
         _symbol = symbol;
@@ -35,7 +35,7 @@ public class CoinGeckoPriceHistoryStore : IPriceHistoryStore
         else if (symbolFrom == "GRT")
             symbol = "the-graph";
 
-        Dictionary<DateTime, CryptoPriceData> dataStore;
+        Dictionary<string, CryptoPriceData> dataStore;
         var csvFileName = $"pricedata/{symbol}-{symbolTo}_history.csv";
 
         if (!File.Exists(csvFileName))
@@ -125,21 +125,21 @@ public class CoinGeckoPriceHistoryStore : IPriceHistoryStore
         }
     }
 
-    private static Dictionary<DateTime, CryptoPriceData> LoadDataFromCandles(IEnumerable<CryptoPriceData> candles)
+    private static Dictionary<string, CryptoPriceData> LoadDataFromCandles(IEnumerable<CryptoPriceData> candles)
     {
-        var dataStore = new Dictionary<DateTime, CryptoPriceData>();
+        var dataStore = new Dictionary<string, CryptoPriceData>();
 
         foreach (var candle in candles)
         {
-            dataStore[candle.Date] = candle;
+            dataStore[candle.Date.ToString("yyyy-MM-dd")] = candle;
         }
 
         return dataStore;
     }
 
-    private static Dictionary<DateTime, CryptoPriceData> LoadDataFromCsv(string csvFileName)
+    private static Dictionary<string, CryptoPriceData> LoadDataFromCsv(string csvFileName)
     {
-        var dataStore = new Dictionary<DateTime, CryptoPriceData>();
+        var dataStore = new Dictionary<string, CryptoPriceData>();
 
         using (var reader = new StreamReader(csvFileName))
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
@@ -147,7 +147,7 @@ public class CoinGeckoPriceHistoryStore : IPriceHistoryStore
             var records = csv.GetRecords<CryptoPriceData>();
             foreach (var record in records)
             {
-                dataStore[record.Date] = record;
+                dataStore[record.Date.ToString("yyyy-MM-dd")] = record;
             }
         }
 
@@ -156,7 +156,7 @@ public class CoinGeckoPriceHistoryStore : IPriceHistoryStore
 
     public async Task<Result<CryptoPriceData>> GetPriceDataAsync(DateTime date)
     {
-        if (_dataStore.TryGetValue(date.Date, out var priceData))
+        if (_dataStore.TryGetValue(date.ToString("yyyy-MM-dd"), out var priceData))
         {
             return priceData;
         }
@@ -182,7 +182,7 @@ public class CoinGeckoPriceHistoryStore : IPriceHistoryStore
                 priceData = fetchedData;
 
                 // Update the in-memory store and save to CSV
-                _dataStore[date] = priceData;
+                _dataStore[date.ToString("yyyy-MM-dd")] = priceData;
                 SaveDataToCsv();
 
                 return priceData;
