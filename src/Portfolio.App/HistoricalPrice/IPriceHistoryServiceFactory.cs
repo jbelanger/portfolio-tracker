@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Portfolio.App;
+namespace Portfolio.App.HistoricalPrice;
 
 public interface IPriceHistoryServiceFactory
 {
