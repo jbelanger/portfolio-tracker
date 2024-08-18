@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using Portfolio.App.HistoricalPrice;
 using Portfolio.Shared;
 using Serilog;
 
@@ -10,23 +11,22 @@ public delegate void TradeAddedHandler(CryptoCurrencyTradeTransaction deposit, C
 
 public class Portfolio
 {
-    private readonly IPriceHistoryServiceFactory _priceHistoryStoreFactory = null!;
-    private Dictionary<string, IPriceHistoryService> _priceHistoryStores = new();
+    private readonly IPriceHistoryService _priceHistoryService = null!;
     private List<CryptoCurrencyHolding> _holdings = new();
 
-    public event DepositAddedHandler OnDepositAdded;
-    public event WithdrawAddedHandler OnWithdrawAdded;
-    public event TradeAddedHandler OnTradeAdded;
+    public event DepositAddedHandler? OnDepositAdded;
+    public event WithdrawAddedHandler? OnWithdrawAdded;
+    public event TradeAddedHandler? OnTradeAdded;
 
     List<ICryptoCurrencyTransaction> _taxableEvents = new();
 
-    public string DefaultCurrency { get; private set; } = "USD";
+    public string DefaultCurrency { get; private set; } = Strings.CURRENCY_USD;
     public IReadOnlyCollection<Wallet> Wallets { get; private set; } = new List<Wallet>();
     public IReadOnlyCollection<CryptoCurrencyHolding> Holdings { get => _holdings; }
 
-    public Portfolio(IPriceHistoryServiceFactory priceHistoryStoreFactory)
+    public Portfolio(IPriceHistoryService priceHistoryService)
     {
-        _priceHistoryStoreFactory = priceHistoryStoreFactory;
+        _priceHistoryService = priceHistoryService;
     }
 
     public Result SetDefaultCurrency(string currencyCode)
@@ -36,6 +36,7 @@ public class Portfolio
             return Result.Failure("Currency code unknown.");
 
         DefaultCurrency = currencyCode;
+        _priceHistoryService.DefaultCurrency = currencyCode;
 
         return Result.Success();
     }
@@ -56,65 +57,12 @@ public class Portfolio
     {
         if (!Wallets.Any())
             return Result.Failure("No wallets to process. Start by adding a wallet.");
-
-        // Get all transactions, in order, for easier processing.
+        
         var transactions = GetTransactionsFromAllWallets();
-
-        // Load historical conversion price data. Used to calculate profit-loss.
-        _priceHistoryStores = await GetPriceHistoryDataStores(_priceHistoryStoreFactory, transactions);
-
         _holdings = (await GetHoldings(transactions)).ToList();
 
         return Result.Success();
     }
-
-    private async Task<Dictionary<string, IPriceHistoryService>> GetPriceHistoryDataStores(IPriceHistoryServiceFactory priceHistoryStoreFactory, IEnumerable<ICryptoCurrencyTransaction> transactions)
-    {
-        Dictionary<string, IPriceHistoryService> priceHistoryStores = new();
-        var transactionsByCurrency = transactions.GroupBy(t => t.Amount.CurrencyCode);
-        foreach (var txByCurrency in transactionsByCurrency)
-        {
-            var currency = txByCurrency.Key;
-            
-            if(currency == DefaultCurrency) continue; 
-
-            var earliestTransaction = txByCurrency.First();
-            var storeResult = await priceHistoryStoreFactory.Create(currency, DefaultCurrency, earliestTransaction.DateTime, DateTime.Now);
-            if (storeResult.IsFailure)
-            {
-                Log.Error(storeResult.Error);
-                continue;
-            }
-            priceHistoryStores.Add(currency, storeResult.Value);
-        }
-
-        // Also add the traded currency in trades...
-        transactionsByCurrency = transactions
-            .Where(t => t is CryptoCurrencyTradeTransaction)
-            .Cast<CryptoCurrencyTradeTransaction>()
-            .GroupBy(t => t.TradeAmount.CurrencyCode);
-        foreach (var txByCurrency in transactionsByCurrency)
-        {
-            if (!priceHistoryStores.Any(s => s.Key == txByCurrency.Key))
-            {
-                var currency = txByCurrency.Key;
-
-                if(currency == DefaultCurrency) continue; 
-
-                var earliestTransaction = txByCurrency.First();
-                var storeResult = await priceHistoryStoreFactory.Create(currency, DefaultCurrency, earliestTransaction.DateTime, DateTime.Now);
-                if (storeResult.IsFailure)
-                {
-                    Log.Error(storeResult.Error);
-                    continue;
-                }
-                priceHistoryStores.Add(currency, storeResult.Value);
-            }
-        }
-
-        return priceHistoryStores;
-    }
-
     private IEnumerable<ICryptoCurrencyTransaction> GetTransactionsFromAllWallets()
     {
         List<ICryptoCurrencyTransaction> allTransactions = [.. Wallets.SelectMany(w => w.Transactions)];
@@ -139,21 +87,16 @@ public class Portfolio
                     receiver.AverageBoughtPrice = 1;
                 else
                 {
-                    if (!_priceHistoryStores.ContainsKey(deposit.Amount.CurrencyCode))
+                    var priceResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(deposit.Amount.CurrencyCode, deposit.DateTime);
+                    if (priceResult.IsFailure)
                     {
-                        Log.Error($"No price history available for {receiver.Asset}.");
+                        Log.Error($"Failed to retrieve price history for asset {receiver.Asset} on {deposit.DateTime:yyyy-MM-dd}. Error: {priceResult.Error}");
                         continue;
                     }
 
-                    var priceValueResult = await _priceHistoryStores[deposit.Amount.CurrencyCode].GetPriceDataAsync(deposit.DateTime);
-                    if (priceValueResult.IsFailure)
-                    {
-                        Log.Error(priceValueResult.Error);
-                        continue;
-                    }
-                    deposit.UnitValue = new Money(priceValueResult.Value.Close, DefaultCurrency);
+                    deposit.UnitValue = new Money(priceResult.Value, DefaultCurrency);
 
-                    decimal newAverage = ((receiver.AverageBoughtPrice * (receiver.Balance - deposit.Amount.Amount)) + (deposit.Amount.Amount * priceValueResult.Value.Close)) / (receiver.Balance);
+                    decimal newAverage = ((receiver.AverageBoughtPrice * (receiver.Balance - deposit.Amount.Amount)) + (deposit.Amount.Amount * priceResult.Value)) / (receiver.Balance);
                     receiver.AverageBoughtPrice = newAverage;
                 }
 
@@ -230,21 +173,14 @@ public class Portfolio
                 holding.CurrentPrice = new Money(1m, holding.Asset);
             else
             {
-                if (!_priceHistoryStores.ContainsKey(holding.Asset))
-                {
-                    Log.Error($"No price history available for {holding.Asset}.");
-                    holding.CurrentPrice = new Money(0m, holding.Asset);
-                    continue;
-                }
-                
-                var priceValueResult = await _priceHistoryStores[holding.Asset].GetPriceDataAsync(DateTime.Now);            
+                var priceValueResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(holding.Asset, DateTime.Now);            
                 if (priceValueResult.IsFailure)
                 {
                     Log.Error(priceValueResult.Error);
                     holding.CurrentPrice = new Money(0m, holding.Asset);
                     continue;
                 }
-                holding.CurrentPrice = new Money(priceValueResult.Value.Close, holding.Asset);
+                holding.CurrentPrice = new Money(priceValueResult.Value, holding.Asset);
             }
         }
 
@@ -303,11 +239,4 @@ public class Portfolio
         }
         return holding;
     }
-}
-
-internal class TaxableEvent
-{
-    public ICryptoCurrencyTransaction Transaction { get; set; }
-    public decimal AverageBuyingPrice { get; set; }
-    public decimal PriceAtEvent { get; set; }
 }
