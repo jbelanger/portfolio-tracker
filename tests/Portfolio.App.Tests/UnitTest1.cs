@@ -279,7 +279,7 @@ public class Tests
         usdHolding.Balance.Should().Be(0);
     }
 
-    public class MockPriceHistoryStore : IPriceHistoryStore
+    public class MockPriceHistoryStore : IPriceHistoryService
     {
         public Task<CryptoPriceData> GetPriceDataAsync(DateTime date)
         {
@@ -296,9 +296,9 @@ public class Tests
 
     public class MockPriceHistoryStoreFactory : IPriceHistoryStoreFactory
     {
-        public Task<Result<IPriceHistoryStore>> Create(string symbolFrom, string symbolTo, DateTime startDate, DateTime endDate)
+        public Task<Result<IPriceHistoryService>> Create(string symbolFrom, string symbolTo, DateTime startDate, DateTime endDate)
         {
-            return Task.FromResult(Result.Success<IPriceHistoryStore>(new MockPriceHistoryStore()));
+            return Task.FromResult(Result.Success<IPriceHistoryService>(new MockPriceHistoryStore()));
         }
     }
 

@@ -7,7 +7,7 @@ using Serilog;
 
 namespace Portfolio.App;
 
-public class CoinGeckoPriceHistoryStore : IPriceHistoryStore
+public class CoinGeckoPriceHistoryStore : IPriceHistoryService
 {
     private readonly Dictionary<string, CryptoPriceData> _dataStore;
     private readonly string _csvFileName;
