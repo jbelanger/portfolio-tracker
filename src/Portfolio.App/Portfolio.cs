@@ -10,7 +10,7 @@ public delegate void TradeAddedHandler(CryptoCurrencyTradeTransaction deposit, C
 
 public class Portfolio
 {
-    private readonly IPriceHistoryStoreFactory _priceHistoryStoreFactory = null!;
+    private readonly IPriceHistoryServiceFactory _priceHistoryStoreFactory = null!;
     private Dictionary<string, IPriceHistoryService> _priceHistoryStores = new();
     private List<CryptoCurrencyHolding> _holdings = new();
 
@@ -24,7 +24,7 @@ public class Portfolio
     public IReadOnlyCollection<Wallet> Wallets { get; private set; } = new List<Wallet>();
     public IReadOnlyCollection<CryptoCurrencyHolding> Holdings { get => _holdings; }
 
-    public Portfolio(IPriceHistoryStoreFactory priceHistoryStoreFactory)
+    public Portfolio(IPriceHistoryServiceFactory priceHistoryStoreFactory)
     {
         _priceHistoryStoreFactory = priceHistoryStoreFactory;
     }
@@ -68,7 +68,7 @@ public class Portfolio
         return Result.Success();
     }
 
-    private async Task<Dictionary<string, IPriceHistoryService>> GetPriceHistoryDataStores(IPriceHistoryStoreFactory priceHistoryStoreFactory, IEnumerable<ICryptoCurrencyTransaction> transactions)
+    private async Task<Dictionary<string, IPriceHistoryService>> GetPriceHistoryDataStores(IPriceHistoryServiceFactory priceHistoryStoreFactory, IEnumerable<ICryptoCurrencyTransaction> transactions)
     {
         Dictionary<string, IPriceHistoryService> priceHistoryStores = new();
         var transactionsByCurrency = transactions.GroupBy(t => t.Amount.CurrencyCode);

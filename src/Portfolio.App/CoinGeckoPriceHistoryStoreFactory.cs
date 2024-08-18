@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Portfolio.App
 {
-    public class CoinGeckoPriceHistoryStoreFactory : IPriceHistoryStoreFactory
+    public class CoinGeckoPriceHistoryStoreFactory : IPriceHistoryServiceFactory
     {
         public async Task<Result<IPriceHistoryService>> Create(string symbolFrom, string symbolTo, DateTime startDate, DateTime endDate)
         {

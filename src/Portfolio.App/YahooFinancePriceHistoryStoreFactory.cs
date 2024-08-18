@@ -6,6 +6,8 @@ public class YahooFinancePriceHistoryStoreFactory : IPriceHistoryServiceFactory
 {
     private const string ERR_SAME_SYMBOLS = "Symbols must be of different currency/coin ({0}-{1}).";
 
+
+
     public async Task<Result<IPriceHistoryService>> Create(string symbolFrom, string symbolTo, DateTime startDate, DateTime endDate)
     {
         if (symbolFrom == symbolTo)
