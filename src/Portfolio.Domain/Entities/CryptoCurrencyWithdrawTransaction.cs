@@ -58,20 +58,5 @@ namespace Portfolio.Domain.Entities
 
             return withdrawal;
         }
-
-        // public override CryptoCurrencyTransaction ToGenericTransaction()
-        // {
-        //     return new CryptoCurrencyTransaction
-        //     {
-        //         DateTime = DateTime,
-        //         Type = TransactionType.Withdrawal,
-        //         Amount = null,
-        //         //SentAmount = Amount,
-        //         FeeAmount = FeeAmount,
-        //         Account = Account,
-        //         Note = Note,
-        //         TransactionIds = TransactionIds
-        //     };
-        // }
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Portfolio.Domain.Constants;
-using Portfolio.Infrastructure;
 using Portfolio.Infrastructure.Identity;
 
 namespace Portfolio.Infrastructure.Data;

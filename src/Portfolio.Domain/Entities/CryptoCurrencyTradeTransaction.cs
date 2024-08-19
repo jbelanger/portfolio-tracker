@@ -66,20 +66,5 @@ namespace Portfolio.Domain.Entities
             };
             return trade;
         }
-
-        // public CryptoCurrencyTransaction ToGenericTransaction()
-        // {
-        //     return new CryptoCurrencyTransaction
-        //     {
-        //         DateTime = DateTime,
-        //         Type = TransactionType.Trade,
-        //         Amount = Amount,
-        //         //TradeAmount = TradeAmount,
-        //         FeeAmount = FeeAmount,
-        //         Account = Account,
-        //         Note = Note,
-        //         TransactionIds = TransactionIds
-        //     };
-        // }
     }
 }

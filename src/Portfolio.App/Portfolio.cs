@@ -1,5 +1,7 @@
 // using Portfolio.App.HistoricalPrice;
 // using Portfolio.Domain;
+// using Portfolio.Domain.Entities;
+// using Portfolio.Domain.ValueObjects;
 
 // namespace Portfolio.App
 // {
@@ -61,13 +63,13 @@
 
 //             return Result.Success();
 //         }
-//         private IEnumerable<ICryptoCurrencyTransaction> GetTransactionsFromAllWallets()
+//         private IEnumerable<CryptoCurrencyRawTransaction> GetTransactionsFromAllWallets()
 //         {
-//             List<ICryptoCurrencyTransaction> allTransactions = [.. Wallets.SelectMany(w => w.Transactions)];
+//             List<CryptoCurrencyRawTransaction> allTransactions = [.. Wallets.SelectMany(w => w.Transactions)];
 //             return allTransactions.OrderBy(t => t.DateTime).ToList();
 //         }
 
-//         internal async Task<IEnumerable<CryptoCurrencyHolding>> GetHoldings(IEnumerable<ICryptoCurrencyTransaction> transactions)
+//         internal async Task<IEnumerable<CryptoCurrencyHolding>> GetHoldings(IEnumerable<CryptoCurrencyRawTransaction> transactions)
 //         {
 //             foreach (var tx in transactions)
 //             {
@@ -219,7 +221,6 @@
 //                 if (expectedTotal != holding.Balance)
 //                     Log.Warning("Missing transactions for holding {Asset}", holding.Asset);
 //             }
-
 //         }
 
 //         internal CryptoCurrencyHolding GetOrCreateHolding(string currencyCode)
