@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using CSharpFunctionalExtensions;
-using Serilog;
 using YahooFinanceApi;
 
 namespace Portfolio.App.HistoricalPrice.YahooFinance

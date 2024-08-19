@@ -1,5 +1,4 @@
 using CSharpFunctionalExtensions;
-using Serilog;
 
 namespace Portfolio.App.HistoricalPrice.CoinGecko
 {
