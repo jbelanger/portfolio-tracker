@@ -41,7 +41,7 @@ public class Tests
         if (testWalletResult.IsFailure)
             throw new Exception(testWalletResult.Error);
 
-        var portfolio = new Portfolio(new MockPriceHistoryStoreFactory());
+        var portfolio = new Portfolio(new MockPriceHistoryStore());
 
         var addWalletResult = portfolio.AddWallet(testWalletResult.Value);
         if (addWalletResult.IsFailure)
@@ -89,7 +89,7 @@ public class Tests
         if (testWalletResult.IsFailure)
             throw new Exception(testWalletResult.Error);
 
-        var portfolio = new Portfolio(new MockPriceHistoryStoreFactory());
+        var portfolio = new Portfolio(new MockPriceHistoryStore());
 
         var addWalletResult = portfolio.AddWallet(testWalletResult.Value);
         if (addWalletResult.IsFailure)
@@ -144,7 +144,7 @@ public class Tests
         if (testWalletResult.IsFailure)
             throw new Exception(testWalletResult.Error);
 
-        var portfolio = new Portfolio(new MockPriceHistoryStoreFactory());
+        var portfolio = new Portfolio(new MockPriceHistoryStore());
 
         var addWalletResult = portfolio.AddWallet(testWalletResult.Value);
         if (addWalletResult.IsFailure)
@@ -199,7 +199,7 @@ public class Tests
         if (testWalletResult.IsFailure)
             throw new Exception(testWalletResult.Error);
 
-        var portfolio = new Portfolio(new MockPriceHistoryStoreFactory());
+        var portfolio = new Portfolio(new MockPriceHistoryStore());
 
         var addWalletResult = portfolio.AddWallet(testWalletResult.Value);
         if (addWalletResult.IsFailure)
@@ -257,7 +257,7 @@ public class Tests
         if (testWalletResult.IsFailure)
             throw new Exception(testWalletResult.Error);
 
-        var portfolio = new Portfolio(new MockPriceHistoryStoreFactory());
+        var portfolio = new Portfolio(new MockPriceHistoryStore());
 
         var addWalletResult = portfolio.AddWallet(testWalletResult.Value);
         if (addWalletResult.IsFailure)
@@ -282,25 +282,18 @@ public class Tests
 
     public class MockPriceHistoryStore : IPriceHistoryService
     {
-        public Task<CryptoPriceRecord> GetPriceDataAsync(DateTime date)
+        public string DefaultCurrency { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public Task<Result<decimal>> GetPriceAtCloseTimeAsync(string symbol, DateTime date)
         {
             if (date.ToString("yyyy-MM-dd") == "2023-07-01")
             {
-                return Task.FromResult(new CryptoPriceRecord { ClosePrice = 50000 });
+                return Task.FromResult(Result.Success(50000m));
             }
             else
             {
-                throw new NotImplementedException();
+                return Task.FromResult(Result.Success(0m));
             }
         }
     }
-
-    public class MockPriceHistoryStoreFactory : IPriceHistoryStoreFactory
-    {
-        public Task<Result<IPriceHistoryService>> Create(string symbolFrom, string symbolTo, DateTime startDate, DateTime endDate)
-        {
-            return Task.FromResult(Result.Success<IPriceHistoryService>(new MockPriceHistoryStore()));
-        }
-    }
-
 }
