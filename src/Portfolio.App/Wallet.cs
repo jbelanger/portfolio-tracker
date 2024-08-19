@@ -1,23 +1,23 @@
-using CSharpFunctionalExtensions;
 using Portfolio.Shared;
 
-namespace Portfolio.App;
-
-public class Wallet
+namespace Portfolio.App
 {
-    public string Name { get; set; } = string.Empty;
-    public IEnumerable<ICryptoCurrencyTransaction> Transactions { get; set; } = null!;
-
-    private Wallet() {}
-
-    public static Result<Wallet> Create(string walletName, IEnumerable<ICryptoCurrencyTransaction> transactions)
+    public class Wallet
     {
-        if(string.IsNullOrWhiteSpace(walletName)) return Result.Failure<Wallet>("Name cannot be empty.");
-        
-        return new Wallet 
+        public string Name { get; set; } = string.Empty;
+        public IEnumerable<ICryptoCurrencyTransaction> Transactions { get; set; } = null!;
+
+        private Wallet() {}
+
+        public static Result<Wallet> Create(string walletName, IEnumerable<ICryptoCurrencyTransaction> transactions)
         {
-            Name = walletName,
-            Transactions = transactions ?? new List<ICryptoCurrencyTransaction>()
-        };
+            if(string.IsNullOrWhiteSpace(walletName)) return Result.Failure<Wallet>("Name cannot be empty.");
+        
+            return new Wallet 
+            {
+                Name = walletName,
+                Transactions = transactions ?? new List<ICryptoCurrencyTransaction>()
+            };
+        }
     }
 }

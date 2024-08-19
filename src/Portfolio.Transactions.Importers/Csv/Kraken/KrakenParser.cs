@@ -4,7 +4,7 @@ using CsvHelper.Configuration;
 using Portfolio.Shared;
 using Serilog;
 
-namespace Portfolio.Kraken
+namespace Portfolio.Transactions.Importers.Csv.Kraken
 {
     public class KrakenCsvParser
     {
@@ -128,7 +128,6 @@ namespace Portfolio.Kraken
 
                 depositResult.Value.State = new KrakenCsvEntry[] { deposit };
 
-
                 transactions.Add(depositResult.Value);
             }
 
@@ -178,10 +177,6 @@ namespace Portfolio.Kraken
             var txGroupsByRefid = rawLedger.GroupBy(x => x.ReferenceId).Where(group => group.Count() > 1);
             foreach (var group in txGroupsByRefid)
             {
-
-                if (group.Key == "TS5PSRF-EJ4SC-FQMLN2")
-                    ;
-
                 var receiveTx = group.Single(l => l.Amount.Amount > 0 && (l.Type == "receive" || l.Type == "trade"));
                 if (group.Count() > 2)
                 {
@@ -230,14 +225,12 @@ namespace Portfolio.Kraken
                     }
                 }
 
-                                if(receiveTx.ReferenceId == "TDAVEN-Q5IGP-SR3WD4")
-                ;
                 var spendTx = group.Single(l => l.Amount.Amount < 0 && (l.Type == "spend" || l.Type == "trade"));
                 decimal receivedAmount = receiveTx.Amount.AbsoluteAmount;
-                Money fee = (spendTx.Fee.AbsoluteAmount > 0) ? spendTx.Fee.ToAbsoluteAmountMoney() : receiveTx.Fee.ToAbsoluteAmountMoney();
+                Money fee = spendTx.Fee.AbsoluteAmount > 0 ? spendTx.Fee.ToAbsoluteAmountMoney() : receiveTx.Fee.ToAbsoluteAmountMoney();
 
-                var isSellTransaction = (receiveTx.Amount.IsFiatCurrency && !spendTx.Amount.IsFiatCurrency);
-                var isReceiveFee = (receiveTx.Amount.CurrencyCode == receiveTx.Fee.CurrencyCode && receiveTx.Fee.Amount > 0);                
+                var isSellTransaction = receiveTx.Amount.IsFiatCurrency && !spendTx.Amount.IsFiatCurrency;
+                var isReceiveFee = receiveTx.Amount.CurrencyCode == receiveTx.Fee.CurrencyCode && receiveTx.Fee.Amount > 0;
                 if (isReceiveFee/* && isSellTransaction*/)
                     receivedAmount -= fee.AbsoluteAmount;
 

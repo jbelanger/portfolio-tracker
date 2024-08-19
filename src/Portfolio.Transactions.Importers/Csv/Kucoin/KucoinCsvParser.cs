@@ -1,9 +1,10 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Portfolio.Shared;
 using Serilog;
 
-namespace Portfolio.Kucoin
+namespace Portfolio.Transactions.Importers.Csv.Kucoin
 {
     public class KucoinCsvParser
     {
@@ -21,9 +22,9 @@ namespace Portfolio.Kucoin
             _folderPath = folderPath ?? throw new ArgumentNullException("The folder path cannot be null or empty.");
         }
 
-        public IEnumerable<CryptoCurrencyTransaction> ExtractTransactions()
+        public IEnumerable<ICryptoCurrencyTransaction> ExtractTransactions()
         {
-            List<CryptoCurrencyTransaction> transactions = new();
+            List<ICryptoCurrencyTransaction> transactions = new();
 
             ReadCsvFile();
 
@@ -89,38 +90,52 @@ namespace Portfolio.Kucoin
             }
         }
 
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<KucoinWithdrawCsvEntry> withdrawals)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<KucoinWithdrawCsvEntry> withdrawals)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
 
             foreach (var withdraw in withdrawals)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateWithdrawal(
+                var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
                     date: withdraw.Date,
-                    sentAmount: withdraw.Amount.ToAbsoluteAmountMoney(),
+                    amount: withdraw.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
-                    "Kucoin",
-                    transactionIds: [withdraw.TransactionId]
-                    ));
+                    "kucoin",
+                    transactionIds: [withdraw.TransactionId],
+                    note: withdraw.Remark);
+
+                if (withdrawResult.IsFailure)
+                    throw new ArgumentException(withdrawResult.Error);
+
+                withdrawResult.Value.State = new KucoinWithdrawCsvEntry[] { withdraw };
+
+                transactions.Add(withdrawResult.Value);
             }
 
             return transactions;
         }
 
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessDeposits(IEnumerable<KucoinDepositCsvEntry> deposits)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessDeposits(IEnumerable<KucoinDepositCsvEntry> deposits)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
 
             foreach (var deposit in deposits)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateDeposit(
+                var depositResult = CryptoCurrencyDepositTransaction.Create(
                     date: deposit.Date,
                     receivedAmount: deposit.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: deposit.Fee.ToAbsoluteAmountMoney(),
-                    "Kucoin",
+                    "kucoin",
                     transactionIds: [deposit.TransactionId],
-                    note: deposit.Remark
-                    ));
+                    note: deposit.Remark);
+
+                if (depositResult.IsFailure)
+                    throw new ArgumentException(depositResult.Error);
+
+                depositResult.Value.State = new KucoinDepositCsvEntry[] { deposit };
+
+
+                transactions.Add(depositResult.Value);
             }
 
             return transactions;
@@ -139,9 +154,9 @@ namespace Portfolio.Kucoin
         /// <param name="depotTransactions"></param>
         /// <param name="accountTransactions"></param>
         /// <returns></returns>
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessStaking(IEnumerable<KucoinFilledOrderCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessStaking(IEnumerable<KucoinFilledOrderCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var stakes = rawLedger.Where(x => x.Type == "DELEGATE");
 
             foreach (var stake in stakes)
@@ -158,21 +173,28 @@ namespace Portfolio.Kucoin
         /// <param name="rawLedger"></param>
         /// <returns></returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessTrades(IEnumerable<KucoinFilledOrderCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessTrades(IEnumerable<KucoinFilledOrderCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var trades = rawLedger.Where(x => x.Type == "BUY");
 
             foreach (var trade in trades)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateTrade(
+                var tradeResult = CryptoCurrencyTradeTransaction.Create(
                     date: trade.Date,
                     receivedAmount: trade.OrderAmount.ToAbsoluteAmountMoney(),
                     sentAmount: trade.FilledVolume.ToAbsoluteAmountMoney(),
                     feeAmount: trade.Fee.ToAbsoluteAmountMoney(),
-                    "Kucoin",
+                    "kucoin",
                     transactionIds: [trade.TransactionId]
-                    ));
+                    );
+
+                if (tradeResult.IsFailure)
+                    throw new ArgumentException(tradeResult.Error);
+
+                tradeResult.Value.State = new KucoinFilledOrderCsvEntry[] { trade };
+
+                transactions.Add(tradeResult.Value);
             }
 
             return transactions;

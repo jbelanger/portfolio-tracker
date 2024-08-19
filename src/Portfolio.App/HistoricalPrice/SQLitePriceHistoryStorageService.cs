@@ -1,5 +1,4 @@
 using Microsoft.Data.Sqlite;
-using CSharpFunctionalExtensions;
 
 namespace Portfolio.App.HistoricalPrice
 {

@@ -1,9 +1,10 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Portfolio.Shared;
 using Serilog;
 
-namespace Portfolio.Coinbase
+namespace Portfolio.Transactions.Importers.Csv.Coinbase
 {
     public class CoinbaseCsvParser
     {
@@ -14,12 +15,12 @@ namespace Portfolio.Coinbase
             _filename = filename ?? throw new ArgumentNullException("The file path cannot be null or empty.");
         }
 
-        public IEnumerable<CryptoCurrencyTransaction> ExtractTransactions()
+        public IEnumerable<ICryptoCurrencyTransaction> ExtractTransactions()
         {
             var csvLines = ReadCsvFile();
 
             var rawLedger = csvLines.OrderBy(x => x.Date).ToList();
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
 
             // Deposits
             var deposits = ProcessDeposits(rawLedger);
@@ -67,52 +68,70 @@ namespace Portfolio.Coinbase
             }
         }
 
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<CoinbaseCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<CoinbaseCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var processedRefIds = new HashSet<string>();
             var sentMoneyTxs = rawLedger.Where(x => x.Type == "Send");
 
             foreach (var withdraw in sentMoneyTxs)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateWithdrawal(
+                var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
                     date: withdraw.Date,
-                    sentAmount: withdraw.Amount.ToAbsoluteAmountMoney(),
+                    amount: withdraw.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
-                    "Coinbase",
-                    transactionIds: [withdraw.TransactionId]
-                    ));
+                    "coinbase",
+                    transactionIds: [withdraw.TransactionId]);
+
+                if (withdrawResult.IsFailure)
+                    throw new ArgumentException(withdrawResult.Error);
+
+                withdrawResult.Value.State = new CoinbaseCsvEntry[] { withdraw };
+
+                transactions.Add(withdrawResult.Value);
             }
 
             var withdrawals = rawLedger.Where(x => x.Type == "Withdrawal");
             foreach (var withdraw in withdrawals)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateWithdrawal(
+                var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
                     date: withdraw.Date,
-                    sentAmount: withdraw.Subtotal.ToAbsoluteAmountMoney(),
+                    amount: withdraw.Subtotal.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
-                    "Coinbase",
-                    transactionIds: [withdraw.TransactionId]
-                    ));
+                    "coinbase",
+                    transactionIds: [withdraw.TransactionId]);
+
+                if (withdrawResult.IsFailure)
+                    throw new ArgumentException(withdrawResult.Error);
+
+                withdrawResult.Value.State = new CoinbaseCsvEntry[] { withdraw };
+
+                transactions.Add(withdrawResult.Value);
             }
 
             return transactions;
         }
 
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessDeposits(IEnumerable<CoinbaseCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessDeposits(IEnumerable<CoinbaseCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var deposits = rawLedger.Where(x => x.Type == "Deposit");
 
             foreach (var deposit in deposits)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateDeposit(
+                var depositResult = CryptoCurrencyDepositTransaction.Create(
                     date: deposit.Date,
                     receivedAmount: deposit.Subtotal.ToAbsoluteAmountMoney(),
                     feeAmount: deposit.Fee.ToAbsoluteAmountMoney(),
-                    "Coinbase",
-                    transactionIds: [deposit.TransactionId]
-                    ));
+                    "coinbase",
+                    transactionIds: [deposit.TransactionId]);
+
+                if (depositResult.IsFailure)
+                    throw new ArgumentException(depositResult.Error);
+
+                depositResult.Value.State = new CoinbaseCsvEntry[] { deposit };
+
+                transactions.Add(depositResult.Value);
             }
 
             return transactions;
@@ -131,9 +150,9 @@ namespace Portfolio.Coinbase
         /// <param name="depotTransactions"></param>
         /// <param name="accountTransactions"></param>
         /// <returns></returns>
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessStaking(IEnumerable<CoinbaseCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessStaking(IEnumerable<CoinbaseCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var stakes = rawLedger.Where(x => x.Type == "DELEGATE");
 
             foreach (var stake in stakes)
@@ -150,34 +169,47 @@ namespace Portfolio.Coinbase
         /// <param name="rawLedger"></param>
         /// <returns></returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessTrades(IEnumerable<CoinbaseCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessTrades(IEnumerable<CoinbaseCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var trades = rawLedger.Where(x => x.Type == "Buy");
 
             foreach (var trade in trades)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateTrade(
+                var tradeResult = CryptoCurrencyTradeTransaction.Create(
                     date: trade.Date,
                     receivedAmount: trade.Amount.ToAbsoluteAmountMoney(),
                     sentAmount: trade.Subtotal.ToAbsoluteAmountMoney(),
                     feeAmount: trade.Fee.ToAbsoluteAmountMoney(),
-                    "Coinbase",
-                    transactionIds: [trade.TransactionId]
-                    ));
+                    "coinbase",
+                    transactionIds: [trade.TransactionId]);
+
+                if (tradeResult.IsFailure)
+                    throw new ArgumentException(tradeResult.Error);
+
+                tradeResult.Value.State = new CoinbaseCsvEntry[] { trade };
+
+                transactions.Add(tradeResult.Value);
             }
 
             var advTrades = rawLedger.Where(x => x.Type == "Advance Trade Sell");
             foreach (var trade in advTrades)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateTrade(
+                var tradeResult = CryptoCurrencyTradeTransaction.Create(
                     date: trade.Date,
                     receivedAmount: trade.Subtotal.ToAbsoluteAmountMoney(),
                     sentAmount: trade.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: trade.Fee.ToAbsoluteAmountMoney(),
-                    "Coinbase",
+                    "coinbase",
                     transactionIds: [trade.TransactionId]
-                    ));
+                    );
+
+                if (tradeResult.IsFailure)
+                    throw new ArgumentException(tradeResult.Error);
+
+                tradeResult.Value.State = new CoinbaseCsvEntry[] { trade };
+
+                transactions.Add(tradeResult.Value);
             }
 
             return transactions;

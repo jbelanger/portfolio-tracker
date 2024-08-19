@@ -1,4 +1,3 @@
-using CSharpFunctionalExtensions;
 using Newtonsoft.Json.Linq;
 
 namespace Portfolio.App.HistoricalPrice.CoinGecko

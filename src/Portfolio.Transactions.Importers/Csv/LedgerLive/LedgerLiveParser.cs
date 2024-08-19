@@ -1,25 +1,26 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Portfolio.Shared;
 using Serilog;
 
-namespace Portfolio.LedgerLive
+namespace Portfolio.Transactions.Importers.Csv.LedgerLive
 {
     public class LedgerLiveCsvParser
-    {        
+    {
         private string _filename;
 
         public LedgerLiveCsvParser(string filename)
         {
-            _filename = filename ?? throw new ArgumentNullException("The file path cannot be null or empty.");         
+            _filename = filename ?? throw new ArgumentNullException("The file path cannot be null or empty.");
         }
 
-        public IEnumerable<CryptoCurrencyTransaction> ExtractTransactions()
+        public IEnumerable<ICryptoCurrencyTransaction> ExtractTransactions()
         {
             var csvLines = ReadCsvFile();
 
             var rawLedger = csvLines.OrderBy(x => x.Date).ToList();
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
 
             // Trades
             var trades = ProcessTrades(rawLedger);
@@ -60,40 +61,54 @@ namespace Portfolio.LedgerLive
             }
         }
 
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<LedgerLiveCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<LedgerLiveCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var processedRefIds = new HashSet<string>();
             var withdrawals = rawLedger.Where(x => x.Type == "OUT");
 
             foreach (var withdraw in withdrawals)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateWithdrawal(
+                var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
                     date: withdraw.Date,
-                    sentAmount: withdraw.Amount.ToAbsoluteAmountMoney(),
+                    amount: withdraw.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
-                    "LedgerLive",
+                    "ledgerlive",
                     transactionIds: [withdraw.TransactionId]
-                    ));
+                    );
+
+                if (withdrawResult.IsFailure)
+                    throw new ArgumentException(withdrawResult.Error);
+
+                withdrawResult.Value.State = new LedgerLiveCsvEntry[] { withdraw };
+
+                transactions.Add(withdrawResult.Value);
             }
 
             return transactions;
         }
 
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessDeposits(IEnumerable<LedgerLiveCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessDeposits(IEnumerable<LedgerLiveCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var deposits = rawLedger.Where(x => x.Type == "IN");
 
             foreach (var deposit in deposits)
             {
-                transactions.Add(CryptoCurrencyTransaction.CreateDeposit(
+                var depositResult = CryptoCurrencyDepositTransaction.Create(
                     date: deposit.Date,
                     receivedAmount: deposit.Amount.ToAbsoluteAmountMoney().Subtract(deposit.Fee.ToAbsoluteAmountMoney()),
                     feeAmount: deposit.Fee.ToAbsoluteAmountMoney(),
-                    "LedgerLive",
+                    "ledgerlive",
                     transactionIds: [deposit.TransactionId]
-                    ));
+                    );
+
+                if (depositResult.IsFailure)
+                    throw new ArgumentException(depositResult.Error);
+
+                depositResult.Value.State = new LedgerLiveCsvEntry[] { deposit };
+
+                transactions.Add(depositResult.Value);
             }
 
             return transactions;
@@ -112,9 +127,9 @@ namespace Portfolio.LedgerLive
         /// <param name="depotTransactions"></param>
         /// <param name="accountTransactions"></param>
         /// <returns></returns>
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessStaking(IEnumerable<LedgerLiveCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessStaking(IEnumerable<LedgerLiveCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             var stakes = rawLedger.Where(x => x.Type == "DELEGATE");
 
             foreach (var stake in stakes)
@@ -131,9 +146,9 @@ namespace Portfolio.LedgerLive
         /// <param name="rawLedger"></param>
         /// <returns></returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static IEnumerable<CryptoCurrencyTransaction> ProcessTrades(IEnumerable<LedgerLiveCsvEntry> rawLedger)
+        private static IEnumerable<ICryptoCurrencyTransaction> ProcessTrades(IEnumerable<LedgerLiveCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyTransaction>();
+            var transactions = new List<ICryptoCurrencyTransaction>();
             // var trades = rawLedger.Where(x => x.Type == "DELEGATE");
 
             // foreach (var trade in trades)

@@ -21,8 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Portfolio.Kraken\portfolio-kraken-parser.csproj" />
+    <ProjectReference Include="..\Portfolio.Transactions.Importers\Portfolio.Transactions.Importers.csproj" />
   </ItemGroup>
-
 
 </Project>
