@@ -1,5 +1,3 @@
-using CSharpFunctionalExtensions;
-
 namespace Portfolio;
 
 /// <summary>

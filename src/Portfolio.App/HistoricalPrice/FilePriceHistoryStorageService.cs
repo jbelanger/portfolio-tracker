@@ -15,7 +15,7 @@ public sealed class CryptoPriceRecordMap : ClassMap<CryptoPriceRecord>
     }
 }
 
-public class LocalFilePriceHistoryStorageService : IPriceHistoryStorageService
+public class FilePriceHistoryStorageService : IPriceHistoryStorageService
 {
     public string StorageLocation { get; set; } = "historical_price_data";
 
@@ -35,7 +35,7 @@ public class LocalFilePriceHistoryStorageService : IPriceHistoryStorageService
         }
         catch (Exception ex)
         {
-            Log.ForContext<LocalFilePriceHistoryStorageService>().Error($"[{nameof(LocalFilePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
+            Log.ForContext<FilePriceHistoryStorageService>().Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
             
             // File might be corrupt. Delete it.
             File.Delete(csvFileName);
@@ -68,7 +68,7 @@ public class LocalFilePriceHistoryStorageService : IPriceHistoryStorageService
         }
         catch (Exception ex)
         {
-            Log.Error($"[{nameof(LocalFilePriceHistoryStorageService)}.{nameof(SaveHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
+            Log.Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(SaveHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
             return Result.Failure($"Error saving data to CSV.");
         }
     }

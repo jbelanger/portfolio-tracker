@@ -1,6 +1,7 @@
 using Portfolio.Shared;
 using FluentAssertions;
 using CSharpFunctionalExtensions;
+using Portfolio.App.HistoricalPrice;
 
 namespace Portfolio.App.Tests;
 
@@ -281,11 +282,11 @@ public class Tests
 
     public class MockPriceHistoryStore : IPriceHistoryService
     {
-        public Task<CryptoPriceData> GetPriceDataAsync(DateTime date)
+        public Task<CryptoPriceRecord> GetPriceDataAsync(DateTime date)
         {
             if (date.ToString("yyyy-MM-dd") == "2023-07-01")
             {
-                return Task.FromResult(new CryptoPriceData { Close = 50000 });
+                return Task.FromResult(new CryptoPriceRecord { ClosePrice = 50000 });
             }
             else
             {
