@@ -57,20 +57,5 @@ namespace Portfolio.Domain.Entities
             };
             return deposit;
         }
-
-        // public CryptoCurrencyTransaction ToGenericTransaction()
-        // {
-        //     return new CryptoCurrencyTransaction
-        //     {
-        //         DateTime = DateTime,
-        //         Type = TransactionType.Deposit,
-        //         Amount = Amount,
-        //         //SentAmount = null,
-        //         FeeAmount = FeeAmount,
-        //         Account = Account,
-        //         Note = Note,
-        //         TransactionIds = TransactionIds
-        //     };
-        // }
     }
 }

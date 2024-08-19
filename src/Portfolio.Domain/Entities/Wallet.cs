@@ -1,71 +1,51 @@
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Common;
-using Portfolio.Domain.Events;
 
 namespace Portfolio.Domain.Entities
 {
-    public class Wallet : AggregateRoot
+    public class Wallet : BaseAuditableEntity
     {        
-        public string Name { get; private set; } = string.Empty;
-
-        private readonly HashSet<CryptoCurrencyHolding> _holdings = new();
-        public IReadOnlyCollection<CryptoCurrencyHolding> Holdings => _holdings;
+        public string Name { get; init; } = string.Empty;
+        private readonly HashSet<CryptoCurrencyRawTransaction> _transactions = new();
+        
+        public IReadOnlyCollection<CryptoCurrencyRawTransaction> Transactions => _transactions;
 
         private Wallet() { }
 
-        public static Result<Wallet> Create(string walletName, IEnumerable<ICryptoCurrencyTransaction> transactions)
+        public static Result<Wallet> Create(string walletName)
         {
-            if (string.IsNullOrWhiteSpace(walletName))
-                throw new ArgumentException("Name cannot be empty.", nameof(walletName));
+            if (string.IsNullOrWhiteSpace(walletName)) return Result.Failure<Wallet>("Name cannot be empty.");
 
-            var wallet = new Wallet
+            return new Wallet
             {
-                Name = walletName
+                Name = walletName                
             };
-
-            foreach (var transaction in transactions.OrderBy(t => t.DateTime))
-            {
-                wallet.ProcessTransaction(transaction);
-            }
-
-            return wallet;
         }
 
-        private void ProcessTransaction(ICryptoCurrencyTransaction transaction)
+        public Result AddTransaction(CryptoCurrencyRawTransaction transaction)
         {
-            CryptoCurrencyHolding? receiver = null;
+            if (transaction == null)
+                return Result.Failure("Transaction cannot be null.");
 
-            if (transaction is CryptoCurrencyDepositTransaction deposit)
+            if (!_transactions.Add(transaction))
             {
-                receiver = GetOrCreateHolding(deposit.Amount.CurrencyCode);
-                receiver.AddTransaction(deposit);
-                AddDomainEvent(new TransactionAddedDomainEvent(receiver, deposit));
-            }
+                return Result.Failure("Transaction already exists in this holding.");
+            }            
 
-            if (transaction is CryptoCurrencyWithdrawTransaction withdraw)
-            {
-                receiver = GetOrCreateHolding(withdraw.Amount.CurrencyCode);
-                receiver.AddTransaction(withdraw);
-                AddDomainEvent(new TransactionAddedDomainEvent(receiver, withdraw));
-            }
-
-            if (transaction is CryptoCurrencyTradeTransaction trade)
-            {
-                receiver = GetOrCreateHolding(trade.Amount.CurrencyCode);
-                receiver.AddTransaction(trade);
-                AddDomainEvent(new TransactionAddedDomainEvent(receiver, trade));
-            }
+            return Result.Success();
         }
 
-        private CryptoCurrencyHolding GetOrCreateHolding(string currencyCode)
+        public Result RemoveTransaction(CryptoCurrencyRawTransaction transaction)
         {
-            var holding = _holdings.SingleOrDefault(h => h.Asset == currencyCode);
-            if (holding == null)
+            if (transaction == null)
+                return Result.Failure("Transaction cannot be null.");
+
+            if (!_transactions.Remove(transaction))
             {
-                holding = new CryptoCurrencyHolding(currencyCode);
-                _holdings.Add(holding);
+                return Result.Failure("Transaction not found in this holding.");
             }
-            return holding;
+
+            return Result.Success();
         }
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.App.Common.Interfaces;
-using Portfolio.Domain;
 using Portfolio.Domain.Common;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure.Data.Configurations;
@@ -22,7 +21,7 @@ namespace Portfolio.Infrastructure
 
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<CryptoCurrencyHolding> Holdings { get; set; }
-        public DbSet<CryptoCurrencyTransaction> Transactions { get; set; }
+        //public DbSet<CryptoCurrencyTransaction> Transactions { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -50,10 +49,14 @@ namespace Portfolio.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new CryptoCurrencyTransactionConfiguration());            
-            modelBuilder.ApplyConfiguration(new CryptoCurrencyTradeTransactionConfiguration());
+            modelBuilder.ApplyConfiguration(new CryptoCurrencyRawTransactionConfiguration());  
+            modelBuilder.ApplyConfiguration(new CryptoCurrencyProcessedTransactionConfiguration());            
+            // modelBuilder.ApplyConfiguration(new CryptoCurrencyTransactionConfiguration());            
+            // modelBuilder.ApplyConfiguration(new CryptoCurrencyTradeTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CryptoCurrencyHoldingConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
+            modelBuilder.ApplyConfiguration(new PortfolioConfiguration());
+
         }
     }
 }

@@ -147,27 +147,94 @@ namespace Portfolio.Infrastructure.DataMigrations
 
             modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyHolding", b =>
                 {
-                    b.Property<string>("Asset")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("AverageBoughtPrice")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("WalletId")
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Asset");
+                    b.Property<string>("Asset")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
 
-                    b.HasIndex("WalletId");
+                    b.Property<decimal?>("AverageBoughtPrice")
+                        .HasColumnType("decimal(18,8)");
 
-                    b.ToTable("Holdings");
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("PortfolioId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PortfolioId");
+
+                    b.ToTable("CryptoCurrencyHoldings", (string)null);
                 });
 
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyTransaction", b =>
+            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyProcessedTransaction", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<string>("Asset")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("AveragePriceAtTime")
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<decimal?>("BalanceAfterTransaction")
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("PortfolioId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("WalletName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PortfolioId");
+
+                    b.ToTable("CryptoCurrencyProcessedTransactions", (string)null);
+                });
+
+            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyRawTransaction", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -178,10 +245,19 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("HoldingAsset")
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Note")
@@ -191,28 +267,48 @@ namespace Portfolio.Infrastructure.DataMigrations
 
                     b.Property<string>("TransactionIds")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("TransactionIds");
 
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
+                    b.Property<long?>("WalletId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("HoldingAsset");
+                    b.HasIndex("WalletId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("CryptoCurrencyRawTransactions", (string)null);
+                });
 
-                    b.HasDiscriminator<int>("TransactionType").HasValue(0);
+            modelBuilder.Entity("Portfolio.Domain.Entities.Portfolio", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.UseTphMappingStrategy();
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Portfolios", (string)null);
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.Wallet", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -233,9 +329,14 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<long?>("PortfolioId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Wallets");
+                    b.HasIndex("PortfolioId");
+
+                    b.ToTable("Wallets", (string)null);
                 });
 
             modelBuilder.Entity("Portfolio.Infrastructure.Identity.ApplicationUser", b =>
@@ -302,27 +403,6 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyDepositTransaction", b =>
-                {
-                    b.HasBaseType("Portfolio.Domain.Entities.CryptoCurrencyTransaction");
-
-                    b.HasDiscriminator().HasValue(2);
-                });
-
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyTradeTransaction", b =>
-                {
-                    b.HasBaseType("Portfolio.Domain.Entities.CryptoCurrencyTransaction");
-
-                    b.HasDiscriminator().HasValue(1);
-                });
-
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyWithdrawTransaction", b =>
-                {
-                    b.HasBaseType("Portfolio.Domain.Entities.CryptoCurrencyTransaction");
-
-                    b.HasDiscriminator().HasValue(3);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -376,99 +456,122 @@ namespace Portfolio.Infrastructure.DataMigrations
 
             modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyHolding", b =>
                 {
-                    b.HasOne("Portfolio.Domain.Entities.Wallet", null)
+                    b.HasOne("Portfolio.Domain.Entities.Portfolio", null)
                         .WithMany("Holdings")
-                        .HasForeignKey("WalletId")
+                        .HasForeignKey("PortfolioId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyTransaction", b =>
+            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyProcessedTransaction", b =>
                 {
-                    b.HasOne("Portfolio.Domain.Entities.CryptoCurrencyHolding", null)
-                        .WithMany("Transactions")
-                        .HasForeignKey("HoldingAsset")
+                    b.HasOne("Portfolio.Domain.Entities.Portfolio", null)
+                        .WithMany("ProcessedTransactions")
+                        .HasForeignKey("PortfolioId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
 
-                    b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "Amount", b1 =>
-                        {
-                            b1.Property<long>("CryptoCurrencyTransactionId")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<decimal>("Amount")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("CurrencyCode")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("CryptoCurrencyTransactionId");
-
-                            b1.ToTable("Transactions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CryptoCurrencyTransactionId");
-                        });
+            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyRawTransaction", b =>
+                {
+                    b.HasOne("Portfolio.Domain.Entities.Wallet", null)
+                        .WithMany("Transactions")
+                        .HasForeignKey("WalletId");
 
                     b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "FeeAmount", b1 =>
                         {
-                            b1.Property<long>("CryptoCurrencyTransactionId")
+                            b1.Property<long>("CryptoCurrencyRawTransactionId")
                                 .HasColumnType("INTEGER");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("TEXT");
+                                .HasColumnType("decimal(18,8)")
+                                .HasColumnName("FeeAmount");
 
                             b1.Property<string>("CurrencyCode")
                                 .IsRequired()
-                                .HasColumnType("TEXT");
+                                .HasMaxLength(3)
+                                .HasColumnType("TEXT")
+                                .HasColumnName("FeeAmountCurrency");
 
-                            b1.HasKey("CryptoCurrencyTransactionId");
+                            b1.HasKey("CryptoCurrencyRawTransactionId");
 
-                            b1.ToTable("Transactions");
+                            b1.ToTable("CryptoCurrencyRawTransactions");
 
                             b1.WithOwner()
-                                .HasForeignKey("CryptoCurrencyTransactionId");
+                                .HasForeignKey("CryptoCurrencyRawTransactionId");
                         });
 
-                    b.Navigation("Amount")
-                        .IsRequired();
+                    b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "ReceivedAmount", b1 =>
+                        {
+                            b1.Property<long>("CryptoCurrencyRawTransactionId")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("decimal(18,8)")
+                                .HasColumnName("ReceivedAmount");
+
+                            b1.Property<string>("CurrencyCode")
+                                .IsRequired()
+                                .HasMaxLength(3)
+                                .HasColumnType("TEXT")
+                                .HasColumnName("ReceivedAmountCurrency");
+
+                            b1.HasKey("CryptoCurrencyRawTransactionId");
+
+                            b1.ToTable("CryptoCurrencyRawTransactions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CryptoCurrencyRawTransactionId");
+                        });
+
+                    b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "SentAmount", b1 =>
+                        {
+                            b1.Property<long>("CryptoCurrencyRawTransactionId")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("decimal(18,8)")
+                                .HasColumnName("SentAmount");
+
+                            b1.Property<string>("CurrencyCode")
+                                .IsRequired()
+                                .HasMaxLength(3)
+                                .HasColumnType("TEXT")
+                                .HasColumnName("SentAmountCurrency");
+
+                            b1.HasKey("CryptoCurrencyRawTransactionId");
+
+                            b1.ToTable("CryptoCurrencyRawTransactions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CryptoCurrencyRawTransactionId");
+                        });
 
                     b.Navigation("FeeAmount");
-                });
 
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyTradeTransaction", b =>
-                {
-                    b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "TradeAmount", b1 =>
-                        {
-                            b1.Property<long>("CryptoCurrencyTradeTransactionId")
-                                .HasColumnType("INTEGER");
+                    b.Navigation("ReceivedAmount");
 
-                            b1.Property<decimal>("Amount")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<string>("CurrencyCode")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.HasKey("CryptoCurrencyTradeTransactionId");
-
-                            b1.ToTable("Transactions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CryptoCurrencyTradeTransactionId");
-                        });
-
-                    b.Navigation("TradeAmount")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyHolding", b =>
-                {
-                    b.Navigation("Transactions");
+                    b.Navigation("SentAmount");
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.Wallet", b =>
                 {
+                    b.HasOne("Portfolio.Domain.Entities.Portfolio", null)
+                        .WithMany("Wallets")
+                        .HasForeignKey("PortfolioId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Portfolio.Domain.Entities.Portfolio", b =>
+                {
                     b.Navigation("Holdings");
+
+                    b.Navigation("ProcessedTransactions");
+
+                    b.Navigation("Wallets");
+                });
+
+            modelBuilder.Entity("Portfolio.Domain.Entities.Wallet", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }

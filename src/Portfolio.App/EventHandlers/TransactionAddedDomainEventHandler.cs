@@ -1,4 +1,3 @@
-using Portfolio.Domain.Entities;
 using Portfolio.Domain.Events;
 
 
@@ -11,14 +10,14 @@ namespace Portfolio.App.DomainEventHandlers
             var holding = notification.Holding;
             var transaction = notification.Transaction;
 
-            if (transaction is CryptoCurrencyDepositTransaction deposit)
-            {
-                holding.UpdateAverageBoughtPrice(deposit);
-            }
-            else if (transaction is CryptoCurrencyTradeTransaction trade)
-            {
-                holding.UpdateAverageBoughtPrice(trade);
-            }
+            // if (transaction is CryptoCurrencyDepositTransaction deposit)
+            // {
+            //     holding.UpdateAverageBoughtPrice(deposit);
+            // }
+            // else if (transaction is CryptoCurrencyTradeTransaction trade)
+            // {
+            //     holding.UpdateAverageBoughtPrice(trade);
+            // }
 
             return Task.CompletedTask;
         }

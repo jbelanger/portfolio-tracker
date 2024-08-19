@@ -1,13 +1,7 @@
-using NUnit.Framework;
 using FluentAssertions;
-using Moq;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.ValueObjects;
 using Portfolio.Transactions.Exporters;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace Portfolio.Tests.Transactions.Exporters
 {

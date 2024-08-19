@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Portfolio.Infrastructure.DataMigrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class RawTransaction : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,12 +51,11 @@ namespace Portfolio.Infrastructure.DataMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Wallets",
+                name: "Portfolios",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -64,7 +63,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Wallets", x => x.Id);
+                    table.PrimaryKey("PK_Portfolios", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -174,54 +173,115 @@ namespace Portfolio.Infrastructure.DataMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Holdings",
+                name: "CryptoCurrencyHoldings",
                 columns: table => new
                 {
-                    Asset = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    AverageBoughtPrice = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Balance = table.Column<decimal>(type: "TEXT", nullable: false),
-                    WalletId = table.Column<int>(type: "INTEGER", nullable: true)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Asset = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,8)", nullable: false),
+                    AverageBoughtPrice = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    PortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Holdings", x => x.Asset);
+                    table.PrimaryKey("PK_CryptoCurrencyHoldings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Holdings_Wallets_WalletId",
-                        column: x => x.WalletId,
-                        principalTable: "Wallets",
+                        name: "FK_CryptoCurrencyHoldings_Portfolios_PortfolioId",
+                        column: x => x.PortfolioId,
+                        principalTable: "Portfolios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transactions",
+                name: "CryptoCurrencyProcessedTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    WalletName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Asset = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,8)", nullable: false),
+                    DateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    AveragePriceAtTime = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    BalanceAfterTransaction = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    PortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CryptoCurrencyProcessedTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CryptoCurrencyProcessedTransactions_Portfolios_PortfolioId",
+                        column: x => x.PortfolioId,
+                        principalTable: "Portfolios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Wallets",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    PortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Wallets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Wallets_Portfolios_PortfolioId",
+                        column: x => x.PortfolioId,
+                        principalTable: "Portfolios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CryptoCurrencyRawTransactions",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     DateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    FeeAmount_Amount = table.Column<decimal>(type: "TEXT", nullable: true),
-                    FeeAmount_CurrencyCode = table.Column<string>(type: "TEXT", nullable: true),
+                    ReceivedAmount = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    ReceivedAmountCurrency = table.Column<string>(type: "TEXT", maxLength: 3, nullable: true),
+                    SentAmount = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    SentAmountCurrency = table.Column<string>(type: "TEXT", maxLength: 3, nullable: true),
+                    FeeAmount = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
+                    FeeAmountCurrency = table.Column<string>(type: "TEXT", maxLength: 3, nullable: true),
                     Account = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Note = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
                     TransactionIds = table.Column<string>(type: "TEXT", nullable: false),
-                    Amount_Amount = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Amount_CurrencyCode = table.Column<string>(type: "TEXT", nullable: false),
-                    HoldingAsset = table.Column<string>(type: "TEXT", nullable: true),
-                    TransactionType = table.Column<int>(type: "INTEGER", nullable: false),
-                    TradeAmount_Amount = table.Column<decimal>(type: "TEXT", nullable: true),
-                    TradeAmount_CurrencyCode = table.Column<string>(type: "TEXT", nullable: true)
+                    WalletId = table.Column<long>(type: "INTEGER", nullable: true),
+                    Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
+                    LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transactions", x => x.Id);
+                    table.PrimaryKey("PK_CryptoCurrencyRawTransactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transactions_Holdings_HoldingAsset",
-                        column: x => x.HoldingAsset,
-                        principalTable: "Holdings",
-                        principalColumn: "Asset",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_CryptoCurrencyRawTransactions_Wallets_WalletId",
+                        column: x => x.WalletId,
+                        principalTable: "Wallets",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -262,14 +322,24 @@ namespace Portfolio.Infrastructure.DataMigrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Holdings_WalletId",
-                table: "Holdings",
+                name: "IX_CryptoCurrencyHoldings_PortfolioId",
+                table: "CryptoCurrencyHoldings",
+                column: "PortfolioId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CryptoCurrencyProcessedTransactions_PortfolioId",
+                table: "CryptoCurrencyProcessedTransactions",
+                column: "PortfolioId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CryptoCurrencyRawTransactions_WalletId",
+                table: "CryptoCurrencyRawTransactions",
                 column: "WalletId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transactions_HoldingAsset",
-                table: "Transactions",
-                column: "HoldingAsset");
+                name: "IX_Wallets_PortfolioId",
+                table: "Wallets",
+                column: "PortfolioId");
         }
 
         /// <inheritdoc />
@@ -291,7 +361,13 @@ namespace Portfolio.Infrastructure.DataMigrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Transactions");
+                name: "CryptoCurrencyHoldings");
+
+            migrationBuilder.DropTable(
+                name: "CryptoCurrencyProcessedTransactions");
+
+            migrationBuilder.DropTable(
+                name: "CryptoCurrencyRawTransactions");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -300,10 +376,10 @@ namespace Portfolio.Infrastructure.DataMigrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Holdings");
+                name: "Wallets");
 
             migrationBuilder.DropTable(
-                name: "Wallets");
+                name: "Portfolios");
         }
     }
 }

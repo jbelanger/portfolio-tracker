@@ -40,8 +40,8 @@ namespace Portfolio.Domain.Entities
         /// </summary>
         public IEnumerable<string> TransactionIds { get; set; } = new List<string>();
 
-
         public Money Amount { get; set; }
+
         public object State { get; set; }
 
         /// <summary>
@@ -49,10 +49,5 @@ namespace Portfolio.Domain.Entities
         /// </summary>
         protected CryptoCurrencyTransaction()
         { }
-
-        // public virtual CryptoCurrencyTransaction ToGenericTransaction()
-        // {
-        //     throw new NotImplementedException();
-        // }
     }
 }
