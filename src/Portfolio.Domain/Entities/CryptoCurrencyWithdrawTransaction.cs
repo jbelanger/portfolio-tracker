@@ -38,8 +38,7 @@ namespace Portfolio.Domain.Entities
             if (feeAmount == null)
                 feeAmount = new Money(0, amount.CurrencyCode);
             else if (feeAmount.CurrencyCode != amount.CurrencyCode)
-                return Result.Failure<CryptoCurrencyWithdrawTransaction>($"Fees are not in the same currency as the deposit currency.");
-
+                return Result.Failure<CryptoCurrencyWithdrawTransaction>($"Fees are not in the same currency as the withdraw currency.");
 
             if (string.IsNullOrWhiteSpace(account))
                 return Result.Failure<CryptoCurrencyWithdrawTransaction>("Account cannot be null or whitespace.");
@@ -60,19 +59,19 @@ namespace Portfolio.Domain.Entities
             return withdrawal;
         }
 
-        public CryptoCurrencyTransaction ToGenericTransaction()
-        {
-            return new CryptoCurrencyTransaction
-            {
-                DateTime = DateTime,
-                Type = TransactionType.Withdrawal,
-                Amount = null,
-                //SentAmount = Amount,
-                FeeAmount = FeeAmount,
-                Account = Account,
-                Note = Note,
-                TransactionIds = TransactionIds
-            };
-        }
+        // public override CryptoCurrencyTransaction ToGenericTransaction()
+        // {
+        //     return new CryptoCurrencyTransaction
+        //     {
+        //         DateTime = DateTime,
+        //         Type = TransactionType.Withdrawal,
+        //         Amount = null,
+        //         //SentAmount = Amount,
+        //         FeeAmount = FeeAmount,
+        //         Account = Account,
+        //         Note = Note,
+        //         TransactionIds = TransactionIds
+        //     };
+        // }
     }
 }

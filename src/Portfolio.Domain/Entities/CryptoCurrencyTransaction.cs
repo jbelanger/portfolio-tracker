@@ -1,3 +1,4 @@
+using Portfolio.Domain.Common;
 using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Domain.Entities
@@ -5,10 +6,8 @@ namespace Portfolio.Domain.Entities
     /// <summary>
     /// Represents a cryptocurrency transaction, which can be a trade, deposit, or withdrawal.
     /// </summary>
-    public class CryptoCurrencyTransaction : ICryptoCurrencyTransaction
+    public abstract class CryptoCurrencyTransaction : BaseAuditableEntity, ICryptoCurrencyTransaction
     {
-        public long Id { get; set; }
-
         public Money UnitValue { get; set; }
         
         /// <summary>
@@ -48,12 +47,12 @@ namespace Portfolio.Domain.Entities
         /// <summary>
         /// Private constructor used internally for factory methods.
         /// </summary>
-        public CryptoCurrencyTransaction()
+        protected CryptoCurrencyTransaction()
         { }
 
-        public CryptoCurrencyTransaction ToGenericTransaction()
-        {
-            throw new NotImplementedException();
-        }
+        // public virtual CryptoCurrencyTransaction ToGenericTransaction()
+        // {
+        //     throw new NotImplementedException();
+        // }
     }
 }

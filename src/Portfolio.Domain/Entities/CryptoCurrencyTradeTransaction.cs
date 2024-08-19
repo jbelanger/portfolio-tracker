@@ -16,7 +16,7 @@ namespace Portfolio.Domain.Entities
         /// <summary>
         /// Private constructor used internally for factory methods.
         /// </summary>
-        public CryptoCurrencyTradeTransaction()
+        private CryptoCurrencyTradeTransaction()
         { }
 
         /// <summary>
@@ -67,19 +67,19 @@ namespace Portfolio.Domain.Entities
             return trade;
         }
 
-        public CryptoCurrencyTransaction ToGenericTransaction()
-        {
-            return new CryptoCurrencyTransaction
-            {
-                DateTime = DateTime,
-                Type = TransactionType.Trade,
-                Amount = Amount,
-                //TradeAmount = TradeAmount,
-                FeeAmount = FeeAmount,
-                Account = Account,
-                Note = Note,
-                TransactionIds = TransactionIds
-            };
-        }
+        // public CryptoCurrencyTransaction ToGenericTransaction()
+        // {
+        //     return new CryptoCurrencyTransaction
+        //     {
+        //         DateTime = DateTime,
+        //         Type = TransactionType.Trade,
+        //         Amount = Amount,
+        //         //TradeAmount = TradeAmount,
+        //         FeeAmount = FeeAmount,
+        //         Account = Account,
+        //         Note = Note,
+        //         TransactionIds = TransactionIds
+        //     };
+        // }
     }
 }

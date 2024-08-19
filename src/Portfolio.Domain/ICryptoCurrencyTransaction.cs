@@ -37,7 +37,7 @@ namespace Portfolio.Domain
 
         public object State { get; set; }
 
-        public CryptoCurrencyTransaction ToGenericTransaction();
+        //public CryptoCurrencyTransaction ToGenericTransaction();
     
     }
 }
