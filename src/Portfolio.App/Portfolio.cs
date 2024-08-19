@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
+using Portfolio.App.HistoricalPrice;
 using Portfolio.Shared;
-using Serilog;
 
 namespace Portfolio.App;
 
@@ -10,23 +10,22 @@ public delegate void TradeAddedHandler(CryptoCurrencyTradeTransaction deposit, C
 
 public class Portfolio
 {
-    private readonly IPriceHistoryStoreFactory _priceHistoryStoreFactory = null!;
-    private Dictionary<string, IPriceHistoryStore> _priceHistoryStores = new();
+    private readonly IPriceHistoryService _priceHistoryService = null!;
     private List<CryptoCurrencyHolding> _holdings = new();
 
-    public event DepositAddedHandler OnDepositAdded;
-    public event WithdrawAddedHandler OnWithdrawAdded;
-    public event TradeAddedHandler OnTradeAdded;
+    public event DepositAddedHandler? OnDepositAdded;
+    public event WithdrawAddedHandler? OnWithdrawAdded;
+    public event TradeAddedHandler? OnTradeAdded;
 
     List<ICryptoCurrencyTransaction> _taxableEvents = new();
 
-    public string DefaultCurrency { get; private set; } = "USD";
+    public string DefaultCurrency { get; private set; } = Strings.CURRENCY_USD;
     public IReadOnlyCollection<Wallet> Wallets { get; private set; } = new List<Wallet>();
     public IReadOnlyCollection<CryptoCurrencyHolding> Holdings { get => _holdings; }
 
-    public Portfolio(IPriceHistoryStoreFactory priceHistoryStoreFactory)
+    public Portfolio(IPriceHistoryService priceHistoryService)
     {
-        _priceHistoryStoreFactory = priceHistoryStoreFactory;
+        _priceHistoryService = priceHistoryService;
     }
 
     public Result SetDefaultCurrency(string currencyCode)
@@ -36,6 +35,7 @@ public class Portfolio
             return Result.Failure("Currency code unknown.");
 
         DefaultCurrency = currencyCode;
+        _priceHistoryService.DefaultCurrency = currencyCode;
 
         return Result.Success();
     }
@@ -52,69 +52,16 @@ public class Portfolio
         return Result.Success();
     }
 
-    public async Task<Result> Process()
+    public async Task<Result> ProcessAsync()
     {
         if (!Wallets.Any())
             return Result.Failure("No wallets to process. Start by adding a wallet.");
-
-        // Get all transactions, in order, for easier processing.
+        
         var transactions = GetTransactionsFromAllWallets();
-
-        // Load historical conversion price data. Used to calculate profit-loss.
-        _priceHistoryStores = await GetPriceHistoryDataStores(_priceHistoryStoreFactory, transactions);
-
-        _holdings = (await GetHoldings(transactions)).ToList();
+        _holdings = (await GetHoldings(transactions).ConfigureAwait(false)).ToList();
 
         return Result.Success();
     }
-
-    private async Task<Dictionary<string, IPriceHistoryStore>> GetPriceHistoryDataStores(IPriceHistoryStoreFactory priceHistoryStoreFactory, IEnumerable<ICryptoCurrencyTransaction> transactions)
-    {
-        Dictionary<string, IPriceHistoryStore> priceHistoryStores = new();
-        var transactionsByCurrency = transactions.GroupBy(t => t.Amount.CurrencyCode);
-        foreach (var txByCurrency in transactionsByCurrency)
-        {
-            var currency = txByCurrency.Key;
-            
-            if(currency == DefaultCurrency) continue; 
-
-            var earliestTransaction = txByCurrency.First();
-            var storeResult = await priceHistoryStoreFactory.Create(currency, DefaultCurrency, earliestTransaction.DateTime, DateTime.Now);
-            if (storeResult.IsFailure)
-            {
-                Log.Error(storeResult.Error);
-                continue;
-            }
-            priceHistoryStores.Add(currency, storeResult.Value);
-        }
-
-        // Also add the traded currency in trades...
-        transactionsByCurrency = transactions
-            .Where(t => t is CryptoCurrencyTradeTransaction)
-            .Cast<CryptoCurrencyTradeTransaction>()
-            .GroupBy(t => t.TradeAmount.CurrencyCode);
-        foreach (var txByCurrency in transactionsByCurrency)
-        {
-            if (!priceHistoryStores.Any(s => s.Key == txByCurrency.Key))
-            {
-                var currency = txByCurrency.Key;
-
-                if(currency == DefaultCurrency) continue; 
-
-                var earliestTransaction = txByCurrency.First();
-                var storeResult = await priceHistoryStoreFactory.Create(currency, DefaultCurrency, earliestTransaction.DateTime, DateTime.Now);
-                if (storeResult.IsFailure)
-                {
-                    Log.Error(storeResult.Error);
-                    continue;
-                }
-                priceHistoryStores.Add(currency, storeResult.Value);
-            }
-        }
-
-        return priceHistoryStores;
-    }
-
     private IEnumerable<ICryptoCurrencyTransaction> GetTransactionsFromAllWallets()
     {
         List<ICryptoCurrencyTransaction> allTransactions = [.. Wallets.SelectMany(w => w.Transactions)];
@@ -139,21 +86,16 @@ public class Portfolio
                     receiver.AverageBoughtPrice = 1;
                 else
                 {
-                    if (!_priceHistoryStores.ContainsKey(deposit.Amount.CurrencyCode))
+                    var priceResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(deposit.Amount.CurrencyCode, deposit.DateTime).ConfigureAwait(false);
+                    if (priceResult.IsFailure)
                     {
-                        Log.Error($"No price history available for {receiver.Asset}.");
+                        Log.Error("Failed to retrieve price history for asset {Asset} on {Date:yyyy-MM-dd}. Error: {Error}", receiver.Asset, deposit.DateTime, priceResult.Error);
                         continue;
                     }
 
-                    var priceValueResult = await _priceHistoryStores[deposit.Amount.CurrencyCode].GetPriceDataAsync(deposit.DateTime);
-                    if (priceValueResult.IsFailure)
-                    {
-                        Log.Error(priceValueResult.Error);
-                        continue;
-                    }
-                    deposit.UnitValue = new Money(priceValueResult.Value.Close, DefaultCurrency);
+                    deposit.UnitValue = new Money(priceResult.Value, DefaultCurrency);
 
-                    decimal newAverage = ((receiver.AverageBoughtPrice * (receiver.Balance - deposit.Amount.Amount)) + (deposit.Amount.Amount * priceValueResult.Value.Close)) / (receiver.Balance);
+                    decimal newAverage = ((receiver.AverageBoughtPrice * (receiver.Balance - deposit.Amount.Amount)) + (deposit.Amount.Amount * priceResult.Value)) / (receiver.Balance);
                     receiver.AverageBoughtPrice = newAverage;
                 }
 
@@ -173,7 +115,7 @@ public class Portfolio
 
                 if (sender.Balance < 0)
                 {
-                    Log.Warning($"{sender.Asset} Balance is under zero: {sender.Balance}");
+                    Log.Warning("{Asset} Balance is under zero: {Balance}", sender.Asset, sender.Balance);
                 }
 
                 OnWithdrawAdded?.Invoke(withdraw, sender);
@@ -197,9 +139,6 @@ public class Portfolio
                     decimal tradedCost = trade.TradeAmount.Amount * sender.AverageBoughtPrice; // 0.04 * 25000 = 1000
                     decimal boughtPrice = tradedCost / trade.Amount.Amount;
 
-                    //var priceValue = await _priceHistoryStores[trade.Amount.CurrencyCode].GetPriceDataAsync(trade.DateTime);
-                    //trade.UnitValue = new Money(priceValue.Close, DefaultCurrency);
-
                     decimal newAverage = ((receiver.AverageBoughtPrice * receiver.Balance) + (trade.Amount.Amount * boughtPrice)) / (receiver.Balance + trade.Amount.Amount);
                     receiver.AverageBoughtPrice = newAverage;
                 }
@@ -215,7 +154,7 @@ public class Portfolio
 
                 if (sender.Balance < 0)
                 {
-                    Log.Error($"{sender.Asset} Balance is under zero: {sender.Balance}");
+                    Log.Warning("{Asset} Balance is under zero: {Balance}", sender.Asset, sender.Balance);
                 }
 
                 // Log.Debug($"Trade Out [{string.Join("|", trade.TransactionIds)}: {sender.Asset}: {sender.Balance}");
@@ -224,27 +163,20 @@ public class Portfolio
         }
 
         // Fetch latest prices...
-        foreach (var holding in _holdings)
+        foreach (var holding in _holdings.Where(h => h.Balance > 0))
         {
             if (holding.Asset == DefaultCurrency)
                 holding.CurrentPrice = new Money(1m, holding.Asset);
             else
             {
-                if (!_priceHistoryStores.ContainsKey(holding.Asset))
-                {
-                    Log.Error($"No price history available for {holding.Asset}.");
-                    holding.CurrentPrice = new Money(0m, holding.Asset);
-                    continue;
-                }
-                
-                var priceValueResult = await _priceHistoryStores[holding.Asset].GetPriceDataAsync(DateTime.Now);            
+                var priceValueResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(holding.Asset, DateTime.Now).ConfigureAwait(false);            
                 if (priceValueResult.IsFailure)
                 {
                     Log.Error(priceValueResult.Error);
                     holding.CurrentPrice = new Money(0m, holding.Asset);
                     continue;
                 }
-                holding.CurrentPrice = new Money(priceValueResult.Value.Close, holding.Asset);
+                holding.CurrentPrice = new Money(priceValueResult.Value, holding.Asset);
             }
         }
 
@@ -260,8 +192,6 @@ public class Portfolio
 
             decimal expectedTotal = 0;
 
-            if (holding.Asset == "LINK")
-                ;
             // Total number of IN transactions should equal to the balance.
             foreach (var tx in holding.Transactions)
             {
@@ -288,7 +218,7 @@ public class Portfolio
             }
 
             if (expectedTotal != holding.Balance)
-                Log.Warning($"Missing transactions for holding {holding.Asset}");
+                Log.Warning("Missing transactions for holding {Asset}", holding.Asset);
         }
 
     }
@@ -303,11 +233,4 @@ public class Portfolio
         }
         return holding;
     }
-}
-
-internal class TaxableEvent
-{
-    public ICryptoCurrencyTransaction Transaction { get; set; }
-    public decimal AverageBuyingPrice { get; set; }
-    public decimal PriceAtEvent { get; set; }
 }
