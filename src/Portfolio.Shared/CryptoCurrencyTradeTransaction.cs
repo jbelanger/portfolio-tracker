@@ -1,7 +1,6 @@
 using CSharpFunctionalExtensions;
-using Portfolio.Shared;
 
-namespace Portfolio
+namespace Portfolio.Shared
 {
     /// <summary>
     /// Represents a cryptocurrency transaction, which can be a trade, deposit, or withdrawal.
@@ -22,7 +21,7 @@ namespace Portfolio
         /// Gets or sets the total amount sent in the transaction without any fees.
         /// </summary>
         public Money TradeAmount { get; set; } = null!;
-
+ 
         /// <summary>
         /// Gets or sets the fee amount for the transaction.
         /// </summary>
@@ -43,7 +42,7 @@ namespace Portfolio
         /// </summary>
         public IEnumerable<string> TransactionIds { get; set; } = new List<string>();
 
-        public object State {get; set;}
+        public object State { get; set; }
 
         /// <summary>
         /// Private constructor used internally for factory methods.
@@ -83,12 +82,12 @@ namespace Portfolio
             if (transactionIds == null || !transactionIds.Any())
                 return Result.Failure<CryptoCurrencyTradeTransaction>("Transaction IDs cannot be null or empty.");
 
-            if(feeAmount == null)        
-                feeAmount = new Money(0, receivedAmount.CurrencyCode);   
+            if (feeAmount == null)
+                feeAmount = new Money(0, receivedAmount.CurrencyCode);
 
             var trade = new CryptoCurrencyTradeTransaction()
             {
-                DateTime = date,            
+                DateTime = date,
                 Amount = receivedAmount.ToAbsoluteAmountMoney(),
                 TradeAmount = sentAmount.ToAbsoluteAmountMoney(),
                 FeeAmount = feeAmount.ToAbsoluteAmountMoney(),

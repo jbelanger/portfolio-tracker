@@ -289,7 +289,7 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
 
         public string DetermineTradingPair(string fromSymbol, string toSymbol)
         {
-            if (FiatCurrencies.Codes.Contains(fromSymbol) && FiatCurrencies.Codes.Contains(toSymbol))
+            if (FiatCurrency.All.Contains(fromSymbol) && FiatCurrency.All.Contains(toSymbol))
                 return $"{fromSymbol}{toSymbol}=X";
 
             return fromSymbol switch
@@ -375,7 +375,7 @@ public class PriceHistoryService : IPriceHistoryService
             if (history.ContainsKey(dateOnly))
                 return history[dateOnly].ClosePrice;
 
-            if (FiatCurrencies.Codes.Contains(symbol))
+            if (FiatCurrency.All.Contains(symbol))
             {
                 var handleMissingFiatResult = HandleMissingFiatData(symbol, dateOnly, history);
                 if (handleMissingFiatResult.IsSuccess)
@@ -460,7 +460,7 @@ public class PriceHistoryService : IPriceHistoryService
 
             if (history.ContainsKey(date.Date))
                 return history[date.Date].ClosePrice;
-            else if (FiatCurrencies.Codes.Contains(symbol))
+            else if (FiatCurrency.All.Contains(symbol))
             {
                 var handleMissingFiatResult = HandleMissingFiatData(symbol, date, history);
                 if (handleMissingFiatResult.IsSuccess)
@@ -806,7 +806,7 @@ public class Portfolio
     public Result SetDefaultCurrency(string currencyCode)
     {
         currencyCode = currencyCode.ToUpper();
-        if (!FiatCurrencies.Codes.Contains(currencyCode))
+        if (!FiatCurrency.All.Contains(currencyCode))
             return Result.Failure("Currency code unknown.");
 
         DefaultCurrency = currencyCode;
@@ -962,7 +962,7 @@ public class Portfolio
     {
         foreach (var holding in _holdings)
         {
-            if (FiatCurrencies.Codes.Contains(holding.Asset))
+            if (FiatCurrency.All.Contains(holding.Asset))
                 continue;
 
             decimal expectedTotal = 0;

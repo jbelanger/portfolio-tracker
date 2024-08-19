@@ -1,4 +1,4 @@
-namespace Portfolio
+namespace Portfolio.Shared
 {
     /// <summary>
     /// Specifies the type of cryptocurrency transaction.

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using Portfolio.Shared;
 
 namespace Portfolio.App.HistoricalPrice
 {
@@ -53,7 +54,7 @@ namespace Portfolio.App.HistoricalPrice
                 if (history.ContainsKey(dateOnly))
                     return history[dateOnly].ClosePrice;
 
-                if (FiatCurrencies.Codes.Contains(symbol))
+                if (FiatCurrency.All.Any(f => f == symbol))
                 {
                     var handleMissingFiatResult = HandleMissingFiatData(symbol, dateOnly, history);
                     if (handleMissingFiatResult.IsSuccess)
@@ -166,7 +167,7 @@ namespace Portfolio.App.HistoricalPrice
 
                 if (history.ContainsKey(date.Date))
                     return history[date.Date].ClosePrice;
-                else if (FiatCurrencies.Codes.Contains(symbol))
+                else if (FiatCurrency.All.Any(f => f == symbol))
                 {
                     var handleMissingFiatResult = HandleMissingFiatData(symbol, date, history);
                     if (handleMissingFiatResult.IsSuccess)

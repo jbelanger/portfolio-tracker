@@ -1,7 +1,6 @@
 using CSharpFunctionalExtensions;
-using Portfolio.Shared;
 
-namespace Portfolio
+namespace Portfolio.Shared
 {
     public class CryptoCurrencyHolding
     {
