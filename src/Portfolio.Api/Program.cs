@@ -1,11 +1,22 @@
+using Portfolio.Api.Features;
+using Portfolio.App;
+using Portfolio.Domain;
+using Portfolio.Infrastructure;
+
 
 namespace Portfolio.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddApplicationServices();
+            builder.Services.AddInfrastructureServices(builder.Configuration);
+            
+            builder.Services.AddScoped<IUser, CurrentUser>();
+            builder.Services.AddHttpContextAccessor();
 
             // Add services to the container.
             builder.Services.AddAuthorization();
@@ -18,7 +29,7 @@ namespace Portfolio.Api
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
-            {
+            {                
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
@@ -46,6 +57,8 @@ namespace Portfolio.Api
             })
             .WithName("GetWeatherForecast")
             .WithOpenApi();
+
+            app.MapWalletEndpoints();
 
             app.Run();
         }

@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Portfolio.Shared;
+using Portfolio.Domain.ValueObjects;
 using YahooFinanceApi;
 
 namespace Portfolio.App.HistoricalPrice.YahooFinance

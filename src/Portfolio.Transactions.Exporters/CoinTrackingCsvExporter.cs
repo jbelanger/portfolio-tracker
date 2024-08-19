@@ -1,4 +1,5 @@
-﻿using Portfolio.Shared;
+﻿using Portfolio.Domain.Entities;
+using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Transactions.Exporters
 {
@@ -77,14 +78,15 @@ namespace Portfolio.Transactions.Exporters
         /// <returns>A string representing the transaction in CoinTracking CSV format.</returns>
         private string ToCsvLine(CryptoCurrencyTransaction tx)
         {
-            var received = tx.ReceivedAmount;
-            var sent = tx.SentAmount;
-            var isSendingFee = tx.SentAmount?.CurrencyCode == tx.FeeAmount?.CurrencyCode;
-            if (tx.FeeAmount.AbsoluteAmount > 0 && (tx.Type == TransactionType.Withdrawal || tx.Type == TransactionType.Trade && isSendingFee))
-            {
-                sent = sent?.Add(tx.FeeAmount);
-            }
-            return $"{tx.Type.ToString()},{received?.AbsoluteAmount},{ConvertToCoinTrackingSymbol(received?.CurrencyCode)},{sent?.AbsoluteAmount},{ConvertToCoinTrackingSymbol(sent?.CurrencyCode)},{tx.FeeAmount?.AbsoluteAmount},{ConvertToCoinTrackingSymbol(tx.FeeAmount?.CurrencyCode)},{tx.Account},{string.Join("|", tx.TransactionIds.Select(x => x))},{tx.Note},{tx.DateTime:dd-MM-yyyy HH:mm:ss UTC}";
+            return "";
+            // var received = tx.ReceivedAmount;
+            // var sent = tx.SentAmount;
+            // var isSendingFee = tx.SentAmount?.CurrencyCode == tx.FeeAmount?.CurrencyCode;
+            // if (tx.FeeAmount.AbsoluteAmount > 0 && (tx.Type == TransactionType.Withdrawal || tx.Type == TransactionType.Trade && isSendingFee))
+            // {
+            //     sent = sent?.Add(tx.FeeAmount);
+            // }
+            // return $"{tx.Type.ToString()},{received?.AbsoluteAmount},{ConvertToCoinTrackingSymbol(received?.CurrencyCode)},{sent?.AbsoluteAmount},{ConvertToCoinTrackingSymbol(sent?.CurrencyCode)},{tx.FeeAmount?.AbsoluteAmount},{ConvertToCoinTrackingSymbol(tx.FeeAmount?.CurrencyCode)},{tx.Account},{string.Join("|", tx.TransactionIds.Select(x => x))},{tx.Note},{tx.DateTime:dd-MM-yyyy HH:mm:ss UTC}";
         }
 
         /// <summary>

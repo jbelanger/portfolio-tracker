@@ -775,7 +775,7 @@ public interface ICurrencyExchangeService
 }
 using CSharpFunctionalExtensions;
 using Portfolio.App.HistoricalPrice;
-using Portfolio.Shared;
+using Portfolio.Domain;
 
 namespace Portfolio.App;
 
@@ -1021,7 +1021,7 @@ public class Errors
     public const string ERR_SAME_SYMBOLS = "Symbols must be of different currency/coin ({0}-{1}).";
     public const string ERR_YAHOO_API_FETCH_FAILURE = "An error occurred while fetching from Yahoo Finance API.";
 }using CSharpFunctionalExtensions;
-using Portfolio.Shared;
+using Portfolio.Domain;
 
 namespace Portfolio.App;
 
@@ -1056,7 +1056,7 @@ public class MockCurrencyExchangeService : ICurrencyExchangeService
 ﻿using Serilog.Events;
 using Serilog.Formatting.Json;
 using Portfolio.Kraken;
-using Portfolio.Shared;
+using Portfolio.Domain;
 using Portfolio.App.HistoricalPrice;
 using Portfolio.App.HistoricalPrice.YahooFinance;
 using Serilog.Enrichers.CallerInfo;
