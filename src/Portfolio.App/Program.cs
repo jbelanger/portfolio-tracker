@@ -4,6 +4,7 @@ using Serilog.Formatting.Json;
 using Portfolio.Kraken;
 using Portfolio.Shared;
 using Portfolio.App.HistoricalPrice;
+using Portfolio.App.HistoricalPrice.YahooFinance;
 
 namespace Portfolio.App;
 
@@ -30,9 +31,13 @@ internal class Program
         if (krakenWalletResult.IsFailure)
             throw new Exception(krakenWalletResult.Error);
 
-        var storage = new LocalFilePriceHistoryStorageService();
+        //var storage = new FilePriceHistoryStorageService();
+
+        var storage = new SQLitePriceHistoryStorageService("path_to_your_database_file.db");
+
+
         var api = new YahooFinancePriceHistoryApi();
-        var svc = new YahooFinancePriceHistoryService(api, storage, "USD");
+        var svc = new PriceHistoryService(api, storage, "USD");
         var portfolio = new Portfolio(svc);
         portfolio.OnDepositAdded += CheckBalance;
         portfolio.OnWithdrawAdded += CheckBalance;

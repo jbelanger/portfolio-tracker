@@ -1,7 +1,7 @@
 using CSharpFunctionalExtensions;
 using Serilog;
 
-namespace Portfolio.App.HistoricalPrice
+namespace Portfolio.App.HistoricalPrice.CoinGecko
 {
     public class CoinGeckoPriceHistoryApi : IPriceHistoryApi
     {
@@ -20,7 +20,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="startDate">The start date for fetching data.</param>
         /// <param name="endDate">The end date for fetching data.</param>
         /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="CryptoPriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchDataAsync(string symbolPair, DateTime startDate, DateTime endDate)
+        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
         {
             try
             {

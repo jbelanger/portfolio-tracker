@@ -3,11 +3,11 @@ using CSharpFunctionalExtensions;
 using Serilog;
 using YahooFinanceApi;
 
-namespace Portfolio.App.HistoricalPrice
+namespace Portfolio.App.HistoricalPrice.YahooFinance
 {
     public class YahooFinancePriceHistoryApi : IPriceHistoryApi
     {
-        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchDataAsync(string symbolPair, DateTime startDate, DateTime endDate)
+        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace Portfolio.App.HistoricalPrice
             catch (Exception ex)
             {
                 // General catch-all for unexpected errors
-                Log.Error(ex, "Unexpected error in {MethodName} for {SymbolPair}.", nameof(FetchDataAsync), symbolPair);
+                Log.Error(ex, "Unexpected error in {MethodName} for {SymbolPair}.", nameof(FetchPriceHistoryAsync), symbolPair);
                 return Result.Failure<IEnumerable<CryptoPriceRecord>>(Errors.ERR_YAHOO_API_FETCH_FAILURE);
             }
         }
@@ -72,7 +72,7 @@ namespace Portfolio.App.HistoricalPrice
             return new CryptoPriceRecord
             {
                 CurrencyPair = currencyPair,
-                CloseDate = candle.DateTime,
+                CloseDate = candle.DateTime > DateTime.Now ? DateTime.Now.Date: candle.DateTime, // Yahoo API sometimes put tomorrow's date when fetching current day...
                 ClosePrice = candle.Close
             };
         }
