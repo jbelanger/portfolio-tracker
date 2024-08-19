@@ -8,6 +8,7 @@
 *.xls
 *.xlsx
 *.logs
+*.db
 important.json
 
 # User-specific files
