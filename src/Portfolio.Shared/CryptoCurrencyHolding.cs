@@ -1,108 +1,109 @@
 using CSharpFunctionalExtensions;
 using Portfolio.Shared;
 
-namespace Portfolio;
-
-public class CryptoCurrencyHolding
+namespace Portfolio
 {
-    public string Asset { get; init; }
-    public decimal AverageBoughtPrice { get; set; }
-    public decimal Balance { get; set; }
-    public List<ICryptoCurrencyTransaction> Transactions { get; set; } = new();
-    public decimal Fees { get; set; }
-    public Money CurrentPrice { get; set; }
-
-    public CryptoCurrencyHolding(string asset)
+    public class CryptoCurrencyHolding
     {
-        Asset = asset;
-    }
+        public string Asset { get; init; }
+        public decimal AverageBoughtPrice { get; set; }
+        public decimal Balance { get; set; }
+        public List<ICryptoCurrencyTransaction> Transactions { get; set; } = new();
+        public decimal Fees { get; set; }
+        public Money CurrentPrice { get; set; }
 
-    public Result AddTransaction(ICryptoCurrencyTransaction transaction)
-    {
-        var lastTransaction = Transactions.LastOrDefault();
-        if (lastTransaction != null && transaction.DateTime < lastTransaction.DateTime)
-            return Result.Failure("Transactions not in order. Ensure transactions are added in a chronological order.");
-
-        if (transaction is CryptoCurrencyDepositTransaction deposit)
+        public CryptoCurrencyHolding(string asset)
         {
-            Balance += deposit.Amount.Amount;
-            Fees += deposit.FeeAmount.Amount;
+            Asset = asset;
         }
 
-        if (transaction is CryptoCurrencyWithdrawTransaction withdraw)
+        public Result AddTransaction(ICryptoCurrencyTransaction transaction)
         {
-            Balance -= transaction.Amount.Add(transaction.FeeAmount).Amount;
-            Fees += transaction.FeeAmount.Amount;
+            var lastTransaction = Transactions.LastOrDefault();
+            if (lastTransaction != null && transaction.DateTime < lastTransaction.DateTime)
+                return Result.Failure("Transactions not in order. Ensure transactions are added in a chronological order.");
 
-            if (Balance == 0)
-                AverageBoughtPrice = 0;
-        }
-
-        if (transaction is CryptoCurrencyTradeTransaction trade)
-        {
-            if (trade.Amount.CurrencyCode == Asset)
+            if (transaction is CryptoCurrencyDepositTransaction deposit)
             {
-                Balance += trade.Amount.Amount;
+                Balance += deposit.Amount.Amount;
+                Fees += deposit.FeeAmount.Amount;
             }
-            else if (trade.TradeAmount.CurrencyCode == Asset)
+
+            if (transaction is CryptoCurrencyWithdrawTransaction withdraw)
             {
-                Balance -= trade.TradeAmount.Amount;
-                if (trade.FeeAmount.CurrencyCode == Asset)
-                {
-                    Balance -= trade.FeeAmount.Amount;
-                    Fees += trade.FeeAmount.Amount;
-                }
+                Balance -= transaction.Amount.Add(transaction.FeeAmount).Amount;
+                Fees += transaction.FeeAmount.Amount;
 
                 if (Balance == 0)
                     AverageBoughtPrice = 0;
             }
-            else
-                return Result.Failure("Invalid transaction for this holding.");
-        }
 
-        Transactions.Add(transaction);
-
-        return Result.Success();
-    }
-
-    public Result RemoveTransaction(ICryptoCurrencyTransaction transaction)
-    {
-        if (transaction is CryptoCurrencyDepositTransaction deposit)
-        {
-            Balance -= deposit.Amount.Amount;
-            Fees -= deposit.FeeAmount.Amount;
-        }
-
-        if (transaction is CryptoCurrencyWithdrawTransaction withdraw)
-        {
-            Balance += transaction.Amount.Add(transaction.FeeAmount).Amount;
-            Fees -= transaction.FeeAmount.Amount;
-        }
-
-        if (transaction is CryptoCurrencyTradeTransaction trade)
-        {
-            if (trade.Amount.CurrencyCode == Asset)
+            if (transaction is CryptoCurrencyTradeTransaction trade)
             {
-                Balance -= trade.Amount.Amount;
-            }
-            else if (trade.TradeAmount.CurrencyCode == Asset)
-            {
-                Balance += trade.TradeAmount.Amount;
-            }
-            else
-                return Result.Failure("Invalid transaction for this holding.");
+                if (trade.Amount.CurrencyCode == Asset)
+                {
+                    Balance += trade.Amount.Amount;
+                }
+                else if (trade.TradeAmount.CurrencyCode == Asset)
+                {
+                    Balance -= trade.TradeAmount.Amount;
+                    if (trade.FeeAmount.CurrencyCode == Asset)
+                    {
+                        Balance -= trade.FeeAmount.Amount;
+                        Fees += trade.FeeAmount.Amount;
+                    }
 
-            if (trade.FeeAmount.CurrencyCode == trade.Amount.CurrencyCode)
-                Fees -= trade.FeeAmount.Amount;
-            else if (trade.FeeAmount.CurrencyCode == trade.TradeAmount.CurrencyCode)
-            {
-                Balance += trade.FeeAmount.Amount;
-                Fees -= trade.FeeAmount.Amount;
+                    if (Balance == 0)
+                        AverageBoughtPrice = 0;
+                }
+                else
+                    return Result.Failure("Invalid transaction for this holding.");
             }
+
+            Transactions.Add(transaction);
+
+            return Result.Success();
         }
 
-        Transactions.Remove(transaction);
+        public Result RemoveTransaction(ICryptoCurrencyTransaction transaction)
+        {
+            if (transaction is CryptoCurrencyDepositTransaction deposit)
+            {
+                Balance -= deposit.Amount.Amount;
+                Fees -= deposit.FeeAmount.Amount;
+            }
 
-        return Result.Success();
+            if (transaction is CryptoCurrencyWithdrawTransaction withdraw)
+            {
+                Balance += transaction.Amount.Add(transaction.FeeAmount).Amount;
+                Fees -= transaction.FeeAmount.Amount;
+            }
+
+            if (transaction is CryptoCurrencyTradeTransaction trade)
+            {
+                if (trade.Amount.CurrencyCode == Asset)
+                {
+                    Balance -= trade.Amount.Amount;
+                }
+                else if (trade.TradeAmount.CurrencyCode == Asset)
+                {
+                    Balance += trade.TradeAmount.Amount;
+                }
+                else
+                    return Result.Failure("Invalid transaction for this holding.");
+
+                if (trade.FeeAmount.CurrencyCode == trade.Amount.CurrencyCode)
+                    Fees -= trade.FeeAmount.Amount;
+                else if (trade.FeeAmount.CurrencyCode == trade.TradeAmount.CurrencyCode)
+                {
+                    Balance += trade.FeeAmount.Amount;
+                    Fees -= trade.FeeAmount.Amount;
+                }
+            }
+
+            Transactions.Remove(transaction);
+
+            return Result.Success();
+        }
     }
 }
