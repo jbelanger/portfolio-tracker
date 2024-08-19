@@ -1,5 +1,4 @@
-﻿using Serilog;
-using Serilog.Events;
+﻿using Serilog.Events;
 using Serilog.Formatting.Json;
 using Portfolio.Kraken;
 using Portfolio.Shared;
@@ -33,7 +32,7 @@ internal class Program
 
         //var storage = new FilePriceHistoryStorageService();
 
-        var storage = new SQLitePriceHistoryStorageService("path_to_your_database_file.db");
+        var storage = new SQLitePriceHistoryStorageService("crypto_price_history.db");
 
 
         var api = new YahooFinancePriceHistoryApi();

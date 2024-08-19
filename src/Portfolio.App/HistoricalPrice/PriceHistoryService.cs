@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using CSharpFunctionalExtensions;
-using Serilog;
 
 namespace Portfolio.App.HistoricalPrice;
 
@@ -8,7 +8,7 @@ public class PriceHistoryService : IPriceHistoryService
 {
     private readonly IPriceHistoryApi _priceHistoryApi;
     private readonly IPriceHistoryStorageService _priceHistoryStorage;
-    private ConcurrentDictionary<string, Dictionary<DateTime, CryptoPriceRecord>> _dataStores = new();
+    private ConcurrentDictionary<string, Lazy<Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>>>> _dataStores = new();
 
     public string DefaultCurrency { get; set; }
 
@@ -30,7 +30,7 @@ public class PriceHistoryService : IPriceHistoryService
         if (symbol == DefaultCurrency)
             return HandleDefaultCurrencyError(symbol);
 
-        var history = await LoadPriceHistory(symbol);
+        var history = await LoadPriceHistoryFromStorageAsync(symbol);
         if (history.Any())
         {
 
@@ -54,12 +54,32 @@ public class PriceHistoryService : IPriceHistoryService
         return Result.Failure<decimal>(string.Format(Errors.ERR_SAME_SYMBOLS, symbol, DefaultCurrency));
     }
 
-    private async Task<Dictionary<DateTime, CryptoPriceRecord>> LoadPriceHistory(string symbol)
+    private async Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
     {
-        return await LoadPriceHistoryFromStorageAsync(symbol);
+        return await _dataStores.GetOrAddAsync(symbol, async s =>
+            {
+                var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
+                var result = await _priceHistoryStorage.LoadHistoryAsync(symbolTradingPair);
+                if (result.IsSuccess)
+                {
+                    return result.Value.Where(r => r.ClosePrice > 0).ToDictionary(
+                        record => record.CloseDate.Date,
+                        record => record
+                    ).AsReadOnly();
+                }
+                else
+                {
+                    // Save an empty file to avoid trying to fetch from API
+                    // over and over again.      
+                    var emptyDictionary = new Dictionary<DateTime, CryptoPriceRecord>();
+                    var saveResult = await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, emptyDictionary.Values)
+                        .TapError(Log.Error);
+                    return emptyDictionary.AsReadOnly();
+                }
+            });
     }
 
-    private Result<decimal> HandleMissingFiatData(string symbol, DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
+    private Result<decimal> HandleMissingFiatData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
     {
         Log.Debug("Missing fiat data for {Symbol} on {Date:yyyy-MM-dd}. Trying previous working days...", symbol, date);
 
@@ -74,20 +94,31 @@ public class PriceHistoryService : IPriceHistoryService
         return Result.Failure<decimal>($"No price data available for {symbol} on {date:yyyy-MM-dd}");
     }
 
-    private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
+    private decimal GetPreviousWorkingDayPriceData(DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
+    {
+        for (int i = 1; i <= 4; i++)
+        {
+            var previousDate = date.AddDays(-i);
+            if (history.TryGetValue(previousDate, out var priceData))
+                return priceData.ClosePrice;
+        }
+        return -1;
+    }
+
+    private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
     {
         var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
         var endDate = AdjustEndDate(date);
         var result = await _priceHistoryApi.FetchPriceHistoryAsync(symbolTradingPair, date.Date, endDate);
 
         if (result.IsSuccess)
-        {            
+        {
             // If save fails, we can still continue however date will be fetched all the time. 
             // Ensure error is logged and proper action is taken.
             var saveResult = await SaveNewPriceHistoryAsync(symbolTradingPair, history, result.Value)
-                .TapError(Log.ForContext<PriceHistoryService>().Error); 
+                .TapError(Log.ForContext<PriceHistoryService>().Error);
 
-            UpdateHistoryWithFetchedData(history, result.Value);
+            history = await UpdateHistoryWithFetchedDataAsync(symbol, history, result.Value);
 
             if (history.ContainsKey(date.Date))
                 return history[date.Date].ClosePrice;
@@ -104,7 +135,13 @@ public class PriceHistoryService : IPriceHistoryService
         return Result.Failure<decimal>(result.Error);
     }
 
-    public async Task<Result> SaveNewPriceHistoryAsync(string symbol, Dictionary<DateTime, CryptoPriceRecord> currentHistory, IEnumerable<CryptoPriceRecord> newRecords)
+    private DateTime AdjustEndDate(DateTime date)
+    {
+        var endDate = date.AddDays(365);
+        return endDate > DateTime.Now ? DateTime.Now.AddDays(1) : endDate;
+    }
+
+    private async Task<Result> SaveNewPriceHistoryAsync(string symbol, ReadOnlyDictionary<DateTime, CryptoPriceRecord> currentHistory, IEnumerable<CryptoPriceRecord> newRecords)
     {
         var existingRecords = currentHistory.Values;
 
@@ -127,55 +164,18 @@ public class PriceHistoryService : IPriceHistoryService
         }
     }
 
-    private DateTime AdjustEndDate(DateTime date)
+    private async Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>> UpdateHistoryWithFetchedDataAsync(string symbol, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history, IEnumerable<CryptoPriceRecord> records)
     {
-        var endDate = date.AddDays(365);
-        return endDate > DateTime.Now ? DateTime.Now.AddDays(1) : endDate;
-    }
-
-    private void UpdateHistoryWithFetchedData(Dictionary<DateTime, CryptoPriceRecord> history, IEnumerable<CryptoPriceRecord> records)
-    {
-        foreach (var record in records)
+        return await _dataStores.AddOrUpdateAsync(symbol, async _ => await Task.FromResult(history), async (k, v) => 
         {
-            var closeDate = record.CloseDate.Date;
-            if (!history.ContainsKey(closeDate) && record.ClosePrice > 0)
-                history[closeDate] = record;
-        }
-    }
-
-    private async Task<Dictionary<DateTime, CryptoPriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
-    {
-        return await _dataStores.GetOrAddAsync(symbol, async s =>
+            var dict = v.ToDictionary();
+            foreach (var record in records)
             {
-                var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
-                var result = await _priceHistoryStorage.LoadHistoryAsync(symbolTradingPair);
-                if (result.IsSuccess)
-                {
-                    return result.Value.Where(r => r.ClosePrice > 0).ToDictionary(
-                        record => record.CloseDate.Date,
-                        record => record
-                    );
-                }
-                else
-                {
-                    // Save an empty file to avoid trying to fetch from API
-                    // over and over again.      
-                    var emptyDictionary = new Dictionary<DateTime, CryptoPriceRecord>();
-                    var saveResult = await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, emptyDictionary.Values)
-                        .TapError(Log.Error);
-                    return emptyDictionary;
-                }
-            });
-    }
-
-    private decimal GetPreviousWorkingDayPriceData(DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
-    {
-        for (int i = 1; i <= 4; i++)
-        {
-            var previousDate = date.AddDays(-i);
-            if (history.TryGetValue(previousDate, out var priceData))
-                return priceData.ClosePrice;
-        }
-        return -1;
+                var closeDate = record.CloseDate.Date;
+                if (!dict.ContainsKey(closeDate) && record.ClosePrice > 0)
+                    dict[closeDate] = record;
+            }
+            return dict.AsReadOnly();
+        });
     }
 }

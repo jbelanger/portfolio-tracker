@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Portfolio.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef43e66e50565ff73be07bcb02819e7660b89621")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4834734cd94a4799d9d51fe5ea6241fd39baa561")]
 [assembly: System.Reflection.AssemblyProductAttribute("Portfolio.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Portfolio.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
@@ -40,10 +40,487 @@ public interface IPriceHistoryServiceFactory
 {
     Task<Result<IPriceHistoryService>> Create(string symbolFrom, string symbolTo, DateTime startDate, DateTime endDate);
 }
+using System;
+using System.Collections.Generic;
+using System.Data;
+using Microsoft.Data.Sqlite;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Serilog;
 
 namespace Portfolio.App.HistoricalPrice
+{
+    public class SQLitePriceHistoryStorageService : IPriceHistoryStorageService
+    {
+        private readonly string _connectionString;
+
+        public SQLitePriceHistoryStorageService(string databaseFilePath)
+        {
+            _connectionString = $"Data Source={databaseFilePath};";
+            InitializeDatabase();
+        }
+
+        private void InitializeDatabase()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            string createTableQuery = @"
+                CREATE TABLE IF NOT EXISTS CryptoPriceRecords (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CurrencyPair TEXT NOT NULL,
+                    CloseDate TEXT NOT NULL,
+                    ClosePrice REAL NOT NULL,
+                    UNIQUE(CurrencyPair, CloseDate)
+                );";
+
+            using var command = new SqliteCommand(createTableQuery, connection);
+            command.ExecuteNonQuery();
+        }
+
+        public async Task<Result<IEnumerable<CryptoPriceRecord>>> LoadHistoryAsync(string symbol)
+        {
+            var priceHistory = new List<CryptoPriceRecord>();
+
+            try
+            {
+                using var connection = new SqliteConnection(_connectionString);
+                await connection.OpenAsync();
+
+                string query = "SELECT CurrencyPair, CloseDate, ClosePrice FROM CryptoPriceRecords WHERE CurrencyPair = @CurrencyPair ORDER BY CloseDate;";
+                using var command = new SqliteCommand(query, connection);
+                command.Parameters.AddWithValue("@CurrencyPair", symbol);
+
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    var currencyPair = reader.GetString(0);
+                    var closeDate = DateTime.Parse(reader.GetString(1));
+                    var closePrice = reader.GetDecimal(2);
+
+                    priceHistory.Add(new CryptoPriceRecord
+                    {
+                        CurrencyPair = currencyPair,
+                        CloseDate = closeDate,
+                        ClosePrice = closePrice
+                    });
+                }
+
+                return Result.Success<IEnumerable<CryptoPriceRecord>>(priceHistory);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[{nameof(SQLitePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
+                return Result.Failure<IEnumerable<CryptoPriceRecord>>("Error loading data from SQLite.");
+            }
+        }
+
+
+        public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<CryptoPriceRecord> priceHistory)
+        {
+            try
+            {
+                using var connection = new SqliteConnection(_connectionString);
+                await connection.OpenAsync();
+
+                using var transaction = connection.BeginTransaction();
+
+                string upsertQuery = @"
+                    INSERT OR REPLACE INTO CryptoPriceRecords (CurrencyPair, CloseDate, ClosePrice) 
+                    VALUES (@CurrencyPair, @CloseDate, @ClosePrice);";
+
+                using var command = new SqliteCommand(upsertQuery, connection, transaction); // Associate the command with the transaction
+
+                foreach (var record in priceHistory)
+                {
+                    command.Parameters.Clear();
+                    command.Parameters.AddWithValue("@CurrencyPair", record.CurrencyPair);
+                    command.Parameters.AddWithValue("@CloseDate", record.CloseDate.ToString("yyyy-MM-dd"));
+                    command.Parameters.AddWithValue("@ClosePrice", record.ClosePrice);
+
+                    await command.ExecuteNonQueryAsync(); // Command is now correctly associated with the transaction
+                }
+
+                transaction.Commit(); // Commit the transaction after all commands are executed
+
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[{nameof(SQLitePriceHistoryStorageService)}.{nameof(SaveHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
+                return Result.Failure("Error saving data to SQLite.");
+            }
+        }
+
+    }
+}
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.App.HistoricalPrice
+{
+    public interface IPriceHistoryApi
+    {
+        public string DetermineTradingPair(string fromSymbol, string toSymbol);
+        public Task<Result<IEnumerable<CryptoPriceRecord>>> FetchPriceHistoryAsync(string symbol, DateTime startDate, DateTime endDate);
+    }
+}
+using System.Globalization;
+using CsvHelper;
+using CSharpFunctionalExtensions;
+using Serilog;
+using CsvHelper.Configuration;
+
+namespace Portfolio.App.HistoricalPrice;
+
+public sealed class CryptoPriceRecordMap : ClassMap<CryptoPriceRecord>
+{
+    public CryptoPriceRecordMap()
+    {
+        AutoMap(CultureInfo.InvariantCulture);
+        Map(m => m.CurrencyPair).Ignore();
+    }
+}
+
+public class FilePriceHistoryStorageService : IPriceHistoryStorageService
+{
+    public string StorageLocation { get; set; } = "historical_price_data";
+
+    public async Task<Result<IEnumerable<CryptoPriceRecord>>> LoadHistoryAsync(string symbol)
+    {
+        var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
+
+        if (!File.Exists(csvFileName))
+            return Result.Failure<IEnumerable<CryptoPriceRecord>>($"File not found: {csvFileName}");
+
+        try
+        {
+            using var reader = new StreamReader(csvFileName);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
+            return await Task.FromResult(csv.GetRecords<CryptoPriceRecord>().ToList());  
+        }
+        catch (Exception ex)
+        {
+            Log.ForContext<FilePriceHistoryStorageService>().Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
+            
+            // File might be corrupt. Delete it.
+            File.Delete(csvFileName);
+            
+            return Result.Failure<IEnumerable<CryptoPriceRecord>>($"Error loading data from CSV.");
+        }
+    }
+
+    public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<CryptoPriceRecord> priceHistory)
+    {
+        var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
+
+        if(!Directory.Exists(StorageLocation))
+            Directory.CreateDirectory(StorageLocation);
+
+        try
+        {
+            using (var writer = new StreamWriter(csvFileName))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
+                csv.WriteRecords(priceHistory.Select(data => new
+                {
+                    CloseDate = data.CloseDate.ToString(Strings.DATE_FORMAT),
+                    data.ClosePrice
+                }));
+            }
+
+            return await Task.FromResult(Result.Success());
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(SaveHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
+            return Result.Failure($"Error saving data to CSV.");
+        }
+    }
+}
+using System.Diagnostics;
+using CSharpFunctionalExtensions;
+using Serilog;
+using YahooFinanceApi;
+
+namespace Portfolio.App.HistoricalPrice.YahooFinance
+{
+    public class YahooFinancePriceHistoryApi : IPriceHistoryApi
+    {
+        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                // Log the beginning of the data fetch operation
+                Log.Information("Initiating data fetch for {SymbolPair} from {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}.", symbolPair, startDate, endDate);
+
+                // Start a timer to measure how long the data fetch takes
+                var stopwatch = Stopwatch.StartNew();
+
+                // Fetch the data from Yahoo Finance API
+                var candles = await Yahoo.GetHistoricalAsync(symbolPair, startDate.Date, endDate.Date, Period.Daily);
+
+                // Log the time taken to fetch the data
+                stopwatch.Stop();
+                Log.Information("Data fetch for {SymbolPair} completed in {ElapsedMilliseconds}ms. Retrieved {CandlesCount} day(s) of data.", symbolPair, stopwatch.ElapsedMilliseconds, candles.Count());
+
+                return Result.Success(MapCandlesToCryptoPriceData(symbolPair, candles));
+            }
+            catch (HttpRequestException httpEx)
+            {
+                // Log specific errors for HTTP request issues
+                Log.Error(httpEx, "HTTP error occurred while fetching data for {SymbolPair}.", symbolPair);
+                return Result.Failure<IEnumerable<CryptoPriceRecord>>(Errors.ERR_YAHOO_API_FETCH_FAILURE);
+            }
+            catch (TimeoutException timeoutEx)
+            {
+                // Log timeout errors separately
+                Log.Error(timeoutEx, "Timeout occurred while fetching data for {SymbolPair}.", symbolPair);
+                return Result.Failure<IEnumerable<CryptoPriceRecord>>("Timeout while fetching data.");
+            }
+            catch (Exception ex)
+            {
+                // General catch-all for unexpected errors
+                Log.Error(ex, "Unexpected error in {MethodName} for {SymbolPair}.", nameof(FetchPriceHistoryAsync), symbolPair);
+                return Result.Failure<IEnumerable<CryptoPriceRecord>>(Errors.ERR_YAHOO_API_FETCH_FAILURE);
+            }
+        }
+
+        public string DetermineTradingPair(string fromSymbol, string toSymbol)
+        {
+            if (FiatCurrencies.Codes.Contains(fromSymbol) && FiatCurrencies.Codes.Contains(toSymbol))
+                return $"{fromSymbol}{toSymbol}=X";
+
+            return fromSymbol switch
+            {
+                "IMX" => $"IMX10603-{toSymbol}",
+                "GRT" => $"GRT6719-{toSymbol}",
+                "RNDR" => $"RENDER-{toSymbol}",
+                "UNI" => $"UNI7083-{toSymbol}",
+                "BEAM" => $"BEAM28298-{toSymbol}",
+                _ => $"{fromSymbol}-{toSymbol}"
+            };
+        }
+
+        private static IEnumerable<CryptoPriceRecord> MapCandlesToCryptoPriceData(string currencyPair, IEnumerable<Candle> candles)
+        {
+            return candles.Select(c => ToCryptoPriceData(currencyPair, c));
+        }
+
+        private static CryptoPriceRecord ToCryptoPriceData(string currencyPair, Candle candle)
+        {
+            return new CryptoPriceRecord
+            {
+                CurrencyPair = currencyPair,
+                CloseDate = candle.DateTime > DateTime.Now ? DateTime.Now.Date: candle.DateTime, // Yahoo API sometimes put tomorrow's date when fetching current day...
+                ClosePrice = candle.Close
+            };
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.App.HistoricalPrice;
+
+public class CryptoPriceRecord : ValueObject
+{
+    public string CurrencyPair { get; set; } = string.Empty;
+    public DateTime CloseDate { get; set; }
+    public decimal ClosePrice { get; set; }
+
+    protected override IEnumerable<IComparable> GetEqualityComponents()
+    {
+        yield return CurrencyPair;
+        yield return CloseDate;
+        yield return ClosePrice;
+    }
+}
+using System.Collections.Concurrent;
+using CSharpFunctionalExtensions;
+using Serilog;
+
+namespace Portfolio.App.HistoricalPrice;
+
+public class PriceHistoryService : IPriceHistoryService
+{
+    private readonly IPriceHistoryApi _priceHistoryApi;
+    private readonly IPriceHistoryStorageService _priceHistoryStorage;
+    private ConcurrentDictionary<string, Dictionary<DateTime, CryptoPriceRecord>> _dataStores = new();
+
+    public string DefaultCurrency { get; set; }
+
+    public PriceHistoryService(
+        IPriceHistoryApi priceHistoryApi,
+        IPriceHistoryStorageService priceHistoryStorage,
+        string defaultCurrencySymbol = Strings.CURRENCY_USD)
+    {
+        _priceHistoryApi = priceHistoryApi ?? throw new ArgumentNullException(nameof(priceHistoryApi));
+        _priceHistoryStorage = priceHistoryStorage ?? throw new ArgumentNullException(nameof(priceHistoryStorage));
+
+        DefaultCurrency = defaultCurrencySymbol ?? throw new ArgumentNullException(nameof(defaultCurrencySymbol));
+    }
+
+    public async Task<Result<decimal>> GetPriceAtCloseTimeAsync(string symbol, DateTime date)
+    {
+        var dateOnly = date.Date;
+
+        if (symbol == DefaultCurrency)
+            return HandleDefaultCurrencyError(symbol);
+
+        var history = await LoadPriceHistory(symbol);
+        if (history.Any())
+        {
+
+            if (history.ContainsKey(dateOnly))
+                return history[dateOnly].ClosePrice;
+
+            if (FiatCurrencies.Codes.Contains(symbol))
+            {
+                var handleMissingFiatResult = HandleMissingFiatData(symbol, dateOnly, history);
+                if (handleMissingFiatResult.IsSuccess)
+                    return handleMissingFiatResult.Value;
+            }
+        }
+
+        return await FetchAndSavePriceData(symbol, dateOnly, history);
+    }
+
+    private Result<decimal> HandleDefaultCurrencyError(string symbol)
+    {
+        Log.Warning("Attempted to fetch price for the same symbol as the default currency ({Symbol}).", symbol);
+        return Result.Failure<decimal>(string.Format(Errors.ERR_SAME_SYMBOLS, symbol, DefaultCurrency));
+    }
+
+    private async Task<Dictionary<DateTime, CryptoPriceRecord>> LoadPriceHistory(string symbol)
+    {
+        return await LoadPriceHistoryFromStorageAsync(symbol);
+    }
+
+    private Result<decimal> HandleMissingFiatData(string symbol, DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
+    {
+        Log.Debug("Missing fiat data for {Symbol} on {Date:yyyy-MM-dd}. Trying previous working days...", symbol, date);
+
+        var previousPriceData = GetPreviousWorkingDayPriceData(date, history);
+        if (previousPriceData > -1)
+        {
+            Log.Debug("Fiat data found for {Symbol} on {Date:yyyy-MM-dd}.", symbol, date);
+            return previousPriceData;
+        }
+
+        Log.Debug("No available fiat data for {Symbol} on previous working days..", symbol);
+        return Result.Failure<decimal>($"No price data available for {symbol} on {date:yyyy-MM-dd}");
+    }
+
+    private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
+    {
+        var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
+        var endDate = AdjustEndDate(date);
+        var result = await _priceHistoryApi.FetchPriceHistoryAsync(symbolTradingPair, date.Date, endDate);
+
+        if (result.IsSuccess)
+        {            
+            // If save fails, we can still continue however date will be fetched all the time. 
+            // Ensure error is logged and proper action is taken.
+            var saveResult = await SaveNewPriceHistoryAsync(symbolTradingPair, history, result.Value)
+                .TapError(Log.ForContext<PriceHistoryService>().Error); 
+
+            UpdateHistoryWithFetchedData(history, result.Value);
+
+            if (history.ContainsKey(date.Date))
+                return history[date.Date].ClosePrice;
+            else if (FiatCurrencies.Codes.Contains(symbol))
+            {
+                var handleMissingFiatResult = HandleMissingFiatData(symbol, date, history);
+                if (handleMissingFiatResult.IsSuccess)
+                    return handleMissingFiatResult.Value;
+            }
+
+            return Result.Failure<decimal>("Unexpected error has occurred. ");
+        }
+
+        return Result.Failure<decimal>(result.Error);
+    }
+
+    public async Task<Result> SaveNewPriceHistoryAsync(string symbol, Dictionary<DateTime, CryptoPriceRecord> currentHistory, IEnumerable<CryptoPriceRecord> newRecords)
+    {
+        var existingRecords = currentHistory.Values;
+
+        // Filter out records that already exist
+        var recordsToSave = newRecords
+            .Where(newRecord => !existingRecords.Any(existingRecord =>
+                existingRecord.CurrencyPair == newRecord.CurrencyPair &&
+                existingRecord.CloseDate == newRecord.CloseDate))
+            .ToList();
+
+        if (recordsToSave.Any())
+        {
+            // Save only the new records
+            return await _priceHistoryStorage.SaveHistoryAsync(symbol, recordsToSave);
+        }
+        else
+        {
+            Log.Information("No new records to save for {Symbol}.", symbol);
+            return Result.Success();
+        }
+    }
+
+    private DateTime AdjustEndDate(DateTime date)
+    {
+        var endDate = date.AddDays(365);
+        return endDate > DateTime.Now ? DateTime.Now.AddDays(1) : endDate;
+    }
+
+    private void UpdateHistoryWithFetchedData(Dictionary<DateTime, CryptoPriceRecord> history, IEnumerable<CryptoPriceRecord> records)
+    {
+        foreach (var record in records)
+        {
+            var closeDate = record.CloseDate.Date;
+            if (!history.ContainsKey(closeDate) && record.ClosePrice > 0)
+                history[closeDate] = record;
+        }
+    }
+
+    private async Task<Dictionary<DateTime, CryptoPriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
+    {
+        return await _dataStores.GetOrAddAsync(symbol, async s =>
+            {
+                var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
+                var result = await _priceHistoryStorage.LoadHistoryAsync(symbolTradingPair);
+                if (result.IsSuccess)
+                {
+                    return result.Value.Where(r => r.ClosePrice > 0).ToDictionary(
+                        record => record.CloseDate.Date,
+                        record => record
+                    );
+                }
+                else
+                {
+                    // Save an empty file to avoid trying to fetch from API
+                    // over and over again.      
+                    var emptyDictionary = new Dictionary<DateTime, CryptoPriceRecord>();
+                    var saveResult = await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, emptyDictionary.Values)
+                        .TapError(Log.Error);
+                    return emptyDictionary;
+                }
+            });
+    }
+
+    private decimal GetPreviousWorkingDayPriceData(DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
+    {
+        for (int i = 1; i <= 4; i++)
+        {
+            var previousDate = date.AddDays(-i);
+            if (history.TryGetValue(previousDate, out var priceData))
+                return priceData.ClosePrice;
+        }
+        return -1;
+    }
+}
+using CSharpFunctionalExtensions;
+using Serilog;
+
+namespace Portfolio.App.HistoricalPrice.CoinGecko
 {
     public class CoinGeckoPriceHistoryApi : IPriceHistoryApi
     {
@@ -62,7 +539,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="startDate">The start date for fetching data.</param>
         /// <param name="endDate">The end date for fetching data.</param>
         /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="CryptoPriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchDataAsync(string symbolPair, DateTime startDate, DateTime endDate)
+        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
         {
             try
             {
@@ -157,33 +634,6 @@ namespace Portfolio.App.HistoricalPrice
 }
 using CSharpFunctionalExtensions;
 
-namespace Portfolio.App.HistoricalPrice
-{
-    public interface IPriceHistoryApi
-    {
-        public string DetermineTradingPair(string fromSymbol, string toSymbol);
-        public Task<Result<IEnumerable<CryptoPriceRecord>>> FetchDataAsync(string symbol, DateTime startDate, DateTime endDate);
-    }
-}
-using CSharpFunctionalExtensions;
-
-namespace Portfolio.App.HistoricalPrice;
-
-public class CryptoPriceRecord : ValueObject
-{
-    public string CurrencyPair { get; set; } = string.Empty;
-    public DateTime CloseDate { get; set; }
-    public decimal ClosePrice { get; set; }
-
-    protected override IEnumerable<IComparable> GetEqualityComponents()
-    {
-        yield return CurrencyPair;
-        yield return CloseDate;
-        yield return ClosePrice;
-    }
-}
-using CSharpFunctionalExtensions;
-
 namespace Portfolio.App.HistoricalPrice;
 
 public interface IPriceHistoryService
@@ -199,279 +649,6 @@ public interface IPriceHistoryStorageService
 {
     Task<Result<IEnumerable<CryptoPriceRecord>>> LoadHistoryAsync(string symbol);
     Task<Result> SaveHistoryAsync(string symbol, IEnumerable<CryptoPriceRecord> priceHistory);
-}
-using System.Collections.Concurrent;
-using CSharpFunctionalExtensions;
-using Serilog;
-
-namespace Portfolio.App.HistoricalPrice;
-
-public class YahooFinancePriceHistoryService : IPriceHistoryService
-{
-    private readonly IPriceHistoryApi _priceHistoryApi;
-    private readonly IPriceHistoryStorageService _priceHistoryStorage;
-    private ConcurrentDictionary<string, Dictionary<DateTime, CryptoPriceRecord>> _dataStores = new();
-
-    public string DefaultCurrency { get; set; }
-
-    public YahooFinancePriceHistoryService(
-        IPriceHistoryApi priceHistoryApi,
-        IPriceHistoryStorageService priceHistoryStorage,
-        string defaultCurrencySymbol = Strings.CURRENCY_USD)
-    {
-        _priceHistoryApi = priceHistoryApi ?? throw new ArgumentNullException(nameof(priceHistoryApi));
-        _priceHistoryStorage = priceHistoryStorage ?? throw new ArgumentNullException(nameof(priceHistoryStorage));
-
-        DefaultCurrency = defaultCurrencySymbol ?? throw new ArgumentNullException(nameof(defaultCurrencySymbol));
-    }
-
-    public async Task<Result<decimal>> GetPriceAtCloseTimeAsync(string symbol, DateTime date)
-    {
-        Log.ForContext<YahooFinancePriceHistoryService>().Information("Retrieving closing price for {Symbol} on {Date:yyyy-MM-dd}.", symbol, date);
-
-        if (symbol == DefaultCurrency)
-        {
-            Log.Warning("Attempted to fetch price for the same symbol as the default currency ({Symbol}).", symbol);
-            return Result.Failure<decimal>(string.Format(Errors.ERR_SAME_SYMBOLS, symbol, DefaultCurrency));
-        }
-
-        var dateOnly = date.Date;
-        var history = await LoadPriceHistoryFromStorageAsync(symbol);
-
-        if (history.ContainsKey(dateOnly))
-            return history[dateOnly].ClosePrice;
-        else
-        {
-            var isFiatSymbol = FiatCurrencies.Codes.Contains(symbol);
-            if (isFiatSymbol)
-            {
-                Log.Debug($"[YahooFinance] [{symbol}] Missing fiat data for {dateOnly:yyyy-MM-dd}. Trying previous working days...");
-
-                var previousPriceData = GetPreviousWorkingDayPriceData(dateOnly, history);
-                if (previousPriceData > -1)
-                    return previousPriceData;
-
-                Log.Debug($"[YahooFinance] [{symbol}] No available data on previous working days.");
-            }
-
-            // If storage does not have any data yet, fetch 
-            var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
-
-            // Fetch data along with the next 365 days or until today...
-            // TODO: This should be controllable from the API service instead.
-            var endDate = dateOnly.AddDays(365);
-            if (endDate > DateTime.Now)
-                endDate = DateTime.Now;
-
-            var result = await _priceHistoryApi.FetchDataAsync(symbolTradingPair, dateOnly, endDate);
-            if (result.IsSuccess)
-            {
-                foreach (var record in result.Value)
-                {
-                    var closeDate = record.CloseDate.Date;
-                    if (!history.ContainsKey(closeDate))
-                        history[closeDate] = record;
-                }
-
-                await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, history.Values);
-
-                return history[dateOnly].ClosePrice;
-            }
-            else
-                return Result.Failure<decimal>(result.Error);
-        }
-    }
-
-    private async Task<Dictionary<DateTime, CryptoPriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
-    {
-        return await _dataStores.GetOrAddAsync(symbol, async s =>
-            {
-                var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
-                var result = await _priceHistoryStorage.LoadHistoryAsync(symbolTradingPair);
-                if (result.IsSuccess)
-                {
-                    return result.Value.ToDictionary(
-                        record => record.CloseDate.Date,
-                        record => record
-                    );
-                }
-                else
-                {
-                    // Save an empty file to avoid trying to fetch from Yahoo Finance
-                    // over and over again.      
-                    var emptyDictionary = new Dictionary<DateTime, CryptoPriceRecord>();
-                    var saveResult = await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, emptyDictionary.Values)
-                        .TapError(Log.Error);
-                    return emptyDictionary;
-                }
-            });
-    }
-
-    private decimal GetPreviousWorkingDayPriceData(DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
-    {
-        for (int i = 1; i <= 4; i++)
-        {
-            var previousDate = date.AddDays(-i);
-            if (history.TryGetValue(previousDate, out var priceData))
-                return priceData.ClosePrice;
-        }
-        return -1;
-    }
-}
-using System.Diagnostics;
-using CSharpFunctionalExtensions;
-using Serilog;
-using YahooFinanceApi;
-
-namespace Portfolio.App.HistoricalPrice
-{
-    public class YahooFinancePriceHistoryApi : IPriceHistoryApi
-    {
-        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchDataAsync(string symbolPair, DateTime startDate, DateTime endDate)
-        {
-            try
-            {
-                // Log the beginning of the data fetch operation
-                Log.Information("Initiating data fetch for {SymbolPair} from {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}.", symbolPair, startDate, endDate);
-
-                // Start a timer to measure how long the data fetch takes
-                var stopwatch = Stopwatch.StartNew();
-
-                // Fetch the data from Yahoo Finance API
-                var candles = await Yahoo.GetHistoricalAsync(symbolPair, startDate.Date, endDate.Date, Period.Daily);
-
-                // Log the time taken to fetch the data
-                stopwatch.Stop();
-                Log.Information("Data fetch for {SymbolPair} completed in {ElapsedMilliseconds}ms. Retrieved {CandlesCount} day(s) of data.", symbolPair, stopwatch.ElapsedMilliseconds, candles.Count());
-
-                return Result.Success(MapCandlesToCryptoPriceData(symbolPair, candles));
-            }
-            catch (HttpRequestException httpEx)
-            {
-                // Log specific errors for HTTP request issues
-                Log.Error(httpEx, "HTTP error occurred while fetching data for {SymbolPair}.", symbolPair);
-                return Result.Failure<IEnumerable<CryptoPriceRecord>>(Errors.ERR_YAHOO_API_FETCH_FAILURE);
-            }
-            catch (TimeoutException timeoutEx)
-            {
-                // Log timeout errors separately
-                Log.Error(timeoutEx, "Timeout occurred while fetching data for {SymbolPair}.", symbolPair);
-                return Result.Failure<IEnumerable<CryptoPriceRecord>>("Timeout while fetching data.");
-            }
-            catch (Exception ex)
-            {
-                // General catch-all for unexpected errors
-                Log.Error(ex, "Unexpected error in {MethodName} for {SymbolPair}.", nameof(FetchDataAsync), symbolPair);
-                return Result.Failure<IEnumerable<CryptoPriceRecord>>(Errors.ERR_YAHOO_API_FETCH_FAILURE);
-            }
-        }
-
-        public string DetermineTradingPair(string fromSymbol, string toSymbol)
-        {
-            if (FiatCurrencies.Codes.Contains(fromSymbol) && FiatCurrencies.Codes.Contains(toSymbol))
-                return $"{fromSymbol}{toSymbol}=X";
-
-            return fromSymbol switch
-            {
-                "IMX" => $"IMX10603-{toSymbol}",
-                "GRT" => $"GRT6719-{toSymbol}",
-                "RNDR" => $"RENDER-{toSymbol}",
-                "UNI" => $"UNI7083-{toSymbol}",
-                "BEAM" => $"BEAM28298-{toSymbol}",
-                _ => $"{fromSymbol}-{toSymbol}"
-            };
-        }
-
-        private static IEnumerable<CryptoPriceRecord> MapCandlesToCryptoPriceData(string currencyPair, IEnumerable<Candle> candles)
-        {
-            return candles.Select(c => ToCryptoPriceData(currencyPair, c));
-        }
-
-        private static CryptoPriceRecord ToCryptoPriceData(string currencyPair, Candle candle)
-        {
-            return new CryptoPriceRecord
-            {
-                CurrencyPair = currencyPair,
-                CloseDate = candle.DateTime,
-                ClosePrice = candle.Close
-            };
-        }
-    }
-}
-using System.Globalization;
-using CsvHelper;
-using CSharpFunctionalExtensions;
-using Serilog;
-using CsvHelper.Configuration;
-
-namespace Portfolio.App.HistoricalPrice;
-
-public sealed class CryptoPriceRecordMap : ClassMap<CryptoPriceRecord>
-{
-    public CryptoPriceRecordMap()
-    {
-        AutoMap(CultureInfo.InvariantCulture);
-        Map(m => m.CurrencyPair).Ignore();
-    }
-}
-
-public class LocalFilePriceHistoryStorageService : IPriceHistoryStorageService
-{
-    public string StorageLocation { get; set; } = "historical_price_data";
-
-    public async Task<Result<IEnumerable<CryptoPriceRecord>>> LoadHistoryAsync(string symbol)
-    {
-        var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
-
-        if (!File.Exists(csvFileName))
-            return Result.Failure<IEnumerable<CryptoPriceRecord>>($"File not found: {csvFileName}");
-
-        try
-        {
-            using var reader = new StreamReader(csvFileName);
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
-            return await Task.FromResult(csv.GetRecords<CryptoPriceRecord>().ToList());  
-        }
-        catch (Exception ex)
-        {
-            Log.ForContext<LocalFilePriceHistoryStorageService>().Error($"[{nameof(LocalFilePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
-            
-            // File might be corrupt. Delete it.
-            File.Delete(csvFileName);
-            
-            return Result.Failure<IEnumerable<CryptoPriceRecord>>($"Error loading data from CSV.");
-        }
-    }
-
-    public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<CryptoPriceRecord> priceHistory)
-    {
-        var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
-
-        if(!Directory.Exists(StorageLocation))
-            Directory.CreateDirectory(StorageLocation);
-
-        try
-        {
-            using (var writer = new StreamWriter(csvFileName))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
-                csv.WriteRecords(priceHistory.Select(data => new
-                {
-                    CloseDate = data.CloseDate.ToString(Strings.DATE_FORMAT),
-                    data.ClosePrice
-                }));
-            }
-
-            return await Task.FromResult(Result.Success());
-        }
-        catch (Exception ex)
-        {
-            Log.Error($"[{nameof(LocalFilePriceHistoryStorageService)}.{nameof(SaveHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
-            return Result.Failure($"Error saving data to CSV.");
-        }
-    }
 }
 using System.Collections.Concurrent;
 
@@ -847,6 +1024,7 @@ using Serilog.Formatting.Json;
 using Portfolio.Kraken;
 using Portfolio.Shared;
 using Portfolio.App.HistoricalPrice;
+using Portfolio.App.HistoricalPrice.YahooFinance;
 
 namespace Portfolio.App;
 
@@ -873,9 +1051,13 @@ internal class Program
         if (krakenWalletResult.IsFailure)
             throw new Exception(krakenWalletResult.Error);
 
-        var storage = new LocalFilePriceHistoryStorageService();
+        //var storage = new FilePriceHistoryStorageService();
+
+        var storage = new SQLitePriceHistoryStorageService("path_to_your_database_file.db");
+
+
         var api = new YahooFinancePriceHistoryApi();
-        var svc = new YahooFinancePriceHistoryService(api, storage, "USD");
+        var svc = new PriceHistoryService(api, storage, "USD");
         var portfolio = new Portfolio(svc);
         portfolio.OnDepositAdded += CheckBalance;
         portfolio.OnWithdrawAdded += CheckBalance;

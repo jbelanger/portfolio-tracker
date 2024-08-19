@@ -1,7 +1,6 @@
 using System.Globalization;
 using CsvHelper;
 using CSharpFunctionalExtensions;
-using Serilog;
 using CsvHelper.Configuration;
 
 namespace Portfolio.App.HistoricalPrice;
@@ -31,15 +30,22 @@ public class FilePriceHistoryStorageService : IPriceHistoryStorageService
             using var reader = new StreamReader(csvFileName);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
-            return await Task.FromResult(csv.GetRecords<CryptoPriceRecord>().ToList());  
+            // Read all records asynchronously
+            var records = new List<CryptoPriceRecord>();
+            await foreach (var record in csv.GetRecordsAsync<CryptoPriceRecord>())
+            {
+                records.Add(record);
+            }
+
+            return Result.Success<IEnumerable<CryptoPriceRecord>>(records);
         }
         catch (Exception ex)
         {
             Log.ForContext<FilePriceHistoryStorageService>().Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
-            
+
             // File might be corrupt. Delete it.
             File.Delete(csvFileName);
-            
+
             return Result.Failure<IEnumerable<CryptoPriceRecord>>($"Error loading data from CSV.");
         }
     }
@@ -48,7 +54,7 @@ public class FilePriceHistoryStorageService : IPriceHistoryStorageService
     {
         var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
 
-        if(!Directory.Exists(StorageLocation))
+        if (!Directory.Exists(StorageLocation))
             Directory.CreateDirectory(StorageLocation);
 
         try

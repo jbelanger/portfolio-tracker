@@ -1,7 +1,6 @@
 using CSharpFunctionalExtensions;
 using Portfolio.App.HistoricalPrice;
 using Portfolio.Shared;
-using Serilog;
 
 namespace Portfolio.App;
 
@@ -167,7 +166,7 @@ public class Portfolio
         }
 
         // Fetch latest prices...
-        foreach (var holding in _holdings)
+        foreach (var holding in _holdings.Where(h => h.Balance > 0))
         {
             if (holding.Asset == DefaultCurrency)
                 holding.CurrentPrice = new Money(1m, holding.Asset);
