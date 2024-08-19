@@ -8,8 +8,6 @@ namespace Portfolio.Domain.Entities
     /// </summary>
     public class CryptoCurrencyDepositTransaction : CryptoCurrencyTransaction
     {
-
-
         /// <summary>
         /// Private constructor used internally for factory methods.
         /// </summary>
@@ -60,19 +58,19 @@ namespace Portfolio.Domain.Entities
             return deposit;
         }
 
-        public CryptoCurrencyTransaction ToGenericTransaction()
-        {
-            return new CryptoCurrencyTransaction
-            {
-                DateTime = DateTime,
-                Type = TransactionType.Deposit,
-                Amount = Amount,
-                //SentAmount = null,
-                FeeAmount = FeeAmount,
-                Account = Account,
-                Note = Note,
-                TransactionIds = TransactionIds
-            };
-        }
+        // public CryptoCurrencyTransaction ToGenericTransaction()
+        // {
+        //     return new CryptoCurrencyTransaction
+        //     {
+        //         DateTime = DateTime,
+        //         Type = TransactionType.Deposit,
+        //         Amount = Amount,
+        //         //SentAmount = null,
+        //         FeeAmount = FeeAmount,
+        //         Account = Account,
+        //         Note = Note,
+        //         TransactionIds = TransactionIds
+        //     };
+        // }
     }
 }

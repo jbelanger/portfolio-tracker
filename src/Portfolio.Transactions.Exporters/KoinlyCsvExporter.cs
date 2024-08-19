@@ -51,22 +51,31 @@ namespace Portfolio.Transactions.Exporters
         /// <param name="tx">The transaction to convert.</param>
         /// <returns>A string representing the transaction in Koinly CSV format.</returns>
         private string ToCsvLine(CryptoCurrencyTransaction tx)
-        {
-            return "";
-            // var sentAmount = tx.SentAmount;
-            // if (tx.Type == TransactionType.Withdrawal && tx.FeeAmount.AbsoluteAmount > 0)
-            // {
-            //     sentAmount = sentAmount?.Add(tx.FeeAmount);
-            // }
+        {            
+            Money? inAmount = null;
+            Money? outAmount = null;
+            var label = tx.Note;
 
-            // if (tx.TransactionIds.Contains("FTYhknV-XRJwlulHpL7VST9y73uoLH"))
-            //     ;
+            switch (tx)
+            {
+                case CryptoCurrencyDepositTransaction deposit:
+                    inAmount = deposit.Amount;
+                    outAmount = null;                    
+                    break;
+                case CryptoCurrencyWithdrawTransaction wihdraw:
+                    inAmount = null;
+                    outAmount = wihdraw.Amount;                    
+                    break;
+                case CryptoCurrencyTradeTransaction trade:
+                    var isCryptoToFiat = trade.Amount.IsFiatCurrency && trade.TradeAmount.IsFiatCurrency;
+                    var isReceiveFee = trade.Amount.CurrencyCode == trade.FeeAmount?.CurrencyCode;
+                    var receiveAmount = isReceiveFee ? trade.Amount.ToAbsoluteAmountMoney().Add(trade.FeeAmount.ToAbsoluteAmountMoney()) : trade.Amount;
+                    inAmount = receiveAmount;
+                    outAmount = trade.TradeAmount;                    
+                    break;
+            }
 
-            // var isCryptoToFiat = tx.ReceivedAmount?.IsFiatCurrency == true && tx.SentAmount?.IsFiatCurrency == false;
-            // var isReceiveFee = tx.ReceivedAmount?.CurrencyCode == tx.FeeAmount?.CurrencyCode;
-            // var receiveAmount = isReceiveFee ? tx.ReceivedAmount.ToAbsoluteAmountMoney()?.Add(tx.FeeAmount.ToAbsoluteAmountMoney()) : tx.ReceivedAmount;
-            // var label = tx.Note;//(tx.Type == TransactionType.Fee) ? "Cost" : tx.Note;        
-            // return $"{tx.DateTime:yyyy-MM-dd HH:mm:ss UTC},{tx.SentAmount?.AbsoluteAmount},{tx.SentAmount?.CurrencyCode},{receiveAmount?.AbsoluteAmount},{tx.ReceivedAmount?.CurrencyCode},{tx.FeeAmount?.AbsoluteAmount},{tx.FeeAmount?.CurrencyCode},,,{label},{tx.Account},{string.Join("|", tx.TransactionIds.Select(x => x))}";
+            return $"{tx.DateTime:yyyy-MM-dd HH:mm:ss UTC},{outAmount?.AbsoluteAmount},{outAmount?.CurrencyCode},{inAmount?.AbsoluteAmount},{inAmount?.CurrencyCode},{tx.FeeAmount?.AbsoluteAmount},{tx.FeeAmount?.CurrencyCode},,,{label},{tx.Account},{string.Join("|", tx.TransactionIds.Select(x => x))}"; ;
         }
     }
 }
