@@ -1,19 +1,27 @@
 using CSharpFunctionalExtensions;
+using Newtonsoft.Json.Linq;
 
 namespace Portfolio.App.HistoricalPrice.CoinGecko
 {
+    /// <summary>
+    /// Provides an implementation of <see cref="IPriceHistoryApi"/> that retrieves historical cryptocurrency price data from the CoinGecko API.
+    /// </summary>
     public class CoinGeckoPriceHistoryApi : IPriceHistoryApi
     {
         private readonly HttpClient _httpClient;
         private const string BaseUrl = "https://api.coingecko.com/api/v3";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CoinGeckoPriceHistoryApi"/> class with the specified <see cref="HttpClient"/>.
+        /// </summary>
+        /// <param name="httpClient">The <see cref="HttpClient"/> used to make requests to the CoinGecko API.</param>
         public CoinGeckoPriceHistoryApi(HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         /// <summary>
-        /// Fetches historical price data from CoinGecko for a given symbol and date range.
+        /// Fetches historical price data for a given cryptocurrency symbol and date range from the CoinGecko API.
         /// </summary>
         /// <param name="symbolPair">The trading pair symbol, e.g., "bitcoin/usd".</param>
         /// <param name="startDate">The start date for fetching data.</param>
@@ -35,17 +43,16 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
 
                 for (var date = startDate.Date; date <= endDate.Date; date = date.AddDays(1))
                 {
-                    var timestamp = ((DateTimeOffset)date).ToUnixTimeSeconds();
                     var url = $"{BaseUrl}/coins/{coinId}/history?date={date:dd-MM-yyyy}";
-                    var response = await _httpClient.GetAsync(url);
+                    var response = await _httpClient.GetAsync(url).ConfigureAwait(false);
                     if (!response.IsSuccessStatusCode)
                     {
                         Log.Warning("Failed to fetch data from CoinGecko for {SymbolPair} on {Date:yyyy-MM-dd}. Status Code: {StatusCode}.", symbolPair, date, response.StatusCode);
                         continue;
                     }
 
-                    var content = await response.Content.ReadAsStringAsync();
-                    var jsonData = Newtonsoft.Json.Linq.JObject.Parse(content);
+                    var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    var jsonData = JObject.Parse(content);
                     var price = jsonData["market_data"]?["current_price"]?[symbolPair.Split('/')[1].ToLower()]?.ToObject<decimal?>();
 
                     if (price.HasValue)
@@ -101,7 +108,7 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
         }
 
         /// <summary>
-        /// Determines the appropriate trading pair symbol for CoinGecko.
+        /// Determines the appropriate trading pair symbol for CoinGecko based on the provided symbols.
         /// </summary>
         /// <param name="fromSymbol">The base currency or coin symbol.</param>
         /// <param name="toSymbol">The quote currency or coin symbol.</param>

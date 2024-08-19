@@ -52,13 +52,13 @@ public class Portfolio
         return Result.Success();
     }
 
-    public async Task<Result> Process()
+    public async Task<Result> ProcessAsync()
     {
         if (!Wallets.Any())
             return Result.Failure("No wallets to process. Start by adding a wallet.");
         
         var transactions = GetTransactionsFromAllWallets();
-        _holdings = (await GetHoldings(transactions)).ToList();
+        _holdings = (await GetHoldings(transactions).ConfigureAwait(false)).ToList();
 
         return Result.Success();
     }
@@ -86,10 +86,10 @@ public class Portfolio
                     receiver.AverageBoughtPrice = 1;
                 else
                 {
-                    var priceResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(deposit.Amount.CurrencyCode, deposit.DateTime);
+                    var priceResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(deposit.Amount.CurrencyCode, deposit.DateTime).ConfigureAwait(false);
                     if (priceResult.IsFailure)
                     {
-                        Log.Error($"Failed to retrieve price history for asset {receiver.Asset} on {deposit.DateTime:yyyy-MM-dd}. Error: {priceResult.Error}");
+                        Log.Error("Failed to retrieve price history for asset {Asset} on {Date:yyyy-MM-dd}. Error: {Error}", receiver.Asset, deposit.DateTime, priceResult.Error);
                         continue;
                     }
 
@@ -115,7 +115,7 @@ public class Portfolio
 
                 if (sender.Balance < 0)
                 {
-                    Log.Warning($"{sender.Asset} Balance is under zero: {sender.Balance}");
+                    Log.Warning("{Asset} Balance is under zero: {Balance}", sender.Asset, sender.Balance);
                 }
 
                 OnWithdrawAdded?.Invoke(withdraw, sender);
@@ -139,9 +139,6 @@ public class Portfolio
                     decimal tradedCost = trade.TradeAmount.Amount * sender.AverageBoughtPrice; // 0.04 * 25000 = 1000
                     decimal boughtPrice = tradedCost / trade.Amount.Amount;
 
-                    //var priceValue = await _priceHistoryStores[trade.Amount.CurrencyCode].GetPriceDataAsync(trade.DateTime);
-                    //trade.UnitValue = new Money(priceValue.Close, DefaultCurrency);
-
                     decimal newAverage = ((receiver.AverageBoughtPrice * receiver.Balance) + (trade.Amount.Amount * boughtPrice)) / (receiver.Balance + trade.Amount.Amount);
                     receiver.AverageBoughtPrice = newAverage;
                 }
@@ -157,7 +154,7 @@ public class Portfolio
 
                 if (sender.Balance < 0)
                 {
-                    Log.Error($"{sender.Asset} Balance is under zero: {sender.Balance}");
+                    Log.Warning("{Asset} Balance is under zero: {Balance}", sender.Asset, sender.Balance);
                 }
 
                 // Log.Debug($"Trade Out [{string.Join("|", trade.TransactionIds)}: {sender.Asset}: {sender.Balance}");
@@ -172,7 +169,7 @@ public class Portfolio
                 holding.CurrentPrice = new Money(1m, holding.Asset);
             else
             {
-                var priceValueResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(holding.Asset, DateTime.Now);            
+                var priceValueResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(holding.Asset, DateTime.Now).ConfigureAwait(false);            
                 if (priceValueResult.IsFailure)
                 {
                     Log.Error(priceValueResult.Error);
@@ -195,8 +192,6 @@ public class Portfolio
 
             decimal expectedTotal = 0;
 
-            if (holding.Asset == "LINK")
-                ;
             // Total number of IN transactions should equal to the balance.
             foreach (var tx in holding.Transactions)
             {
@@ -223,7 +218,7 @@ public class Portfolio
             }
 
             if (expectedTotal != holding.Balance)
-                Log.Warning($"Missing transactions for holding {holding.Asset}");
+                Log.Warning("Missing transactions for holding {Asset}", holding.Asset);
         }
 
     }

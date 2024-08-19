@@ -4,6 +4,7 @@ using Portfolio.Kraken;
 using Portfolio.Shared;
 using Portfolio.App.HistoricalPrice;
 using Portfolio.App.HistoricalPrice.YahooFinance;
+using Serilog.Enrichers.CallerInfo;
 
 namespace Portfolio.App;
 
@@ -12,6 +13,8 @@ internal class Program
     private static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext() // Allows you to add properties to the log context dynamically
+            //.Enrich.WithCallerInfo() // Automatically includes method and class names
             // add console as logging target
             .WriteTo.Console()
             // add a logging target for warnings and higher severity  logs
@@ -36,7 +39,7 @@ internal class Program
 
 
         var api = new YahooFinancePriceHistoryApi();
-        var svc = new PriceHistoryService(api, storage, "USD");
+        var svc = new PriceHistoryService(api, storage, Strings.CURRENCY_USD);
         var portfolio = new Portfolio(svc);
         portfolio.OnDepositAdded += CheckBalance;
         portfolio.OnWithdrawAdded += CheckBalance;
@@ -46,7 +49,7 @@ internal class Program
         if (addWalletResult.IsFailure)
             throw new Exception(addWalletResult.Error);
 
-        var processResult = await portfolio.Process();
+        var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
         if (processResult.IsFailure)
             throw new Exception(processResult.Error);
 

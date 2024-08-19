@@ -47,7 +47,7 @@ public class Tests
         if (addWalletResult.IsFailure)
             throw new Exception(addWalletResult.Error);
 
-        var processResult = await portfolio.Process();
+        var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
         if (processResult.IsFailure)
             throw new Exception(processResult.Error);
 
@@ -95,7 +95,7 @@ public class Tests
         if (addWalletResult.IsFailure)
             throw new Exception(addWalletResult.Error);
 
-        var processResult = await portfolio.Process();
+        var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
         if (processResult.IsFailure)
             throw new Exception(processResult.Error);
 
@@ -150,7 +150,7 @@ public class Tests
         if (addWalletResult.IsFailure)
             throw new Exception(addWalletResult.Error);
 
-        var processResult = await portfolio.Process();
+        var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
         if (processResult.IsFailure)
             throw new Exception(processResult.Error);
 
@@ -205,7 +205,7 @@ public class Tests
         if (addWalletResult.IsFailure)
             throw new Exception(addWalletResult.Error);
 
-        var processResult = await portfolio.Process();
+        var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
         if (processResult.IsFailure)
             throw new Exception(processResult.Error);
 
@@ -263,7 +263,7 @@ public class Tests
         if (addWalletResult.IsFailure)
             throw new Exception(addWalletResult.Error);
 
-        var processResult = await portfolio.Process();
+        var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
         if (processResult.IsFailure)
             throw new Exception(processResult.Error);
 

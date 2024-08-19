@@ -14,10 +14,21 @@ public sealed class CryptoPriceRecordMap : ClassMap<CryptoPriceRecord>
     }
 }
 
+/// <summary>
+/// Provides an implementation of <see cref="IPriceHistoryStorageService"/> that uses CSV files for storing and retrieving historical cryptocurrency price data.
+/// </summary>
 public class FilePriceHistoryStorageService : IPriceHistoryStorageService
 {
+    /// <summary>
+    /// Gets or sets the location where the CSV files containing historical price data are stored.
+    /// </summary>
     public string StorageLocation { get; set; } = "historical_price_data";
 
+    /// <summary>
+    /// Loads historical price data for a specified cryptocurrency symbol from a CSV file.
+    /// </summary>
+    /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC/USD").</param>
+    /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="CryptoPriceRecord"/> or an error message.</returns>
     public async Task<Result<IEnumerable<CryptoPriceRecord>>> LoadHistoryAsync(string symbol)
     {
         var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
@@ -30,9 +41,9 @@ public class FilePriceHistoryStorageService : IPriceHistoryStorageService
             using var reader = new StreamReader(csvFileName);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
-            // Read all records asynchronously
+
             var records = new List<CryptoPriceRecord>();
-            await foreach (var record in csv.GetRecordsAsync<CryptoPriceRecord>())
+            await foreach (var record in csv.GetRecordsAsync<CryptoPriceRecord>().ConfigureAwait(false))
             {
                 records.Add(record);
             }
@@ -50,6 +61,12 @@ public class FilePriceHistoryStorageService : IPriceHistoryStorageService
         }
     }
 
+    /// <summary>
+    /// Saves historical price data for a specified cryptocurrency symbol to a CSV file.
+    /// </summary>
+    /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC/USD").</param>
+    /// <param name="priceHistory">The historical price data to be saved.</param>
+    /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
     public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<CryptoPriceRecord> priceHistory)
     {
         var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
@@ -70,7 +87,7 @@ public class FilePriceHistoryStorageService : IPriceHistoryStorageService
                 }));
             }
 
-            return await Task.FromResult(Result.Success());
+            return await Task.FromResult(Result.Success()).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
