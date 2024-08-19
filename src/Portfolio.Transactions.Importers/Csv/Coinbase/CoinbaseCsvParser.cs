@@ -1,7 +1,8 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Portfolio.Shared;
+using Portfolio.Domain;
+using Portfolio.Domain.Entities;
 using Serilog;
 
 namespace Portfolio.Transactions.Importers.Csv.Coinbase

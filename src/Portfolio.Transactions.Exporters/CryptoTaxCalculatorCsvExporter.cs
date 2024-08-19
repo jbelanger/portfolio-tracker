@@ -1,4 +1,5 @@
-﻿using Portfolio.Shared;
+﻿using Portfolio.Domain.Entities;
+using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Transactions.Exporters
 {
@@ -51,67 +52,68 @@ namespace Portfolio.Transactions.Exporters
         /// <returns>A string representing the transaction in CoinTracker CSV format.</returns>
         private string ToCsvLine(CryptoCurrencyTransaction tx)
         {
-            string txType = string.Empty;
-            Money? baseMoney = tx.ReceivedAmount;
-            Money? quoteMoney = tx.SentAmount;
-            switch (tx.Type)
-            {
-                case TransactionType.Trade:
-                    if (tx.TransactionIds.Contains("TS5PSRF-EJ4SC-FQMLN2"))
-                        ;
+            return "";
+            // string txType = string.Empty;
+            // Money? baseMoney = tx.ReceivedAmount;
+            // Money? quoteMoney = tx.SentAmount;
+            // switch (tx.Type)
+            // {
+            //     case TransactionType.Trade:
+            //         if (tx.TransactionIds.Contains("TS5PSRF-EJ4SC-FQMLN2"))
+            //             ;
 
-                    if (tx.SentAmount?.IsFiatCurrency == true)
-                    {
-                        txType = "buy";
-                        //if(tx.ReceivedAmount?.IsFiatCurrency == true)
-                        {
-                            if (tx.SentAmount?.CurrencyCode == tx.FeeAmount?.CurrencyCode)
-                            {
-                                //quoteMoney = tx.SentAmount.Subtract(tx.FeeAmount);
-                            }
-                            else if (tx.ReceivedAmount?.CurrencyCode == tx.FeeAmount?.CurrencyCode)
-                            {
-                                baseMoney = tx.ReceivedAmount?.Subtract(tx.FeeAmount);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        txType = "sell";
-                        baseMoney = tx.SentAmount;
-                        quoteMoney = tx.ReceivedAmount;
-                    }
+            //         if (tx.SentAmount?.IsFiatCurrency == true)
+            //         {
+            //             txType = "buy";
+            //             //if(tx.ReceivedAmount?.IsFiatCurrency == true)
+            //             {
+            //                 if (tx.SentAmount?.CurrencyCode == tx.FeeAmount?.CurrencyCode)
+            //                 {
+            //                     //quoteMoney = tx.SentAmount.Subtract(tx.FeeAmount);
+            //                 }
+            //                 else if (tx.ReceivedAmount?.CurrencyCode == tx.FeeAmount?.CurrencyCode)
+            //                 {
+            //                     baseMoney = tx.ReceivedAmount?.Subtract(tx.FeeAmount);
+            //                 }
+            //             }
+            //         }
+            //         else
+            //         {
+            //             txType = "sell";
+            //             baseMoney = tx.SentAmount;
+            //             quoteMoney = tx.ReceivedAmount;
+            //         }
 
 
-                    break;
-                case TransactionType.Deposit:
-                    if (tx.ReceivedAmount?.IsFiatCurrency == true)
-                    {
-                        txType = "fiat-deposit";
-                        baseMoney = tx.ReceivedAmount.Add(tx.FeeAmount);
-                    }
-                    else
-                    {
-                        txType = "receive";
-                    }
-                    break;
-                case TransactionType.Withdrawal:
-                    baseMoney = tx.SentAmount;
-                    quoteMoney = tx.ReceivedAmount;
-                    if (tx.SentAmount?.IsFiatCurrency == true)
-                    {
-                        txType = "fiat-withdrawal";
-                    }
-                    else
-                    {
-                        txType = "send";
-                    }
-                    break;
-                default:
-                    break;
-            }
+            //         break;
+            //     case TransactionType.Deposit:
+            //         if (tx.ReceivedAmount?.IsFiatCurrency == true)
+            //         {
+            //             txType = "fiat-deposit";
+            //             baseMoney = tx.ReceivedAmount.Add(tx.FeeAmount);
+            //         }
+            //         else
+            //         {
+            //             txType = "receive";
+            //         }
+            //         break;
+            //     case TransactionType.Withdrawal:
+            //         baseMoney = tx.SentAmount;
+            //         quoteMoney = tx.ReceivedAmount;
+            //         if (tx.SentAmount?.IsFiatCurrency == true)
+            //         {
+            //             txType = "fiat-withdrawal";
+            //         }
+            //         else
+            //         {
+            //             txType = "send";
+            //         }
+            //         break;
+            //     default:
+            //         break;
+            // }
 
-            return $"{tx.DateTime:yyyy-MM-dd HH:mm:ss},{txType},{baseMoney?.CurrencyCode},{baseMoney?.AbsoluteAmount},{quoteMoney?.CurrencyCode},{quoteMoney?.AbsoluteAmount},{tx.FeeAmount?.CurrencyCode},{tx.FeeAmount?.AbsoluteAmount},,,,,,,";
+            // return $"{tx.DateTime:yyyy-MM-dd HH:mm:ss},{txType},{baseMoney?.CurrencyCode},{baseMoney?.AbsoluteAmount},{quoteMoney?.CurrencyCode},{quoteMoney?.AbsoluteAmount},{tx.FeeAmount?.CurrencyCode},{tx.FeeAmount?.AbsoluteAmount},,,,,,,";
         }
     }
 }

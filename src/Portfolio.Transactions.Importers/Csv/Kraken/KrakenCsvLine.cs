@@ -1,5 +1,5 @@
 using CsvHelper.Configuration;
-using Portfolio.Shared;
+using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Transactions.Importers.Csv.Kraken
 {

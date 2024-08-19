@@ -1,4 +1,4 @@
-﻿using Portfolio.Shared;
+﻿using Portfolio.Domain.Entities;
 
 namespace Portfolio.Transactions.Exporters
 {
@@ -52,7 +52,7 @@ namespace Portfolio.Transactions.Exporters
         private string ToCsvLine(CryptoCurrencyTransaction tx)
         {
             // MM/DD/YYYY HH:MM:SS. For example, "06/14/2017 20:57:35".
-            return $"{tx.DateTime:dd.MM.yyyy HH:mm:ss},{tx.Account},{tx.Type},{tx.SentAmount?.CurrencyCode},{tx.SentAmount?.AbsoluteAmount},{tx.ReceivedAmount?.CurrencyCode},{tx.ReceivedAmount?.AbsoluteAmount},{tx.FeeAmount?.CurrencyCode},{tx.FeeAmount?.AbsoluteAmount},,";
+            return "";//$"{tx.DateTime:dd.MM.yyyy HH:mm:ss},{tx.Account},{tx.Type},{tx.SentAmount?.CurrencyCode},{tx.SentAmount?.AbsoluteAmount},{tx.ReceivedAmount?.CurrencyCode},{tx.ReceivedAmount?.AbsoluteAmount},{tx.FeeAmount?.CurrencyCode},{tx.FeeAmount?.AbsoluteAmount},,";
         }
     }
 }
