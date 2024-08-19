@@ -1,5 +1,4 @@
 using CSharpFunctionalExtensions;
-using Newtonsoft.Json.Linq;
 using Portfolio.Shared;
 
 namespace Portfolio;
