@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Portfolio.Shared;
 using YahooFinanceApi;
 
 namespace Portfolio.App.HistoricalPrice.YahooFinance
@@ -62,7 +63,7 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
         /// <returns>The trading pair symbol in the appropriate format.</returns>
         public string DetermineTradingPair(string fromSymbol, string toSymbol)
         {
-            if (FiatCurrencies.Codes.Contains(fromSymbol) && FiatCurrencies.Codes.Contains(toSymbol))
+            if (FiatCurrency.All.Any(f => f == fromSymbol) && FiatCurrency.All.Any(f => f == toSymbol))
                 return $"{fromSymbol}{toSymbol}=X";
 
             return fromSymbol switch

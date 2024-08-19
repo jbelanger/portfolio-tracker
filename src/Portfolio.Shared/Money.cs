@@ -1,4 +1,4 @@
-namespace Portfolio
+namespace Portfolio.Shared
 {
     /// <summary>
     /// Represents a monetary amount in a specific currency, ensuring proper handling
@@ -12,7 +12,7 @@ namespace Portfolio
         /// <value>
         /// True if the currency is a fiat currency; otherwise, false.
         /// </value>
-        public bool IsFiatCurrency => FiatCurrencies.Codes.Any(c => c == CurrencyCode);
+        public bool IsFiatCurrency => FiatCurrency.All.Any(c => c == CurrencyCode);
 
         /// <summary>
         /// Gets the absolute value of the monetary amount.
@@ -45,10 +45,10 @@ namespace Portfolio
             if (other == null)
                 return this;
 
-            if (this.CurrencyCode != other.CurrencyCode)
+            if (CurrencyCode != other.CurrencyCode)
                 throw new InvalidOperationException("Cannot add amounts in different currencies.");
 
-            return new Money(this.Amount + other.Amount, this.CurrencyCode);
+            return new Money(Amount + other.Amount, CurrencyCode);
         }
 
         /// <summary>
@@ -64,10 +64,10 @@ namespace Portfolio
             if (other == null)
                 return this;
 
-            if (this.CurrencyCode != other.CurrencyCode)
+            if (CurrencyCode != other.CurrencyCode)
                 throw new InvalidOperationException("Cannot subtract amounts in different currencies.");
 
-            return new Money(this.Amount - other.Amount, this.CurrencyCode);
+            return new Money(Amount - other.Amount, CurrencyCode);
         }
 
         /// <summary>

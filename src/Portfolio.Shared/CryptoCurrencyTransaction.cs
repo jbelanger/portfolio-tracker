@@ -1,4 +1,4 @@
-namespace Portfolio
+namespace Portfolio.Shared
 {
     /// <summary>
     /// Represents a cryptocurrency transaction, which can be a trade, deposit, or withdrawal.

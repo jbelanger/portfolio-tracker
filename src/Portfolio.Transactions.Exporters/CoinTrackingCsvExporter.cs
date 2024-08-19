@@ -1,4 +1,6 @@
-﻿namespace Portfolio.Transactions.Exporters
+﻿using Portfolio.Shared;
+
+namespace Portfolio.Transactions.Exporters
 {
     /// <summary>
     /// Provides functionality to export cryptocurrency transaction data to a CSV file format compatible with CoinTracking.

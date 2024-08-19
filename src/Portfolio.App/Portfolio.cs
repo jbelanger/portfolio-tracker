@@ -30,7 +30,7 @@ namespace Portfolio.App
         public Result SetDefaultCurrency(string currencyCode)
         {
             currencyCode = currencyCode.ToUpper();
-            if (!FiatCurrencies.Codes.Contains(currencyCode))
+            if (!FiatCurrency.All.Any(f => f == currencyCode))
                 return Result.Failure("Currency code unknown.");
 
             DefaultCurrency = currencyCode;
@@ -186,7 +186,7 @@ namespace Portfolio.App
         {
             foreach (var holding in _holdings)
             {
-                if (FiatCurrencies.Codes.Contains(holding.Asset))
+                if (FiatCurrency.All.Any(f => f == holding.Asset))
                     continue;
 
                 decimal expectedTotal = 0;

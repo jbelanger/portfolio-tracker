@@ -1,4 +1,5 @@
 using CsvHelper.Configuration;
+using Portfolio.Shared;
 
 namespace Portfolio.Transactions.Importers.Csv.LedgerLive
 {
