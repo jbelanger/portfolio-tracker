@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Portfolio.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4834734cd94a4799d9d51fe5ea6241fd39baa561")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51d6d463e3f59d01852b47dcfaec0f2dd35774fb")]
 [assembly: System.Reflection.AssemblyProductAttribute("Portfolio.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Portfolio.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
@@ -40,13 +40,8 @@ public interface IPriceHistoryServiceFactory
 {
     Task<Result<IPriceHistoryService>> Create(string symbolFrom, string symbolTo, DateTime startDate, DateTime endDate);
 }
-using System;
-using System.Collections.Generic;
-using System.Data;
 using Microsoft.Data.Sqlite;
-using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using Serilog;
 
 namespace Portfolio.App.HistoricalPrice
 {
@@ -85,14 +80,14 @@ namespace Portfolio.App.HistoricalPrice
             try
             {
                 using var connection = new SqliteConnection(_connectionString);
-                await connection.OpenAsync();
+                await connection.OpenAsync().ConfigureAwait(false);
 
                 string query = "SELECT CurrencyPair, CloseDate, ClosePrice FROM CryptoPriceRecords WHERE CurrencyPair = @CurrencyPair ORDER BY CloseDate;";
                 using var command = new SqliteCommand(query, connection);
                 command.Parameters.AddWithValue("@CurrencyPair", symbol);
 
                 using var reader = await command.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
+                while (await reader.ReadAsync().ConfigureAwait(false))
                 {
                     var currencyPair = reader.GetString(0);
                     var closeDate = DateTime.Parse(reader.GetString(1));
@@ -121,7 +116,7 @@ namespace Portfolio.App.HistoricalPrice
             try
             {
                 using var connection = new SqliteConnection(_connectionString);
-                await connection.OpenAsync();
+                await connection.OpenAsync().ConfigureAwait(false);
 
                 using var transaction = connection.BeginTransaction();
 
@@ -138,7 +133,7 @@ namespace Portfolio.App.HistoricalPrice
                     command.Parameters.AddWithValue("@CloseDate", record.CloseDate.ToString("yyyy-MM-dd"));
                     command.Parameters.AddWithValue("@ClosePrice", record.ClosePrice);
 
-                    await command.ExecuteNonQueryAsync(); // Command is now correctly associated with the transaction
+                    await command.ExecuteNonQueryAsync().ConfigureAwait(false); // Command is now correctly associated with the transaction
                 }
 
                 transaction.Commit(); // Commit the transaction after all commands are executed
@@ -167,7 +162,6 @@ namespace Portfolio.App.HistoricalPrice
 using System.Globalization;
 using CsvHelper;
 using CSharpFunctionalExtensions;
-using Serilog;
 using CsvHelper.Configuration;
 
 namespace Portfolio.App.HistoricalPrice;
@@ -197,15 +191,22 @@ public class FilePriceHistoryStorageService : IPriceHistoryStorageService
             using var reader = new StreamReader(csvFileName);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
-            return await Task.FromResult(csv.GetRecords<CryptoPriceRecord>().ToList());  
+            // Read all records asynchronously
+            var records = new List<CryptoPriceRecord>();
+            await foreach (var record in csv.GetRecordsAsync<CryptoPriceRecord>())
+            {
+                records.Add(record);
+            }
+
+            return Result.Success<IEnumerable<CryptoPriceRecord>>(records);
         }
         catch (Exception ex)
         {
             Log.ForContext<FilePriceHistoryStorageService>().Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
-            
+
             // File might be corrupt. Delete it.
             File.Delete(csvFileName);
-            
+
             return Result.Failure<IEnumerable<CryptoPriceRecord>>($"Error loading data from CSV.");
         }
     }
@@ -214,7 +215,7 @@ public class FilePriceHistoryStorageService : IPriceHistoryStorageService
     {
         var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
 
-        if(!Directory.Exists(StorageLocation))
+        if (!Directory.Exists(StorageLocation))
             Directory.CreateDirectory(StorageLocation);
 
         try
@@ -241,7 +242,6 @@ public class FilePriceHistoryStorageService : IPriceHistoryStorageService
 }
 using System.Diagnostics;
 using CSharpFunctionalExtensions;
-using Serilog;
 using YahooFinanceApi;
 
 namespace Portfolio.App.HistoricalPrice.YahooFinance
@@ -253,13 +253,13 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
             try
             {
                 // Log the beginning of the data fetch operation
-                Log.Information("Initiating data fetch for {SymbolPair} from {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}.", symbolPair, startDate, endDate);
+                Log.ForContext<YahooFinancePriceHistoryApi>().Information("Initiating data fetch for {SymbolPair} from {StartDate:yyyy-MM-dd} to {EndDate:yyyy-MM-dd}.", symbolPair, startDate, endDate);
 
                 // Start a timer to measure how long the data fetch takes
                 var stopwatch = Stopwatch.StartNew();
 
                 // Fetch the data from Yahoo Finance API
-                var candles = await Yahoo.GetHistoricalAsync(symbolPair, startDate.Date, endDate.Date, Period.Daily);
+                var candles = await Yahoo.GetHistoricalAsync(symbolPair, startDate.Date, endDate.Date, Period.Daily).ConfigureAwait(false);
 
                 // Log the time taken to fetch the data
                 stopwatch.Stop();
@@ -337,8 +337,8 @@ public class CryptoPriceRecord : ValueObject
     }
 }
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using CSharpFunctionalExtensions;
-using Serilog;
 
 namespace Portfolio.App.HistoricalPrice;
 
@@ -346,7 +346,7 @@ public class PriceHistoryService : IPriceHistoryService
 {
     private readonly IPriceHistoryApi _priceHistoryApi;
     private readonly IPriceHistoryStorageService _priceHistoryStorage;
-    private ConcurrentDictionary<string, Dictionary<DateTime, CryptoPriceRecord>> _dataStores = new();
+    private ConcurrentDictionary<string, Lazy<Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>>>> _dataStores = new();
 
     public string DefaultCurrency { get; set; }
 
@@ -368,7 +368,7 @@ public class PriceHistoryService : IPriceHistoryService
         if (symbol == DefaultCurrency)
             return HandleDefaultCurrencyError(symbol);
 
-        var history = await LoadPriceHistory(symbol);
+        var history = await LoadPriceHistoryFromStorageAsync(symbol).ConfigureAwait(false);
         if (history.Any())
         {
 
@@ -383,49 +383,80 @@ public class PriceHistoryService : IPriceHistoryService
             }
         }
 
-        return await FetchAndSavePriceData(symbol, dateOnly, history);
+        return await FetchAndSavePriceData(symbol, dateOnly, history).ConfigureAwait(false);
     }
 
     private Result<decimal> HandleDefaultCurrencyError(string symbol)
     {
-        Log.Warning("Attempted to fetch price for the same symbol as the default currency ({Symbol}).", symbol);
+        Log.ForContext<PriceHistoryService>().Warning("Attempted to fetch price for the same symbol as the default currency ({Symbol}).", symbol);
         return Result.Failure<decimal>(string.Format(Errors.ERR_SAME_SYMBOLS, symbol, DefaultCurrency));
     }
 
-    private async Task<Dictionary<DateTime, CryptoPriceRecord>> LoadPriceHistory(string symbol)
+    private async Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
     {
-        return await LoadPriceHistoryFromStorageAsync(symbol);
+        return await _dataStores.GetOrAddAsync(symbol, async s =>
+            {
+                var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
+                var result = await _priceHistoryStorage.LoadHistoryAsync(symbolTradingPair).ConfigureAwait(false);
+                if (result.IsSuccess)
+                {
+                    return result.Value.Where(r => r.ClosePrice > 0).ToDictionary(
+                        record => record.CloseDate.Date,
+                        record => record
+                    ).AsReadOnly();
+                }
+                else
+                {
+                    // Save an empty file to avoid trying to fetch from API
+                    // over and over again.      
+                    var emptyDictionary = new Dictionary<DateTime, CryptoPriceRecord>();
+                    var saveResult = await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, emptyDictionary.Values)
+                        .TapError(Log.ForContext<PriceHistoryService>().Error).ConfigureAwait(false);
+                    return emptyDictionary.AsReadOnly();
+                }
+            }).ConfigureAwait(false);
     }
 
-    private Result<decimal> HandleMissingFiatData(string symbol, DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
+    private Result<decimal> HandleMissingFiatData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
     {
-        Log.Debug("Missing fiat data for {Symbol} on {Date:yyyy-MM-dd}. Trying previous working days...", symbol, date);
+        Log.ForContext<PriceHistoryService>().Debug("Missing fiat data for {Symbol} on {Date:yyyy-MM-dd}. Trying previous working days...", symbol, date);
 
         var previousPriceData = GetPreviousWorkingDayPriceData(date, history);
         if (previousPriceData > -1)
         {
-            Log.Debug("Fiat data found for {Symbol} on {Date:yyyy-MM-dd}.", symbol, date);
+            Log.ForContext<PriceHistoryService>().Debug("Fiat data found for {Symbol} on {Date:yyyy-MM-dd}.", symbol, date);
             return previousPriceData;
         }
 
-        Log.Debug("No available fiat data for {Symbol} on previous working days..", symbol);
+        Log.ForContext<PriceHistoryService>().Debug("No available fiat data for {Symbol} on previous working days..", symbol);
         return Result.Failure<decimal>($"No price data available for {symbol} on {date:yyyy-MM-dd}");
     }
 
-    private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
+    private decimal GetPreviousWorkingDayPriceData(DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
+    {
+        for (int i = 1; i <= 4; i++)
+        {
+            var previousDate = date.AddDays(-i);
+            if (history.TryGetValue(previousDate, out var priceData))
+                return priceData.ClosePrice;
+        }
+        return -1;
+    }
+
+    private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
     {
         var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
         var endDate = AdjustEndDate(date);
-        var result = await _priceHistoryApi.FetchPriceHistoryAsync(symbolTradingPair, date.Date, endDate);
+        var result = await _priceHistoryApi.FetchPriceHistoryAsync(symbolTradingPair, date.Date, endDate).ConfigureAwait(false);
 
         if (result.IsSuccess)
-        {            
+        {
             // If save fails, we can still continue however date will be fetched all the time. 
             // Ensure error is logged and proper action is taken.
             var saveResult = await SaveNewPriceHistoryAsync(symbolTradingPair, history, result.Value)
-                .TapError(Log.ForContext<PriceHistoryService>().Error); 
+                .TapError(Log.ForContext<PriceHistoryService>().Error).ConfigureAwait(false);
 
-            UpdateHistoryWithFetchedData(history, result.Value);
+            history = await UpdateHistoryWithFetchedDataAsync(symbol, history, result.Value).ConfigureAwait(false);
 
             if (history.ContainsKey(date.Date))
                 return history[date.Date].ClosePrice;
@@ -442,7 +473,13 @@ public class PriceHistoryService : IPriceHistoryService
         return Result.Failure<decimal>(result.Error);
     }
 
-    public async Task<Result> SaveNewPriceHistoryAsync(string symbol, Dictionary<DateTime, CryptoPriceRecord> currentHistory, IEnumerable<CryptoPriceRecord> newRecords)
+    private DateTime AdjustEndDate(DateTime date)
+    {
+        var endDate = date.AddDays(365);
+        return endDate > DateTime.Now ? DateTime.Now.AddDays(1) : endDate;
+    }
+
+    private async Task<Result> SaveNewPriceHistoryAsync(string symbol, ReadOnlyDictionary<DateTime, CryptoPriceRecord> currentHistory, IEnumerable<CryptoPriceRecord> newRecords)
     {
         var existingRecords = currentHistory.Values;
 
@@ -456,7 +493,7 @@ public class PriceHistoryService : IPriceHistoryService
         if (recordsToSave.Any())
         {
             // Save only the new records
-            return await _priceHistoryStorage.SaveHistoryAsync(symbol, recordsToSave);
+            return await _priceHistoryStorage.SaveHistoryAsync(symbol, recordsToSave).ConfigureAwait(false);
         }
         else
         {
@@ -465,60 +502,22 @@ public class PriceHistoryService : IPriceHistoryService
         }
     }
 
-    private DateTime AdjustEndDate(DateTime date)
+    private async Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>> UpdateHistoryWithFetchedDataAsync(string symbol, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history, IEnumerable<CryptoPriceRecord> records)
     {
-        var endDate = date.AddDays(365);
-        return endDate > DateTime.Now ? DateTime.Now.AddDays(1) : endDate;
-    }
-
-    private void UpdateHistoryWithFetchedData(Dictionary<DateTime, CryptoPriceRecord> history, IEnumerable<CryptoPriceRecord> records)
-    {
-        foreach (var record in records)
+        return await _dataStores.AddOrUpdateAsync(symbol, async _ => await Task.FromResult(history), async (k, v) => 
         {
-            var closeDate = record.CloseDate.Date;
-            if (!history.ContainsKey(closeDate) && record.ClosePrice > 0)
-                history[closeDate] = record;
-        }
-    }
-
-    private async Task<Dictionary<DateTime, CryptoPriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
-    {
-        return await _dataStores.GetOrAddAsync(symbol, async s =>
+            var dict = v.ToDictionary();
+            foreach (var record in records)
             {
-                var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
-                var result = await _priceHistoryStorage.LoadHistoryAsync(symbolTradingPair);
-                if (result.IsSuccess)
-                {
-                    return result.Value.Where(r => r.ClosePrice > 0).ToDictionary(
-                        record => record.CloseDate.Date,
-                        record => record
-                    );
-                }
-                else
-                {
-                    // Save an empty file to avoid trying to fetch from API
-                    // over and over again.      
-                    var emptyDictionary = new Dictionary<DateTime, CryptoPriceRecord>();
-                    var saveResult = await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, emptyDictionary.Values)
-                        .TapError(Log.Error);
-                    return emptyDictionary;
-                }
-            });
-    }
-
-    private decimal GetPreviousWorkingDayPriceData(DateTime date, Dictionary<DateTime, CryptoPriceRecord> history)
-    {
-        for (int i = 1; i <= 4; i++)
-        {
-            var previousDate = date.AddDays(-i);
-            if (history.TryGetValue(previousDate, out var priceData))
-                return priceData.ClosePrice;
-        }
-        return -1;
+                var closeDate = record.CloseDate.Date;
+                if (!dict.ContainsKey(closeDate) && record.ClosePrice > 0)
+                    dict[closeDate] = record;
+            }
+            return dict.AsReadOnly();
+        }).ConfigureAwait(false);
     }
 }
 using CSharpFunctionalExtensions;
-using Serilog;
 
 namespace Portfolio.App.HistoricalPrice.CoinGecko
 {
@@ -557,14 +556,14 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
                 {
                     var timestamp = ((DateTimeOffset)date).ToUnixTimeSeconds();
                     var url = $"{BaseUrl}/coins/{coinId}/history?date={date:dd-MM-yyyy}";
-                    var response = await _httpClient.GetAsync(url);
+                    var response = await _httpClient.GetAsync(url).ConfigureAwait(false);
                     if (!response.IsSuccessStatusCode)
                     {
                         Log.Warning("Failed to fetch data from CoinGecko for {SymbolPair} on {Date:yyyy-MM-dd}. Status Code: {StatusCode}.", symbolPair, date, response.StatusCode);
                         continue;
                     }
 
-                    var content = await response.Content.ReadAsStringAsync();
+                    var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     var jsonData = Newtonsoft.Json.Linq.JObject.Parse(content);
                     var price = jsonData["market_data"]?["current_price"]?[symbolPair.Split('/')[1].ToLower()]?.ToObject<decimal?>();
 
@@ -650,43 +649,85 @@ public interface IPriceHistoryStorageService
     Task<Result<IEnumerable<CryptoPriceRecord>>> LoadHistoryAsync(string symbol);
     Task<Result> SaveHistoryAsync(string symbol, IEnumerable<CryptoPriceRecord> priceHistory);
 }
-using System.Collections.Concurrent;
+global using Serilog;using System.Collections.Concurrent;
 
 namespace Portfolio.App;
 
 public static class ConcurrentDictionaryExtensions
 {
     public static async Task<TValue> GetOrAddAsync<TKey, TValue>(
-        this ConcurrentDictionary<TKey, TValue> dictionary,
+        this ConcurrentDictionary<TKey, Lazy<Task<TValue>>> dictionary,
         TKey key,
-        Func<TKey, Task<TValue>> valueFactory)
+        Func<TKey, Task<TValue>> valueFactory) where TKey : notnull
     {
-        if (dictionary.TryGetValue(key, out var existingValue))
+        var lazyValue = dictionary.GetOrAdd(key, k => new Lazy<Task<TValue>>(() => valueFactory(k)));
+
+        try
         {
-            return existingValue;
+            return await lazyValue.Value.ConfigureAwait(false);
         }
-
-        var newValue = await valueFactory(key);
-
-        // TryAdd will return false if another thread added the key before us
-        return dictionary.GetOrAdd(key, newValue);
+        catch
+        {
+            // If the valueFactory throws an exception, remove the key to avoid leaving an invalid entry in the dictionary.
+            dictionary.TryRemove(key, out _);
+            throw;
+        }
     }
 
     public static async Task<bool> TryAddAsync<TKey, TValue>(
-    this ConcurrentDictionary<TKey, TValue> dictionary,
-    TKey key,
-    Func<TKey, Task<TValue>> valueFactory)
+        this ConcurrentDictionary<TKey, Lazy<Task<TValue>>> dictionary,
+        TKey key,
+        Func<TKey, Task<TValue>> valueFactory) where TKey : notnull
     {
-        if (dictionary.ContainsKey(key))
+        var lazyValue = new Lazy<Task<TValue>>(() => valueFactory(key));
+
+        if (dictionary.TryAdd(key, lazyValue))
         {
-            return false; // The key already exists, so we don't add a new value.
+            try
+            {
+                await lazyValue.Value.ConfigureAwait(false);
+                return true;
+            }
+            catch
+            {
+                // If the valueFactory throws an exception, remove the key to avoid leaving an invalid entry in the dictionary.
+                dictionary.TryRemove(key, out _);
+                throw;
+            }
         }
 
-        var newValue = await valueFactory(key);
-
-        return dictionary.TryAdd(key, newValue);
+        return false; // The key already exists, so we don't add a new value.
     }
-}using Newtonsoft.Json.Linq;
+
+    public static async Task<TValue> AddOrUpdateAsync<TKey, TValue>(
+        this ConcurrentDictionary<TKey, Lazy<Task<TValue>>> dictionary,
+        TKey key,
+        Func<TKey, Task<TValue>> addValueFactory,
+        Func<TKey, TValue, Task<TValue>> updateValueFactory) where TKey : notnull
+    {
+        var lazyValue = new Lazy<Task<TValue>>(() => addValueFactory(key));
+
+        var result = dictionary.AddOrUpdate(
+            key,
+            lazyValue,
+            (k, existingLazyValue) => new Lazy<Task<TValue>>(async () =>
+            {
+                var existingValue = await existingLazyValue.Value.ConfigureAwait(false);
+                return await updateValueFactory(k, existingValue).ConfigureAwait(false);
+            }));
+
+        try
+        {
+            return await result.Value.ConfigureAwait(false);
+        }
+        catch
+        {
+            dictionary.TryRemove(key, out _);
+            throw;
+        }
+    }
+}
+using Newtonsoft.Json.Linq;
 
 namespace Portfolio.App;
 
@@ -712,10 +753,10 @@ public class CurrencyExchangeService
         string formattedDate = date.ToString("yyyy-MM-dd");
         string url = $"{BaseUrl}/{formattedDate}?access_key={_apiKey}&base={fromCurrency}&symbols={toCurrency}";
 
-        HttpResponseMessage response = await _httpClient.GetAsync(url);
+        HttpResponseMessage response = await _httpClient.GetAsync(url).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
-            string responseBody = await response.Content.ReadAsStringAsync();
+            string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             JObject json = JObject.Parse(responseBody);
             decimal exchangeRate = json["rates"][toCurrency].Value<decimal>();
             return exchangeRate;
@@ -735,7 +776,6 @@ public interface ICurrencyExchangeService
 using CSharpFunctionalExtensions;
 using Portfolio.App.HistoricalPrice;
 using Portfolio.Shared;
-using Serilog;
 
 namespace Portfolio.App;
 
@@ -787,13 +827,13 @@ public class Portfolio
         return Result.Success();
     }
 
-    public async Task<Result> Process()
+    public async Task<Result> ProcessAsync()
     {
         if (!Wallets.Any())
             return Result.Failure("No wallets to process. Start by adding a wallet.");
         
         var transactions = GetTransactionsFromAllWallets();
-        _holdings = (await GetHoldings(transactions)).ToList();
+        _holdings = (await GetHoldings(transactions).ConfigureAwait(false)).ToList();
 
         return Result.Success();
     }
@@ -821,10 +861,10 @@ public class Portfolio
                     receiver.AverageBoughtPrice = 1;
                 else
                 {
-                    var priceResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(deposit.Amount.CurrencyCode, deposit.DateTime);
+                    var priceResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(deposit.Amount.CurrencyCode, deposit.DateTime).ConfigureAwait(false);
                     if (priceResult.IsFailure)
                     {
-                        Log.Error($"Failed to retrieve price history for asset {receiver.Asset} on {deposit.DateTime:yyyy-MM-dd}. Error: {priceResult.Error}");
+                        Log.Error("Failed to retrieve price history for asset {Asset} on {Date:yyyy-MM-dd}. Error: {Error}", receiver.Asset, deposit.DateTime, priceResult.Error);
                         continue;
                     }
 
@@ -850,7 +890,7 @@ public class Portfolio
 
                 if (sender.Balance < 0)
                 {
-                    Log.Warning($"{sender.Asset} Balance is under zero: {sender.Balance}");
+                    Log.Warning("{Asset} Balance is under zero: {Balance}", sender.Asset, sender.Balance);
                 }
 
                 OnWithdrawAdded?.Invoke(withdraw, sender);
@@ -874,9 +914,6 @@ public class Portfolio
                     decimal tradedCost = trade.TradeAmount.Amount * sender.AverageBoughtPrice; // 0.04 * 25000 = 1000
                     decimal boughtPrice = tradedCost / trade.Amount.Amount;
 
-                    //var priceValue = await _priceHistoryStores[trade.Amount.CurrencyCode].GetPriceDataAsync(trade.DateTime);
-                    //trade.UnitValue = new Money(priceValue.Close, DefaultCurrency);
-
                     decimal newAverage = ((receiver.AverageBoughtPrice * receiver.Balance) + (trade.Amount.Amount * boughtPrice)) / (receiver.Balance + trade.Amount.Amount);
                     receiver.AverageBoughtPrice = newAverage;
                 }
@@ -892,7 +929,7 @@ public class Portfolio
 
                 if (sender.Balance < 0)
                 {
-                    Log.Error($"{sender.Asset} Balance is under zero: {sender.Balance}");
+                    Log.Warning("{Asset} Balance is under zero: {Balance}", sender.Asset, sender.Balance);
                 }
 
                 // Log.Debug($"Trade Out [{string.Join("|", trade.TransactionIds)}: {sender.Asset}: {sender.Balance}");
@@ -901,13 +938,13 @@ public class Portfolio
         }
 
         // Fetch latest prices...
-        foreach (var holding in _holdings)
+        foreach (var holding in _holdings.Where(h => h.Balance > 0))
         {
             if (holding.Asset == DefaultCurrency)
                 holding.CurrentPrice = new Money(1m, holding.Asset);
             else
             {
-                var priceValueResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(holding.Asset, DateTime.Now);            
+                var priceValueResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(holding.Asset, DateTime.Now).ConfigureAwait(false);            
                 if (priceValueResult.IsFailure)
                 {
                     Log.Error(priceValueResult.Error);
@@ -930,8 +967,6 @@ public class Portfolio
 
             decimal expectedTotal = 0;
 
-            if (holding.Asset == "LINK")
-                ;
             // Total number of IN transactions should equal to the balance.
             foreach (var tx in holding.Transactions)
             {
@@ -958,7 +993,7 @@ public class Portfolio
             }
 
             if (expectedTotal != holding.Balance)
-                Log.Warning($"Missing transactions for holding {holding.Asset}");
+                Log.Warning("Missing transactions for holding {Asset}", holding.Asset);
         }
 
     }
@@ -1018,13 +1053,13 @@ public class MockCurrencyExchangeService : ICurrencyExchangeService
         return Task.FromResult(1.4m);
     }
 }
-﻿using Serilog;
-using Serilog.Events;
+﻿using Serilog.Events;
 using Serilog.Formatting.Json;
 using Portfolio.Kraken;
 using Portfolio.Shared;
 using Portfolio.App.HistoricalPrice;
 using Portfolio.App.HistoricalPrice.YahooFinance;
+using Serilog.Enrichers.CallerInfo;
 
 namespace Portfolio.App;
 
@@ -1033,6 +1068,8 @@ internal class Program
     private static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext() // Allows you to add properties to the log context dynamically
+            //.Enrich.WithCallerInfo() // Automatically includes method and class names
             // add console as logging target
             .WriteTo.Console()
             // add a logging target for warnings and higher severity  logs
@@ -1053,7 +1090,7 @@ internal class Program
 
         //var storage = new FilePriceHistoryStorageService();
 
-        var storage = new SQLitePriceHistoryStorageService("path_to_your_database_file.db");
+        var storage = new SQLitePriceHistoryStorageService("crypto_price_history.db");
 
 
         var api = new YahooFinancePriceHistoryApi();
@@ -1067,7 +1104,7 @@ internal class Program
         if (addWalletResult.IsFailure)
             throw new Exception(addWalletResult.Error);
 
-        var processResult = await portfolio.Process();
+        var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
         if (processResult.IsFailure)
             throw new Exception(processResult.Error);
 
