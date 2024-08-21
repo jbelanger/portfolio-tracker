@@ -4,10 +4,11 @@ using Portfolio.Domain.Common;
 namespace Portfolio.Domain.Entities
 {
     public class Wallet : BaseAuditableEntity
-    {        
+    {
         public string Name { get; init; } = string.Empty;
+        public long PortfolioId { get; set; }
         private readonly HashSet<CryptoCurrencyRawTransaction> _transactions = new();
-        
+
         public IReadOnlyCollection<CryptoCurrencyRawTransaction> Transactions => _transactions;
 
         private Wallet() { }
@@ -18,7 +19,7 @@ namespace Portfolio.Domain.Entities
 
             return new Wallet
             {
-                Name = walletName                
+                Name = walletName
             };
         }
 
@@ -27,11 +28,9 @@ namespace Portfolio.Domain.Entities
             if (transaction == null)
                 return Result.Failure("Transaction cannot be null.");
 
-            if (!_transactions.Add(transaction))
-            {
+            if (_transactions.Any(t => IsSameTransaction(t, transaction)) || !_transactions.Add(transaction))
                 return Result.Failure("Transaction already exists in this holding.");
-            }            
-
+            
             return Result.Success();
         }
 
@@ -46,6 +45,15 @@ namespace Portfolio.Domain.Entities
             }
 
             return Result.Success();
+        }
+
+        public bool IsSameTransaction(CryptoCurrencyRawTransaction obj, CryptoCurrencyRawTransaction other)
+        {
+            return obj.DateTime.TruncateToSecond() == other.DateTime.TruncateToSecond() &&
+                   obj.Type == other.Type &&
+                   Equals(obj.ReceivedAmount, other.ReceivedAmount) &&
+                   Equals(obj.SentAmount, other.SentAmount) &&
+                   Equals(obj.FeeAmount, other.FeeAmount);
         }
     }
 }

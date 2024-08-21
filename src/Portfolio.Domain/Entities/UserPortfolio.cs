@@ -1,9 +1,10 @@
+using CSharpFunctionalExtensions;
 using Portfolio.Domain.Common;
 
 
 namespace Portfolio.Domain.Entities
 {
-    public class Portfolio : AggregateRoot
+    public class UserPortfolio : AggregateRoot
     {
         private readonly List<Wallet> _wallets = new();
         private readonly Dictionary<string, CryptoCurrencyHolding> _holdings = new();
@@ -13,15 +14,26 @@ namespace Portfolio.Domain.Entities
         public IReadOnlyCollection<CryptoCurrencyHolding> Holdings => _holdings.Values.ToList().AsReadOnly();
         public IReadOnlyCollection<CryptoCurrencyProcessedTransaction> ProcessedTransactions => _processedTransactions.AsReadOnly();
 
-        public void AddWallet(Wallet wallet)
+        private UserPortfolio()
+        {            
+        }
+        
+        public static Result<UserPortfolio> Create()
+        {
+            return new UserPortfolio();
+        }
+
+        public Result AddWallet(Wallet wallet)
         {
             if (wallet == null)
                 throw new ArgumentNullException(nameof(wallet));
 
             if (_wallets.Any(w => w.Name == wallet.Name))
-                throw new InvalidOperationException("Wallet already exists.");
+                return Result.Failure("Wallet already exists.");
 
             _wallets.Add(wallet);
+
+            return Result.Success();
         }
 
         public async Task CalculateTradesAsync()

@@ -1,40 +1,59 @@
+using Portfolio.App.DTOs;
+using Portfolio.App.Services;
+
 namespace Portfolio.Api.Features
 {
     public static class WalletEndpoints
     {
         public static void MapWalletEndpoints(this IEndpointRouteBuilder routes)
         {
-            var group = routes.MapGroup("/wallets");
+            var group = routes.MapGroup("/portfolios/{portfolioId:long}/wallets");
 
-            group.MapGet("/", async (context) =>
+            group.MapGet("/{walletId:long}", async (IWalletService walletService, long portfolioId, long walletId) =>
             {
-                // Your code to handle the GET request
-                await context.Response.WriteAsync("Get all products");
+                var result = await walletService.GetWalletAsync(portfolioId, walletId);
+                
+                if (result.IsSuccess)
+                {
+                    return Results.Ok(result.Value);
+                }
+                return Results.NotFound(result.Error);
             });
 
-            group.MapGet("/{id:int}", async (HttpContext context, int id) =>
+            group.MapGet("/", async (IWalletService walletService, long portfolioId) =>
             {
-                // Your code to handle the GET request with id
-                await context.Response.WriteAsync($"Get product with ID {id}");
+                var result = await walletService.GetWalletsAsync(portfolioId);
+                
+                if (result.IsSuccess)
+                {
+                    return Results.Ok(result.Value);
+                }
+                return Results.NotFound(result.Error);
             });
 
-            group.MapPost("/", async (context) =>
+            group.MapPost("/", async (IWalletService walletService, long portfolioId, WalletDto walletDto) =>
             {
-                // Your code to handle the POST request
-                await context.Response.WriteAsync("Create a new product");
+                var result = await walletService.CreateWalletAsync(portfolioId, walletDto);
+
+                if (result.IsSuccess)
+                {
+                    return Results.Created($"/portfolios/{portfolioId}/wallets/{result.Value}", result.Value);
+                }
+                return Results.BadRequest(result.Error);
             });
 
-            group.MapPut("/{id:int}", async (HttpContext context, int id) =>
+            group.MapDelete("/{walletId:long}", async (IWalletService walletService, long portfolioId, long walletId) =>
             {
-                // Your code to handle the PUT request
-                await context.Response.WriteAsync($"Update product with ID {id}");
-            });
+                var result = await walletService.DeleteWalletAsync(portfolioId, walletId);
 
-            group.MapDelete("/{id:int}", async (HttpContext context, int id) =>
-            {
-                // Your code to handle the DELETE request
-                await context.Response.WriteAsync($"Delete product with ID {id}");
+                if (result.IsSuccess)
+                {
+                    return Results.NoContent();
+                }
+                return Results.BadRequest(result.Error);
             });
         }
+
+
     }
 }

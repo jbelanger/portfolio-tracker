@@ -9,7 +9,7 @@ namespace Portfolio.Domain.Entities
     /// </summary>
     public class CryptoCurrencyRawTransaction : BaseAuditableEntity
     {
-        public DateTime DateTime { get; init; }
+        public DateTime DateTime { get; private set; }
 
         public TransactionType Type { get; init; }
 
@@ -21,9 +21,14 @@ namespace Portfolio.Domain.Entities
 
         public string Account { get; init; } = string.Empty;
 
-        public string Note { get; init; } = string.Empty;
+        public string Note { get; private set; } = string.Empty;
 
-        public IEnumerable<string> TransactionIds { get; init; } = new List<string>();        
+        public IEnumerable<string>? TransactionIds { get; init; }
+
+        /// <summary>
+        /// When transaction is created from a csv import, this contains the csv lines that were used to build this transaction.
+        /// </summary>
+        public string CsvLinesJson { get; set; } = string.Empty;
 
         protected CryptoCurrencyRawTransaction()
         { }
@@ -31,127 +36,153 @@ namespace Portfolio.Domain.Entities
         public static Result<CryptoCurrencyRawTransaction> CreateDeposit(
             DateTime date,
             Money receivedAmount,
-            Money feeAmount,
+            Money? feeAmount,
             string account,
-            IEnumerable<string> transactionIds,
+            IEnumerable<string>? transactionIds,
             string note = "")
         {
-            if (receivedAmount == null)
-                return Result.Failure<CryptoCurrencyRawTransaction>($"Received amount cannot be null for a deposit.");
-
-            if (feeAmount == null)
-                feeAmount = new Money(0, receivedAmount.CurrencyCode);
-            else if (feeAmount.CurrencyCode != receivedAmount.CurrencyCode)
-                return Result.Failure<CryptoCurrencyRawTransaction>($"Fees are not in the same currency as the deposit currency.");
-
             if (string.IsNullOrWhiteSpace(account))
                 return Result.Failure<CryptoCurrencyRawTransaction>($"Account cannot be null or whitespace.");
 
-            if (transactionIds == null || !transactionIds.Any())
-                return Result.Failure<CryptoCurrencyRawTransaction>($"Transaction IDs cannot be null or empty.");
-
-            return new CryptoCurrencyRawTransaction()
+            var tx = new CryptoCurrencyRawTransaction()
             {
-                DateTime = date,
                 Type = TransactionType.Deposit,
-                ReceivedAmount = receivedAmount.ToAbsoluteAmountMoney(),
-                FeeAmount = feeAmount.ToAbsoluteAmountMoney(),
                 Account = account,
-                TransactionIds = transactionIds,
-                Note = note
+                TransactionIds = transactionIds
             };
+
+            return Result.Success(tx)
+                .Check(t => t.SetTransactionDate(date))
+                .Check(t => t.SetNote(note))
+                .Check(t => t.SetTransactionAmounts(receivedAmount, null, feeAmount));
         }
 
         public static Result<CryptoCurrencyRawTransaction> CreateWithdraw(
             DateTime date,
-            Money amount,
-            Money feeAmount,
+            Money sentAmount,
+            Money? feeAmount,
             string account,
-            IEnumerable<string> transactionIds,
+            IEnumerable<string>? transactionIds,
             string note = "")
         {
-            if (amount == null)
-                return Result.Failure<CryptoCurrencyRawTransaction>("Sent amount cannot be null for a withdrawal.");
-
-            if (feeAmount == null)
-                feeAmount = new Money(0, amount.CurrencyCode);
-            else if (feeAmount.CurrencyCode != amount.CurrencyCode)
-                return Result.Failure<CryptoCurrencyRawTransaction>($"Fees are not in the same currency as the withdraw currency.");
-
             if (string.IsNullOrWhiteSpace(account))
-                return Result.Failure<CryptoCurrencyRawTransaction>("Account cannot be null or whitespace.");
+                return Result.Failure<CryptoCurrencyRawTransaction>($"Account cannot be null or whitespace.");
 
-            if (transactionIds == null || !transactionIds.Any())
-                return Result.Failure<CryptoCurrencyRawTransaction>("Transaction IDs cannot be null or empty.");
-
-            return new CryptoCurrencyRawTransaction()
+            var tx = new CryptoCurrencyRawTransaction()
             {
-                DateTime = date,
                 Type = TransactionType.Withdrawal,
-                SentAmount = amount.ToAbsoluteAmountMoney(),
-                FeeAmount = feeAmount.ToAbsoluteAmountMoney(),
                 Account = account,
-                TransactionIds = transactionIds,
-                Note = note
+                TransactionIds = transactionIds
             };
+
+            return Result.Success(tx)
+                .Check(t => t.SetTransactionDate(date))
+                .Check(t => t.SetNote(note))
+                .Check(t => t.SetTransactionAmounts(null, sentAmount, feeAmount));
         }
 
         public static Result<CryptoCurrencyRawTransaction> CreateTrade(
             DateTime date,
             Money receivedAmount,
             Money sentAmount,
-            Money feeAmount,
+            Money? feeAmount,
             string account,
-            IEnumerable<string> transactionIds,
+            IEnumerable<string>? transactionIds,
             string note = "")
         {
-            if (receivedAmount == null)
-                return Result.Failure<CryptoCurrencyRawTransaction>("Received amount cannot be null for a trade transaction.");
-
-            if (sentAmount == null)
-                return Result.Failure<CryptoCurrencyRawTransaction>("Sent amount cannot be null for a trade transaction.");
-
             if (string.IsNullOrWhiteSpace(account))
                 return Result.Failure<CryptoCurrencyRawTransaction>("Account cannot be null or whitespace.");
-
-            if (transactionIds == null || !transactionIds.Any())
-                return Result.Failure<CryptoCurrencyRawTransaction>("Transaction IDs cannot be null or empty.");
 
             if (feeAmount == null)
                 feeAmount = new Money(0, receivedAmount.CurrencyCode);
 
-            return new CryptoCurrencyRawTransaction()
+            var tx = new CryptoCurrencyRawTransaction()
             {
-                DateTime = date,
                 Type = TransactionType.Trade,
-                ReceivedAmount = receivedAmount.ToAbsoluteAmountMoney(),
-                SentAmount = sentAmount.ToAbsoluteAmountMoney(),
-                FeeAmount = feeAmount.ToAbsoluteAmountMoney(),
                 Account = account,
-                TransactionIds = transactionIds,
-                Note = note
+                TransactionIds = transactionIds
             };
+
+            return Result.Success(tx)
+                .Check(t => t.SetTransactionDate(date))
+                .Check(t => t.SetNote(note))
+                .Check(t => t.SetTransactionAmounts(receivedAmount, sentAmount, feeAmount));
+
         }
 
-        public override bool Equals(object? obj)
+        public Result SetTransactionAmounts(Money? receivedAmount, Money? sentAmount, Money? feeAmount)
         {
-            if (obj is not CryptoCurrencyRawTransaction other)
-                return false;
+            var received = receivedAmount?.Amount ?? 0;
+            var sent = sentAmount?.Amount ?? 0;
+            var fee = feeAmount?.Amount ?? 0;
 
-            return DateTime.TruncateToSecond() == other.DateTime.TruncateToSecond() &&
-                   Type == other.Type &&
-                   Equals(ReceivedAmount, other.ReceivedAmount) &&
-                   Equals(SentAmount, other.SentAmount) &&
-                   Equals(FeeAmount, other.FeeAmount);
+            if (received <= 0 && (Type == TransactionType.Deposit || Type == TransactionType.Trade))
+                return Result.Failure<CryptoCurrencyRawTransaction>($"Received amount must be greater than zero.");
+            else if (received > 0 && Type == TransactionType.Withdrawal)
+                return Result.Failure($"Received amount can not be set on a 'withdrawal' transaction.");
+
+            if (sent <= 0 && (Type == TransactionType.Withdrawal || Type == TransactionType.Trade))
+                return Result.Failure<CryptoCurrencyRawTransaction>($"Sent amount must be greater than zero.");
+            else if (sent > 0 && Type == TransactionType.Deposit)
+                return Result.Failure($"Sent amount can not be set on a 'deposit' transaction.");
+
+            if (feeAmount != null)
+            {
+                if (Type == TransactionType.Deposit && receivedAmount?.CurrencyCode != feeAmount.CurrencyCode)
+                    return Result.Failure($"Fees are not in the same currency as the deposit currency.");
+                else if (Type == TransactionType.Withdrawal && sentAmount?.CurrencyCode != feeAmount.CurrencyCode)
+                    return Result.Failure($"Fees are not in the same currency as the withdraw currency.");
+                else if (feeAmount.CurrencyCode != receivedAmount?.CurrencyCode && feeAmount.CurrencyCode != sentAmount?.CurrencyCode)
+                    return Result.Failure<CryptoCurrencyRawTransaction>($"Fees must be in the same currency as the received or sent amounts.");
+            }
+
+            ReceivedAmount = receivedAmount;
+            SentAmount = sentAmount;
+            FeeAmount = feeAmount;
+
+            return Result.Success();
         }
 
-        public override int GetHashCode()
+        public Result SetTransactionDate(DateTime date)
         {
-            return HashCode.Combine(DateTime.TruncateToSecond(),
-                                    Type,
-                                    ReceivedAmount,
-                                    SentAmount,
-                                    FeeAmount);
+            if (date == null || date == DateTime.MinValue)
+                return Result.Failure("Transaction date is invalid.");
+
+            // This is important to ensure we always store the date up to the second only. 
+            // This makes it safer for comparison later on...
+            DateTime = date.TruncateToSecond();
+
+            return Result.Success();
         }
+
+        public Result SetNote(string note)
+        {
+            if (note?.Length > 500)
+                return Result.Failure("Note cannot be longer than 500 characters.");
+            Note = note ?? string.Empty;
+            
+            return Result.Success();
+        }
+
+        // public override bool Equals(object? obj)
+        // {
+        //     if (obj is not CryptoCurrencyRawTransaction other)
+        //         return false;
+
+        //     return DateTime == other.DateTime &&
+        //            Type == other.Type &&
+        //            Equals(ReceivedAmount, other.ReceivedAmount) &&
+        //            Equals(SentAmount, other.SentAmount) &&
+        //            Equals(FeeAmount, other.FeeAmount);
+        // }
+
+        // public override int GetHashCode()
+        // {
+        //     return HashCode.Combine(DateTime,
+        //                             Type,
+        //                             ReceivedAmount,
+        //                             SentAmount,
+        //                             FeeAmount);
+        // }
     }
 }

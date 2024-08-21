@@ -19,9 +19,10 @@ namespace Portfolio.Infrastructure
             _mediator = mediator;
         }
 
+        public DbSet<UserPortfolio> Portfolios { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<CryptoCurrencyHolding> Holdings { get; set; }
-        //public DbSet<CryptoCurrencyTransaction> Transactions { get; set; }
+        public DbSet<CryptoCurrencyRawTransaction> RawTransactions { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

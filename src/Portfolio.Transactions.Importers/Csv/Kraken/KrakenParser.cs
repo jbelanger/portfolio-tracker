@@ -1,30 +1,57 @@
 using System.Globalization;
+using System.Text.Json;
+using CSharpFunctionalExtensions;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Portfolio.Domain;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.ValueObjects;
+using Portfolio.Transactions.Importers.Utilities;
 using Serilog;
 
 namespace Portfolio.Transactions.Importers.Csv.Kraken
 {
     public class KrakenCsvParser
     {
-        private IEnumerable<string>? _refidsToIgnore = new List<string>();
-        private string _filename;
+        public static readonly string EXPECTED_FILE_HEADER = "txid,refid,time,type,subtype,aclass,asset,wallet,amount,fee,balance";
+        private readonly IEnumerable<KrakenCsvEntry> _csvLines;
+        private readonly IEnumerable<string>? _refidsToIgnore = new List<string>();
 
-        public KrakenCsvParser(string filename, IEnumerable<string>? ignoreRefIds = null)
+        public static Result<KrakenCsvParser> Create(StreamReader streamReader, IEnumerable<string>? ignoreRefIds = null)
         {
-            _filename = filename ?? throw new ArgumentNullException("The file path cannot be null or empty.");
+            var streamValidResult = StreamReaderValidator.ValidateStreamReader(streamReader);
+            if (streamValidResult.IsFailure)
+                return Result.Failure<KrakenCsvParser>(streamValidResult.Error);
+
+            try
+            {
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true
+                };
+
+                using (var csv = new CsvReader(streamReader, config))
+                {
+                    csv.Context.RegisterClassMap<KrakenCsvLineMap>();
+                    var records = csv.GetRecords<KrakenCsvEntry>();
+                    return new KrakenCsvParser(records.ToList(), ignoreRefIds);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure<KrakenCsvParser>($"Failed to import transactions from CSV: {ex.Message}");
+            }
+        }
+
+        private KrakenCsvParser(IEnumerable<KrakenCsvEntry> csvLines, IEnumerable<string>? ignoreRefIds = null)
+        {
+            _csvLines = csvLines ?? throw new ArgumentNullException(nameof(csvLines));
             _refidsToIgnore = ignoreRefIds;
         }
 
-        public IEnumerable<ICryptoCurrencyTransaction> ExtractTransactions()
+        public IEnumerable<CryptoCurrencyRawTransaction> ExtractTransactions()
         {
-            var csvLines = ReadCsvFile();
-
-            var rawLedger = csvLines.Where(x => _refidsToIgnore == null || !_refidsToIgnore.Any() || !_refidsToIgnore.Contains(x.ReferenceId)).OrderBy(x => x.Date).ToList();
-            var transactions = new List<ICryptoCurrencyTransaction>();
+            var rawLedger = _csvLines.Where(x => _refidsToIgnore == null || !_refidsToIgnore.Any() || !_refidsToIgnore.Contains(x.ReferenceId)).OrderBy(x => x.Date).ToList();
+            var transactions = new List<CryptoCurrencyRawTransaction>();
 
             // Trades
             var trades = ProcessTrades(rawLedger);
@@ -55,25 +82,9 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
             return transactions.OrderBy(t => t.DateTime);
         }
 
-        private List<KrakenCsvEntry> ReadCsvFile()
+        private static IEnumerable<CryptoCurrencyRawTransaction> ProcessWithdrawals(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = true
-            };
-
-            using (var reader = new StreamReader(_filename))
-            using (var csv = new CsvReader(reader, config))
-            {
-                csv.Context.RegisterClassMap<KrakenCsvLineMap>();
-                var records = csv.GetRecords<KrakenCsvEntry>();
-                return records.ToList();
-            }
-        }
-
-        private static IEnumerable<ICryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<KrakenCsvEntry> rawLedger)
-        {
-            var transactions = new List<ICryptoCurrencyTransaction>();
+            var transactions = new List<CryptoCurrencyRawTransaction>();
             var processedRefIds = new HashSet<string>();
             var withdrawals = rawLedger.Where(x => x.Type == "withdrawal");
 
@@ -86,9 +97,9 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
 
             foreach (var withdraw in withdrawals)
             {
-                var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
+                var withdrawResult = CryptoCurrencyRawTransaction.CreateWithdraw(
                     date: withdraw.Date,
-                    amount: withdraw.Amount.ToAbsoluteAmountMoney(),
+                    sentAmount: withdraw.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
                     "kraken",
                     transactionIds: [withdraw.ReferenceId]);
@@ -96,7 +107,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                 if (withdrawResult.IsFailure)
                     throw new ArgumentException(withdrawResult.Error);
 
-                withdrawResult.Value.State = new KrakenCsvEntry[] { withdraw };
+                withdrawResult.Value.CsvLinesJson = JsonSerializer.Serialize(new KrakenCsvEntry[] { withdraw });
 
                 transactions.Add(withdrawResult.Value);
             }
@@ -104,9 +115,9 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
             return transactions;
         }
 
-        private static IEnumerable<ICryptoCurrencyTransaction> ProcessDeposits(IEnumerable<KrakenCsvEntry> rawLedger)
+        private static IEnumerable<CryptoCurrencyRawTransaction> ProcessDeposits(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var transactions = new List<ICryptoCurrencyTransaction>();
+            var transactions = new List<CryptoCurrencyRawTransaction>();
             var deposits = rawLedger.Where(x => x.Type == "deposit");
 
             // Ensure data is valid
@@ -118,7 +129,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
 
             foreach (var deposit in deposits)
             {
-                var depositResult = CryptoCurrencyDepositTransaction.Create(
+                var depositResult = CryptoCurrencyRawTransaction.CreateDeposit(
                     date: deposit.Date,
                     receivedAmount: deposit.Amount.ToAbsoluteAmountMoney().Subtract(deposit.Fee.ToAbsoluteAmountMoney()),
                     feeAmount: deposit.Fee.ToAbsoluteAmountMoney(),
@@ -128,7 +139,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                 if (depositResult.IsFailure)
                     throw new ArgumentException(depositResult.Error);
 
-                depositResult.Value.State = new KrakenCsvEntry[] { deposit };
+                depositResult.Value.CsvLinesJson = JsonSerializer.Serialize(new KrakenCsvEntry[] { deposit });
 
                 transactions.Add(depositResult.Value);
             }
@@ -172,9 +183,9 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
         /// <param name="rawLedger"></param>
         /// <returns></returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static IEnumerable<ICryptoCurrencyTransaction> ProcessTrades(IEnumerable<KrakenCsvEntry> rawLedger)
+        private static IEnumerable<CryptoCurrencyRawTransaction> ProcessTrades(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var trades = new List<ICryptoCurrencyTransaction>();
+            var trades = new List<CryptoCurrencyRawTransaction>();
             var processedRefIds = new HashSet<string>();
             var txGroupsByRefid = rawLedger.GroupBy(x => x.ReferenceId).Where(group => group.Count() > 1);
             foreach (var group in txGroupsByRefid)
@@ -186,7 +197,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                     // In those cases, we can see multiple "spend" for one "receive".
                     if (receiveTx.Amount.Amount < 1)
                     {
-                        var depositResult = CryptoCurrencyDepositTransaction.Create(
+                        var depositResult = CryptoCurrencyRawTransaction.CreateDeposit(
                             date: receiveTx.Date,
                             receivedAmount: receiveTx.Amount.ToAbsoluteAmountMoney().Subtract(receiveTx.Fee.ToAbsoluteAmountMoney()),
                             feeAmount: receiveTx.Fee.ToAbsoluteAmountMoney(),
@@ -198,14 +209,14 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                         if (depositResult.IsFailure)
                             throw new ArgumentException(depositResult.Error);
 
-                        depositResult.Value.State = new KrakenCsvEntry[] { receiveTx };
+                        depositResult.Value.CsvLinesJson = JsonSerializer.Serialize(new KrakenCsvEntry[] { receiveTx });
                         trades.Add(depositResult.Value);
 
                         foreach (var sTx in group.Where(t => t != receiveTx))
                         {
-                            var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
+                            var withdrawResult = CryptoCurrencyRawTransaction.CreateWithdraw(
                                 date: sTx.Date,
-                                amount: sTx.Amount.ToAbsoluteAmountMoney(),
+                                sentAmount: sTx.Amount.ToAbsoluteAmountMoney(),
                                 feeAmount: sTx.Fee.ToAbsoluteAmountMoney(),
                                 "kraken",
                                 transactionIds: group.Select(t => t.ReferenceId),
@@ -215,7 +226,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                             if (withdrawResult.IsFailure)
                                 throw new ArgumentException(withdrawResult.Error);
 
-                            withdrawResult.Value.State = new KrakenCsvEntry[] { sTx };
+                            withdrawResult.Value.CsvLinesJson = JsonSerializer.Serialize(new KrakenCsvEntry[] { sTx });
                             trades.Add(withdrawResult.Value);
                         }
                         Log.Warning($"Dust sweeping found, deposit created for {receiveTx.Amount.Amount}{receiveTx.Amount.CurrencyCode}, refid {group.Key} ...");
@@ -236,7 +247,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                 if (isReceiveFee/* && isSellTransaction*/)
                     receivedAmount -= fee.AbsoluteAmount;
 
-                var tradeResult = CryptoCurrencyTradeTransaction.Create(
+                var tradeResult = CryptoCurrencyRawTransaction.CreateTrade(
                     date: receiveTx.Date,
                     receivedAmount: new Money(receivedAmount, receiveTx.Amount.CurrencyCode),
                     sentAmount: spendTx.Amount.ToAbsoluteAmountMoney(),
@@ -247,7 +258,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                 if (tradeResult.IsFailure)
                     throw new ArgumentException(tradeResult.Error);
 
-                tradeResult.Value.State = new KrakenCsvEntry[] { receiveTx, spendTx };
+                tradeResult.Value.CsvLinesJson = JsonSerializer.Serialize(new KrakenCsvEntry[] { receiveTx, spendTx });
 
                 trades.Add(tradeResult.Value);
             }

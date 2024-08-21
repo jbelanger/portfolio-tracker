@@ -23,6 +23,11 @@ namespace Portfolio.App
                 .MinimumLevel.Debug()
                 .CreateLogger();
 
+            using (var reader = new StreamReader("sample.csv"))
+            {
+                var processor = KrakenCsvParser.Create(reader).Value;
+                var transactions = processor.ExtractTransactions();
+            }
             // var processor = new KrakenCsvParser(filename: "sample.csv");
             // var transactions = processor.ExtractTransactions();
 

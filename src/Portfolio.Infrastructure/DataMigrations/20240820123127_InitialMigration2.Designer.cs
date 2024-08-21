@@ -11,8 +11,8 @@ using Portfolio.Infrastructure;
 namespace Portfolio.Infrastructure.DataMigrations
 {
     [DbContext(typeof(PortfolioDbContext))]
-    [Migration("20240819232405_RawTransaction")]
-    partial class RawTransaction
+    [Migration("20240820123127_InitialMigration2")]
+    partial class InitialMigration2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,12 +177,12 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("PortfolioId")
+                    b.Property<long?>("UserPortfolioId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PortfolioId");
+                    b.HasIndex("UserPortfolioId");
 
                     b.ToTable("CryptoCurrencyHoldings", (string)null);
                 });
@@ -222,7 +222,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("PortfolioId")
+                    b.Property<long?>("UserPortfolioId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("WalletName")
@@ -232,7 +232,7 @@ namespace Portfolio.Infrastructure.DataMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PortfolioId");
+                    b.HasIndex("UserPortfolioId");
 
                     b.ToTable("CryptoCurrencyProcessedTransactions", (string)null);
                 });
@@ -254,6 +254,10 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CsvLinesJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("TEXT");
 
@@ -269,7 +273,6 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TransactionIds")
-                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("TransactionIds");
 
@@ -286,7 +289,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.ToTable("CryptoCurrencyRawTransactions", (string)null);
                 });
 
-            modelBuilder.Entity("Portfolio.Domain.Entities.Portfolio", b =>
+            modelBuilder.Entity("Portfolio.Domain.Entities.UserPortfolio", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -306,7 +309,7 @@ namespace Portfolio.Infrastructure.DataMigrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Portfolios", (string)null);
+                    b.ToTable("UserPortfolios", (string)null);
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.Wallet", b =>
@@ -332,7 +335,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("PortfolioId")
+                    b.Property<long>("PortfolioId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -459,17 +462,17 @@ namespace Portfolio.Infrastructure.DataMigrations
 
             modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyHolding", b =>
                 {
-                    b.HasOne("Portfolio.Domain.Entities.Portfolio", null)
+                    b.HasOne("Portfolio.Domain.Entities.UserPortfolio", null)
                         .WithMany("Holdings")
-                        .HasForeignKey("PortfolioId")
+                        .HasForeignKey("UserPortfolioId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyProcessedTransaction", b =>
                 {
-                    b.HasOne("Portfolio.Domain.Entities.Portfolio", null)
+                    b.HasOne("Portfolio.Domain.Entities.UserPortfolio", null)
                         .WithMany("ProcessedTransactions")
-                        .HasForeignKey("PortfolioId")
+                        .HasForeignKey("UserPortfolioId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -557,13 +560,14 @@ namespace Portfolio.Infrastructure.DataMigrations
 
             modelBuilder.Entity("Portfolio.Domain.Entities.Wallet", b =>
                 {
-                    b.HasOne("Portfolio.Domain.Entities.Portfolio", null)
+                    b.HasOne("Portfolio.Domain.Entities.UserPortfolio", null)
                         .WithMany("Wallets")
                         .HasForeignKey("PortfolioId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("Portfolio.Domain.Entities.Portfolio", b =>
+            modelBuilder.Entity("Portfolio.Domain.Entities.UserPortfolio", b =>
                 {
                     b.Navigation("Holdings");
 
