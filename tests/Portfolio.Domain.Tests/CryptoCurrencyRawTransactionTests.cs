@@ -144,5 +144,123 @@ namespace Portfolio.Tests
             // Assert
             areEqual.Should().BeFalse();
         }
+
+        [Test]
+        public void SetTransactionAmounts_Should_ReturnFailure_When_ReceivedAmount_IsInvalid_ForDeposit()
+        {
+            // Arrange
+            var transaction = CryptoCurrencyRawTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+
+            // Act
+            var result = transaction.SetTransactionAmounts(new Money(0, "USD"), null, null);
+
+            // Assert
+            result.IsFailure.Should().BeTrue();
+            result.Error.Should().Be("Received amount must be greater than zero.");
+        }
+
+        [Test]
+        public void SetTransactionAmounts_Should_ReturnFailure_When_SentAmount_IsInvalid_ForWithdrawal()
+        {
+            // Arrange
+            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+
+            // Act
+            var result = transaction.SetTransactionAmounts(null, new Money(0, "USD"), null);
+
+            // Assert
+            result.IsFailure.Should().BeTrue();
+            result.Error.Should().Be("Sent amount must be greater than zero.");
+        }
+
+        [Test]
+        public void SetTransactionAmounts_Should_ReturnFailure_When_ReceivedAmount_IsSet_ForWithdrawal()
+        {
+            // Arrange
+            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+
+            // Act
+            var result = transaction.SetTransactionAmounts(new Money(100, "USD"), null, null);
+
+            // Assert
+            result.IsFailure.Should().BeTrue();
+            result.Error.Should().Be("Received amount can not be set on a 'withdrawal' transaction.");
+        }
+
+        [Test]
+        public void SetTransactionAmounts_Should_ReturnFailure_When_SentAmount_IsSet_ForDeposit()
+        {
+            // Arrange
+            var transaction = CryptoCurrencyRawTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+
+            // Act
+            var result = transaction.SetTransactionAmounts(new Money(100, "USD"), new Money(100, "USD"), null);
+
+            // Assert
+            result.IsFailure.Should().BeTrue();
+            result.Error.Should().Be("Sent amount can not be set on a 'deposit' transaction.");
+        }
+
+        [Test]
+        public void SetTransactionAmounts_Should_ReturnFailure_When_FeeCurrency_DoesNotMatch_ReceivedOrSent()
+        {
+            // Arrange
+            var transaction = CryptoCurrencyRawTransaction.CreateTrade(DateTime.UtcNow, new Money(100, "USD"), new Money(50, "USD"), null, "Account1", null).Value;
+
+            // Act
+            var result = transaction.SetTransactionAmounts(new Money(100, "USD"), new Money(50, "USD"), new Money(10, "EUR"));
+
+            // Assert
+            result.IsFailure.Should().BeTrue();
+            result.Error.Should().Be("Fees must be in the same currency as the received or sent amounts.");
+        }
+
+        [Test]
+        public void SetTransactionAmounts_Should_ReturnSuccess_When_ValidAmounts_AreSet_ForTrade()
+        {
+            // Arrange
+            var transaction = CryptoCurrencyRawTransaction.CreateTrade(DateTime.UtcNow, new Money(100, "USD"), new Money(50, "USD"), null, "Account1", null).Value;
+
+            // Act
+            var result = transaction.SetTransactionAmounts(new Money(100, "USD"), new Money(50, "USD"), new Money(5, "USD"));
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            transaction.ReceivedAmount.Should().Be(new Money(100, "USD"));
+            transaction.SentAmount.Should().Be(new Money(50, "USD"));
+            transaction.FeeAmount.Should().Be(new Money(5, "USD"));
+        }
+
+        [Test]
+        public void SetTransactionAmounts_Should_ReturnSuccess_When_ValidAmounts_AreSet_ForDeposit()
+        {
+            // Arrange
+            var transaction = CryptoCurrencyRawTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+
+            // Act
+            var result = transaction.SetTransactionAmounts(new Money(100, "USD"), null, new Money(1, "USD"));
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            transaction.ReceivedAmount.Should().Be(new Money(100, "USD"));
+            transaction.SentAmount.Should().BeNull();
+            transaction.FeeAmount.Should().Be(new Money(1, "USD"));
+        }
+
+        [Test]
+        public void SetTransactionAmounts_Should_ReturnSuccess_When_ValidAmounts_AreSet_ForWithdrawal()
+        {
+            // Arrange
+            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+
+            // Act
+            var result = transaction.SetTransactionAmounts(null, new Money(100, "USD"), new Money(1, "USD"));
+
+            // Assert
+            result.IsSuccess.Should().BeTrue();
+            transaction.ReceivedAmount.Should().BeNull();
+            transaction.SentAmount.Should().Be(new Money(100, "USD"));
+            transaction.FeeAmount.Should().Be(new Money(1, "USD"));
+        }
     }
 }
