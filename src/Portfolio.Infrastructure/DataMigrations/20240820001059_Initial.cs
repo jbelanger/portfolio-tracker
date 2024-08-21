@@ -1,12 +1,11 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Portfolio.Infrastructure.DataMigrations
 {
     /// <inheritdoc />
-    public partial class RawTransaction : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,7 +50,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Portfolios",
+                name: "UserPortfolios",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
@@ -63,7 +62,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Portfolios", x => x.Id);
+                    table.PrimaryKey("PK_UserPortfolios", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -181,7 +180,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                     Asset = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,8)", nullable: false),
                     AverageBoughtPrice = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
-                    PortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
+                    UserPortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -191,9 +190,9 @@ namespace Portfolio.Infrastructure.DataMigrations
                 {
                     table.PrimaryKey("PK_CryptoCurrencyHoldings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CryptoCurrencyHoldings_Portfolios_PortfolioId",
-                        column: x => x.PortfolioId,
-                        principalTable: "Portfolios",
+                        name: "FK_CryptoCurrencyHoldings_UserPortfolios_UserPortfolioId",
+                        column: x => x.UserPortfolioId,
+                        principalTable: "UserPortfolios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -210,7 +209,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                     DateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     AveragePriceAtTime = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
                     BalanceAfterTransaction = table.Column<decimal>(type: "decimal(18,8)", nullable: true),
-                    PortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
+                    UserPortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -220,9 +219,9 @@ namespace Portfolio.Infrastructure.DataMigrations
                 {
                     table.PrimaryKey("PK_CryptoCurrencyProcessedTransactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CryptoCurrencyProcessedTransactions_Portfolios_PortfolioId",
-                        column: x => x.PortfolioId,
-                        principalTable: "Portfolios",
+                        name: "FK_CryptoCurrencyProcessedTransactions_UserPortfolios_UserPortfolioId",
+                        column: x => x.UserPortfolioId,
+                        principalTable: "UserPortfolios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -234,7 +233,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    PortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
+                    UserPortfolioId = table.Column<long>(type: "INTEGER", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -244,9 +243,9 @@ namespace Portfolio.Infrastructure.DataMigrations
                 {
                     table.PrimaryKey("PK_Wallets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Wallets_Portfolios_PortfolioId",
-                        column: x => x.PortfolioId,
-                        principalTable: "Portfolios",
+                        name: "FK_Wallets_UserPortfolios_UserPortfolioId",
+                        column: x => x.UserPortfolioId,
+                        principalTable: "UserPortfolios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -322,14 +321,14 @@ namespace Portfolio.Infrastructure.DataMigrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CryptoCurrencyHoldings_PortfolioId",
+                name: "IX_CryptoCurrencyHoldings_UserPortfolioId",
                 table: "CryptoCurrencyHoldings",
-                column: "PortfolioId");
+                column: "UserPortfolioId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CryptoCurrencyProcessedTransactions_PortfolioId",
+                name: "IX_CryptoCurrencyProcessedTransactions_UserPortfolioId",
                 table: "CryptoCurrencyProcessedTransactions",
-                column: "PortfolioId");
+                column: "UserPortfolioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CryptoCurrencyRawTransactions_WalletId",
@@ -337,9 +336,9 @@ namespace Portfolio.Infrastructure.DataMigrations
                 column: "WalletId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Wallets_PortfolioId",
+                name: "IX_Wallets_UserPortfolioId",
                 table: "Wallets",
-                column: "PortfolioId");
+                column: "UserPortfolioId");
         }
 
         /// <inheritdoc />
@@ -379,7 +378,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                 name: "Wallets");
 
             migrationBuilder.DropTable(
-                name: "Portfolios");
+                name: "UserPortfolios");
         }
     }
 }

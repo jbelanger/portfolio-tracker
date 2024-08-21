@@ -23,7 +23,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
             Map(m => m.WalletName).Name("wallet");
             Map(m => m.Amount).Name("amount").Convert(args => new Money(ToDecimal(args.Row.GetField("amount")), NormalizeCurrencyAbbreviation(args.Row.GetField("asset"))));
             Map(m => m.Fee).Name("fee").Convert(args => new Money(ToDecimal(args.Row.GetField("fee")), NormalizeCurrencyAbbreviation(args.Row.GetField("asset"))));
-            Map(m => m.Balance).Name("balance").Convert(args => new Money(ToDecimal(args.Row.GetField("balance")), NormalizeCurrencyAbbreviation(args.Row.GetField("asset"))));
+            Map(m => m.Balance).Name("balance").Convert(args => new Money(ToDecimal(args.Row.GetField("balance")), NormalizeCurrencyAbbreviation(args.Row.GetField("asset"))));            
         }
 
         /// <summary>
@@ -105,6 +105,6 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
         public string WalletName { get; set; } = null!;
         public Money Amount { get; set; } = null!;
         public Money Fee { get; set; } = null!;
-        public Money Balance { get; set; } = null!;
+        public Money Balance { get; set; } = null!;        
     }
 }

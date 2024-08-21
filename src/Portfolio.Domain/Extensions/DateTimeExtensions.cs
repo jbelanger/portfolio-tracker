@@ -18,17 +18,4 @@ public static class DateTimeExtensions
             0, // Milliseconds set to 0
             dateTime.Kind); // Preserve the original DateTimeKind (Local, UTC, or Unspecified)
     }
-
-        public static DateTime TruncateToSecond1(this DateTime dateTime)
-    {
-        return new DateTime(
-            dateTime.Year,
-            dateTime.Month,
-            dateTime.Day,
-            dateTime.Hour,
-            dateTime.Minute,
-            dateTime.Second,
-            0, // Milliseconds set to 0
-            dateTime.Kind); // Preserve the original DateTimeKind (Local, UTC, or Unspecified)
-    }
 }

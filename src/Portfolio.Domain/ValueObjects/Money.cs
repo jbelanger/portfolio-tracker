@@ -1,11 +1,17 @@
+using CSharpFunctionalExtensions;
+
 namespace Portfolio.Domain.ValueObjects
 {
     /// <summary>
     /// Represents a monetary amount in a specific currency, ensuring proper handling
     /// of operations between amounts in the same or different currencies.
     /// </summary>
-    public record Money(decimal Amount, string CurrencyCode)
+    public class Money : ValueObject
     {
+        public decimal Amount { get; private set; }
+
+        public string CurrencyCode { get; private set; } = string.Empty;
+
         /// <summary>
         /// Checks if the currency of this money instance is among predefined fiat currencies.
         /// </summary>
@@ -21,6 +27,19 @@ namespace Portfolio.Domain.ValueObjects
         /// The absolute (non-negative) value of the Amount.
         /// </value>
         public decimal AbsoluteAmount => Math.Abs(Amount);
+
+        public Money(decimal amount, string currencyCode)
+        {
+            Amount = amount;
+            CurrencyCode = currencyCode ?? throw new ArgumentNullException(nameof(currencyCode));
+        }
+
+        public static Maybe<Money> Create(decimal? amount, string currencyCode)
+        {
+            if ((amount ?? 0) == 0 || string.IsNullOrWhiteSpace(currencyCode))
+                return Maybe.None;
+            return new Money(amount.GetValueOrDefault(), currencyCode);
+        }
 
         /// <summary>
         /// Converts the amount to a new Money instance with an absolute value of the amount.
@@ -77,6 +96,12 @@ namespace Portfolio.Domain.ValueObjects
         public override string ToString()
         {
             return $"{Amount:0.##} {CurrencyCode}";
+        }
+
+        protected override IEnumerable<IComparable> GetEqualityComponents()
+        {
+            yield return Amount;
+            yield return CurrencyCode;
         }
     }
 }
