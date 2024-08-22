@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, RadioGroup, FormControl, FormControlLabel, Radio, InputLabel, Select, MenuItem, Snackbar, Alert
+  Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, RadioGroup, FormControl, FormControlLabel, Radio, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { CsvFileImportType, CryptoCurrencyTransactionDto } from '../types/Wallet';
 import apiClient from '../api/axios';
@@ -19,17 +19,14 @@ const AddTransactionDialog: React.FC<TransactionDialogProps> = ({ open, onClose,
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [transactionMode, setTransactionMode] = useState<'manual' | 'csv'>('csv');
   const [currentTransaction, setCurrentTransaction] = useState<CryptoCurrencyTransactionDto | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     if (event.target.files && event.target.files[0]) {
       setSelectedFile(event.target.files[0]);
     }
   };
 
-  const handleImportTransactions = async () => {
+  const handleImportTransactions = async (): Promise<void> => {
     if (!selectedFile) return;
 
     const formData = new FormData();
@@ -50,7 +47,7 @@ const AddTransactionDialog: React.FC<TransactionDialogProps> = ({ open, onClose,
     }
   };
 
-  const handleSaveManualTransaction = async () => {
+  const handleSaveManualTransaction = async (): Promise<void> => {
     if (!currentTransaction) return;
 
     try {
