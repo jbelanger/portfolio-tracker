@@ -18,14 +18,11 @@ namespace Portfolio.Api.Services
 
         public async Task<Result<long>> AddTransactionAsync(long portfolioId, long walletId, CryptoCurrencyTransactionDto transactionDto)
         {
-            var wallet = await _dbContext.Wallets
-                .AsNoTracking()
+            var wallet = await _dbContext.Wallets                
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (wallet == null)
-            {
                 return Result.Failure<long>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
-            }
 
             if (!Enum.TryParse(transactionDto.Type, true, out TransactionType transactionType))
                 return Result.Failure<long>($"Invalid transaction type {transactionDto.Type}");
@@ -266,6 +263,7 @@ namespace Portfolio.Api.Services
             string? feeCurrency = n.FeeAmount?.CurrencyCode ?? null;
 
             var exists = await _dbContext.RawTransactions.AsNoTracking().AnyAsync(other =>
+                n.WalletId == other.WalletId &&
                 n.DateTime == other.DateTime &&
                 n.Type == other.Type &&
                 received == other.ReceivedAmount.Amount &&

@@ -16,9 +16,13 @@ namespace Portfolio.Infrastructure.Data.Configurations
                    .IsRequired()
                    .HasMaxLength(100);
 
-            // builder.HasMany<CryptoCurrencyRawTransaction>()
-            //        .WithOne()                   
-            //        .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany<CryptoCurrencyRawTransaction>("Transactions")
+                   .WithOne()                   
+                   .HasForeignKey(t => t.WalletId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            //builder.Metadata.FindNavigation("Transactions")?.SetPropertyAccessMode(PropertyAccessMode.Field);
+                //.UsePropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

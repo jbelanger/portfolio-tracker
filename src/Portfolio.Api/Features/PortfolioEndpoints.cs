@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Portfolio.App.DTOs;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure;
 
@@ -10,11 +11,12 @@ namespace Portfolio.Api.Features
         {
             var group = routes.MapGroup("/portfolios");
 
-            group.MapPost("/", async (PortfolioDbContext dbContext, UserPortfolio portfolio) =>
+            group.MapPost("/", async (PortfolioDbContext dbContext, PortfolioDto portfolio) =>
             {
-                dbContext.Portfolios.Add(portfolio);
+                var up = UserPortfolio.Create().Value;
+                dbContext.Portfolios.Add(up);
                 await dbContext.SaveChangesAsync();
-                return Results.Created($"/portfolios/{portfolio.Id}", portfolio);
+                return Results.Created($"/portfolios/{up.Id}", portfolio);
             });
 
             group.MapGet("/{id:long}", async (PortfolioDbContext dbContext, long id) =>

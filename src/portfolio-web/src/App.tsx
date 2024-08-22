@@ -8,10 +8,10 @@ const App: React.FC = () => {
 
   const theme = createTheme({
     palette: {
-      mode: 'dark'
+      mode: darkMode ? 'dark' : 'light',
     },
     typography: {
-      fontSize: 14,  // Smaller font size for compact UI      
+      fontSize: 14,
       fontFamily: [
         '-apple-system',
         'BlinkMacSystemFont',
@@ -28,7 +28,7 @@ const App: React.FC = () => {
   });
 
   const handleToggleDarkMode = () => {
-    setDarkMode(!darkMode);
+    setDarkMode((prevMode) => !prevMode);
   };
 
   return (
