@@ -51,7 +51,7 @@ namespace Portfolio.Infrastructure
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new CryptoCurrencyRawTransactionConfiguration());  
-            modelBuilder.ApplyConfiguration(new CryptoCurrencyProcessedTransactionConfiguration());            
+            //modelBuilder.ApplyConfiguration(new CryptoCurrencyProcessedTransactionConfiguration());            
             // modelBuilder.ApplyConfiguration(new CryptoCurrencyTransactionConfiguration());            
             // modelBuilder.ApplyConfiguration(new CryptoCurrencyTradeTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CryptoCurrencyHoldingConfiguration());

@@ -9,6 +9,7 @@ namespace Portfolio.Domain.Entities
     /// </summary>
     public class CryptoCurrencyRawTransaction : BaseAuditableEntity
     {
+        public long WalletId { get; private set; }
         public DateTime DateTime { get; private set; }
 
         public TransactionType Type { get; init; }

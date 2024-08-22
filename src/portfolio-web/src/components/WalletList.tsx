@@ -8,8 +8,8 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import apiClient from '../api/axios';
 import { Wallet, CryptoCurrencyTransactionDto } from '../types/Wallet';
 import dayjs from 'dayjs';
-import TransactionForm from './TransactionForm'
-import AddTransactionDialog from './AddTransactionDialog'
+import TransactionForm from './TransactionForm';
+import AddTransactionDialog from './AddTransactionDialog';
 import BulkEditDialog from './BulkEditDialog';
 
 interface WalletListProps {
@@ -23,16 +23,14 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
     const [currentTransaction, setCurrentTransaction] = useState<CryptoCurrencyTransactionDto | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [exportFormat, setExportFormat] = useState('xlsx');
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [transactionDialogOpen, setTransactionDialogOpen] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-    const [deleting, setDeleting] = useState<number | null>(null); // Track the ID of the deleting transaction
+    const [deleting, setDeleting] = useState<number | null>(null);
     const [selectedTransactions, setSelectedTransactions] = useState<number[]>([]);
     const [bulkEditDialogOpen, setBulkEditDialogOpen] = useState(false);
-    const [bulkEditOption, setBulkEditOption] = useState(''); // Track the selected bulk edit option
-    const [bulkAction, setBulkAction] = useState<string | null>(null); // Track the selected bulk action
+    const [bulkAction, setBulkAction] = useState<string | null>(null);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
     useEffect(() => {
@@ -46,10 +44,9 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
     const fetchTransactions = async (walletId: number | null) => {
         try {
             if (walletId === null) {
-                const response = await apiClient.get<CryptoCurrencyTransactionDto[]>('/portfolios/1/transactions'); // Replace with the appropriate API endpoint
+                const response = await apiClient.get<CryptoCurrencyTransactionDto[]>('/portfolios/1/transactions');
                 setTransactions(response.data);
-            }
-            else {
+            } else {
                 const response = await apiClient.get<CryptoCurrencyTransactionDto[]>(`/portfolios/1/wallets/${walletId}/transactions`);
                 setTransactions(response.data);
             }
@@ -60,36 +57,31 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
     };
 
     const handleDeleteTransaction = async (transactionId: number) => {
-
         try {
-            // Optimistically update the state
             const updatedTransactions = transactions.filter(transaction => transaction.id !== transactionId);
             setTransactions(updatedTransactions);
-            setDeleting(transactionId);  // Set the deleting state to the ID of the transaction being deleted
+            setDeleting(transactionId);
 
             if (wallet) {
                 await apiClient.delete(`/portfolios/1/wallets/${wallet.id}/transactions/${transactionId}`);
-                setTransactions(transactions.filter(transaction => transaction.id !== transactionId));
                 showSnackbar('Transaction deleted successfully.', 'success');
             }
         } catch (error) {
-            // Rollback the state update if the API call fails
             setTransactions(transactions);
             console.error('Error deleting transaction:', error);
             showSnackbar('Error deleting transaction. Please try again.', 'error');
         } finally {
-            // Temporarily disable the button to prevent double click
-            setDeleting(null);  // Clear the deleting state once deletion is complete
+            setDeleting(null);
         }
     };
 
     const handleBulkDelete = async () => {
         try {
             await apiClient.delete(`/portfolios/1/wallets/${wallet?.id}/transactions/bulk-delete`, {
-                data: selectedTransactions, // Send selected transaction IDs
+                data: selectedTransactions,
             });
             setTransactions(transactions.filter(transaction => !selectedTransactions.includes(transaction.id)));
-            setSelectedTransactions([]);  // Clear selection after deletion
+            setSelectedTransactions([]);
             showSnackbar('Selected transactions deleted successfully.', 'success');
         } catch (error) {
             console.error('Error deleting transactions:', error);
@@ -97,37 +89,31 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
         }
     };
 
-
-
     const handleEditTransaction = (transaction: CryptoCurrencyTransactionDto) => {
         setCurrentTransaction(transaction);
         setIsEditing(true);
         setDialogOpen(true);
     };
 
-
     const handleBulkEdit = async (updatedFields: Partial<CryptoCurrencyTransactionDto>) => {
         try {
             const transactionsToUpdate = selectedTransactions.map(id => ({
                 ...transactions.find(t => t.id === id),
-                ...updatedFields, // Apply the updated fields
+                ...updatedFields,
             }));
 
             await apiClient.put(`/portfolios/1/wallets/${wallet?.id}/transactions/bulk-edit`, transactionsToUpdate);
 
-            // Optionally, refetch transactions from the server
             await fetchTransactions(wallet?.id!);
 
             setBulkEditDialogOpen(false);
-            setSelectedTransactions([]);  // Clear selection after edit
+            setSelectedTransactions([]);
             showSnackbar('Selected transactions updated successfully.', 'success');
         } catch (error) {
             console.error('Error updating transactions:', error);
             showSnackbar('Error updating transactions. Please try again.', 'error');
         }
     };
-
-
 
     const handleDialogClose = () => {
         setDialogOpen(false);
@@ -137,26 +123,18 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
     const handleSaveTransaction = async () => {
         if (!currentTransaction || !wallet) return;
         try {
-            setErrorMessage(null); // Clear previous error message
-
             if (isEditing) {
-                // If editing, use PUT to update the transaction
                 await apiClient.put(`/portfolios/1/wallets/${wallet.id}/transactions/${currentTransaction.id}`, currentTransaction);
             } else {
-                // If not editing, use POST to create a new transaction
                 await apiClient.post(`/portfolios/1/wallets/${wallet.id}/transactions`, currentTransaction);
             }
 
-            // Refresh the transactions from the server only after a successful save
             await fetchTransactions(wallet.id);
             handleDialogClose();
         } catch (error: any) {
             console.error('Error saving transaction:', error);
-            if (error.response && error.response.data && typeof error.response.data === 'string') {
-                setErrorMessage(error.response.data); // Display server error message
-            } else {
-                setErrorMessage('An unexpected error occurred. Please try again.'); // Generic error message
-            }
+            const errorMessage = error.response?.data || 'An unexpected error occurred. Please try again.';
+            showSnackbar(errorMessage, 'error');
         }
     };
 
@@ -166,16 +144,15 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
 
     const handleTransactionDialogClose = () => {
         setTransactionDialogOpen(false);
-        fetchTransactions(wallet?.id || 0); // Refresh transactions after dialog closes
+        fetchTransactions(wallet?.id || 0);
     };
 
     const handleBulkAction = (action: string | null) => {
         if (action === 'bulkEdit') {
-            setBulkEditDialogOpen(true);  // Open bulk edit dialog
+            setBulkEditDialogOpen(true);
         } else if (action === 'bulkDelete') {
-            setConfirmDeleteOpen(true);  // Trigger bulk delete action
+            setConfirmDeleteOpen(true);
         }
-        // Clear the selection after the action
         setBulkAction("");
     };
 
@@ -183,7 +160,7 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
         if (!wallet) return;
         try {
             const response = await apiClient.get(`/portfolios/1/wallets/${wallet.id}/export?format=${exportFormat}`, {
-                responseType: 'blob', // To handle file downloads
+                responseType: 'blob',
             });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -229,7 +206,6 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
         {
             field: 'feeAmount',
             headerName: 'Fee',
-            //width: 20,
             flex: 1,
             valueGetter: (params: any, tx: CryptoCurrencyTransactionDto) =>
                 `${tx.feeAmount ?? ''} ${tx.feeCurrency ?? ''}`,
@@ -245,13 +221,13 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
                 <>
                     <IconButton
                         onClick={() => handleEditTransaction(params.row as CryptoCurrencyTransactionDto)}
-                        disabled={deleting !== null}  // Disable the edit button when deleting is in progress
+                        disabled={deleting !== null}
                     >
                         <Edit />
                     </IconButton>
                     <IconButton
                         onClick={() => handleDeleteTransaction((params.row as CryptoCurrencyTransactionDto).id)}
-                        disabled={deleting === (params.row as CryptoCurrencyTransactionDto).id}  // Disable only the delete button for the transaction being deleted
+                        disabled={deleting === (params.row as CryptoCurrencyTransactionDto).id}
                     >
                         <Delete />
                     </IconButton>
@@ -286,24 +262,6 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
                                         handleBulkAction(e.target.value);
                                     }}
                                     displayEmpty
-                                    sx={{
-                                        //backgroundColor: '#1976d2',
-                                        color: 'white',
-                                        //textTransform: 'uppercase',
-                                        '& .MuiSelect-icon': {
-                                            color: 'white',
-                                        },
-                                        '& .MuiOutlinedInput-notchedOutline': {
-                                            //borderColor: 'transparent',
-                                        },
-                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                            //borderColor: 'transparent',
-                                        },
-                                        '&:focus .MuiOutlinedInput-notchedOutline': {
-                                            //borderColor: 'transparent',
-                                        },
-                                    }}
-                                //renderValue={(selected) => (selected ? selected : 'Bulk Actions')}
                                 >
                                     <MenuItem value="" disabled>Bulk Action</MenuItem>
                                     <MenuItem value="bulkEdit">Bulk Edit</MenuItem>
@@ -351,7 +309,6 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
                                 disableRowSelectionOnClick
                                 checkboxSelection
                                 onRowSelectionModelChange={(newSelection) => setSelectedTransactions(newSelection as number[])}
-
                             />
                         </div>
                     </div>
@@ -361,11 +318,6 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
             <Dialog open={dialogOpen} onClose={handleDialogClose}>
                 <DialogTitle>{isEditing ? 'Edit Transaction' : 'Add Transaction'}</DialogTitle>
                 <DialogContent>
-                    {errorMessage && (
-                        <Typography color="error" variant="body2" gutterBottom>
-                            {errorMessage}
-                        </Typography>
-                    )}
                     <TransactionForm
                         transaction={currentTransaction}
                         onChange={setCurrentTransaction}
@@ -383,17 +335,14 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
                 onClose={handleTransactionDialogClose}
                 onTransactionAdded={handleTransactionDialogClose}
                 selectedWalletId={wallet?.id || 0}
-                showSnackbar={showSnackbar}  // Pass showSnackbar to the dialog
+                showSnackbar={showSnackbar}
             />
             <BulkEditDialog
                 open={bulkEditDialogOpen}
                 onClose={() => setBulkEditDialogOpen(false)}
                 selectedTransactions={selectedTransactions}
             />
-            <Dialog
-                open={confirmDeleteOpen}
-                onClose={() => setConfirmDeleteOpen(false)}
-            >
+            <Dialog open={confirmDeleteOpen} onClose={() => setConfirmDeleteOpen(false)}>
                 <DialogTitle>Confirm Bulk Delete</DialogTitle>
                 <DialogContent>
                     <Typography>Are you sure you want to delete the selected transactions?</Typography>
@@ -405,7 +354,7 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
                     <Button
                         onClick={() => {
                             setConfirmDeleteOpen(false);
-                            handleBulkDelete();  // Perform bulk delete after confirmation
+                            handleBulkDelete();
                         }}
                         color="secondary"
                     >
@@ -413,7 +362,6 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
                     </Button>
                 </DialogActions>
             </Dialog>
-
 
             <Snackbar
                 open={snackbarOpen}

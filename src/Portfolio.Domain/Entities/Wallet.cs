@@ -7,9 +7,8 @@ namespace Portfolio.Domain.Entities
     {
         public string Name { get; init; } = string.Empty;
         public long PortfolioId { get; set; }
-        private readonly HashSet<CryptoCurrencyRawTransaction> _transactions = new();
-
-        public IReadOnlyCollection<CryptoCurrencyRawTransaction> Transactions => _transactions;
+        private readonly List<CryptoCurrencyRawTransaction> _transactions = new();
+        public IReadOnlyCollection<CryptoCurrencyRawTransaction> Transactions => _transactions.AsReadOnly();
 
         private Wallet() { }
 
@@ -28,9 +27,9 @@ namespace Portfolio.Domain.Entities
             if (transaction == null)
                 return Result.Failure("Transaction cannot be null.");
 
-            if (_transactions.Any(t => IsSameTransaction(t, transaction)) || !_transactions.Add(transaction))
+            if (_transactions.Any(t => IsSameTransaction(t, transaction)))// || !_transactions.Add(transaction))
                 return Result.Failure("Transaction already exists in this holding.");
-            
+            _transactions.Add(transaction);
             return Result.Success();
         }
 

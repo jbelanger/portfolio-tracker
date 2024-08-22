@@ -14,12 +14,6 @@ namespace Portfolio.Infrastructure.Data.Configurations
                      // Define the primary key
                      builder.HasKey(t => t.Id);
 
-                     builder.HasIndex(rt => new
-                     {
-                            rt.DateTime
-                     })
-                     .IsUnique();
-
                      // Define properties
                      builder.Property(t => t.DateTime)
                             .IsRequired();
@@ -39,7 +33,7 @@ namespace Portfolio.Infrastructure.Data.Configurations
                      // Define the relationship to the Wallet (assuming a Wallet entity exists)
                      //      builder.HasOne<Wallet>()
                      //             .WithMany()
-                     //             .HasForeignKey("WalletId")
+                     //             .HasForeignKey(t => t.WalletId)
                      //             .OnDelete(DeleteBehavior.Cascade);
 
                      // Configure the value objects (Money)
