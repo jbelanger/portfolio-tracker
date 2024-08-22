@@ -11,5 +11,7 @@ namespace Portfolio.Api.Services
         Task<Result<CryptoCurrencyTransactionDto>> GetTransactionAsync(long portfolioId, long walletId, long transactionId);
         Task<Result<IEnumerable<CryptoCurrencyTransactionDto>>> GetTransactionsAsync(long portfolioId, long walletId);
         Task<Result> ImportTransactionsFromCsvAsync(long portfolioId, long walletId, CsvFileImportType csvType, StreamReader streamReader);
+        Task<Result> BulkUpdateTransactionsAsync(long portfolioId, long walletId, List<CryptoCurrencyTransactionDto> transactionsToUpdate);
+        Task<Result> BulkDeleteTransactionsAsync(long portfolioId, long walletId, long[] transactionIds);
     }
 }
