@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Portfolio.Api.Services;
 using Portfolio.App;
 using Portfolio.App.DTOs;
@@ -34,6 +35,18 @@ namespace Portfolio.Api.Features
                 return Results.BadRequest(result.Error);
             });
 
+            group.MapPut("/bulk-edit", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, [FromBody] List<CryptoCurrencyTransactionDto> transactionsToUpdate) =>
+            {
+                var result = await transactionService.BulkUpdateTransactionsAsync(portfolioId, walletId, transactionsToUpdate);
+
+                if (result.IsSuccess)
+                {
+                    return Results.NoContent();
+                }
+                return Results.BadRequest(result.Error);
+            });
+
+
             group.MapDelete("/{transactionId:long}", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, long transactionId) =>
             {
                 var result = await transactionService.DeleteTransactionAsync(portfolioId, walletId, transactionId);
@@ -44,6 +57,18 @@ namespace Portfolio.Api.Features
                 }
                 return Results.BadRequest(result.Error);
             });
+
+            group.MapDelete("/bulk-delete", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, [FromBody] long[] transactionIds) =>
+            {
+                var result = await transactionService.BulkDeleteTransactionsAsync(portfolioId, walletId, transactionIds);
+
+                if (result.IsSuccess)
+                {
+                    return Results.NoContent();
+                }
+                return Results.BadRequest(result.Error);
+            });
+
 
             group.MapGet("/", async (ICryptoTransactionService transactionService, long portfolioId, long walletId) =>
             {
@@ -67,7 +92,7 @@ namespace Portfolio.Api.Features
                 return Results.NotFound(result.Error);
             });
 
-            group.MapPost("/upload-csv", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, CsvFileImportType csvImportType,IFormFile file) =>
+            group.MapPost("/upload-csv", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, CsvFileImportType csvImportType, IFormFile file) =>
             {
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
