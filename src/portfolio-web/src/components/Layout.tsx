@@ -43,7 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ darkMode, onToggleDarkMode }) => {
   return (
     <Router>
       <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-        <CssBaseline />
+        <CssBaseline />        
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <Toolbar>
             <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>

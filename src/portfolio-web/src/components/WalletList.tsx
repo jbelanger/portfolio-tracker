@@ -290,8 +290,7 @@ const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = nu
                                 Export
                             </Button>
                         </Box>
-                    </Box>
-                    <Typography variant="h6">Transactions for {wallet.name}</Typography>
+                    </Box>                    
                     <div style={{ display: 'flex', height: '100%' }}>
                         <div style={{ flexGrow: 1 }}>
                             <DataGrid
