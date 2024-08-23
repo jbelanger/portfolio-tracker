@@ -1,23 +1,27 @@
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Moq;
-using Portfolio.App.HistoricalPrice;
+using Portfolio.Domain;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.ValueObjects;
 
-namespace Portfolio.Tests;
+namespace Portfolio.Domain.Tests.Entities;
 
 [TestFixture]
 public class PortfolioFullTestSuite
 {
     private Mock<IPriceHistoryService> _priceHistoryServiceMock;
-    private Portfolio.App.Portfolio _portfolio;
+    private Domain.Entities.UserPortfolio _portfolio;
 
     [SetUp]
     public void SetUp()
     {
         _priceHistoryServiceMock = new Mock<IPriceHistoryService>();
-        _portfolio = new Portfolio.App.Portfolio(_priceHistoryServiceMock.Object);
+        _priceHistoryServiceMock
+            .Setup(p => p.GetPriceAtCloseTimeAsync(It.IsAny<string>(), It.IsAny<DateTime>()))
+            .ReturnsAsync(Result.Failure<decimal>("Price not found"));
+
+        _portfolio = new Portfolio.Domain.Entities.UserPortfolio();
     }
 
     [Test]
@@ -38,14 +42,14 @@ public class PortfolioFullTestSuite
         var wallet = Wallet.Create("Test Wallet").Value;
         wallet.AddTransaction(transaction);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", transactionDate))
             .ReturnsAsync(Result.Success(30000m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -86,14 +90,14 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(depositTransaction);
         wallet.AddTransaction(withdrawalTransaction);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDate))
             .ReturnsAsync(Result.Success(30000m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -145,7 +149,7 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(depositTransactionETH);
         wallet.AddTransaction(withdrawalTransactionBTC);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDateBTC))
@@ -155,7 +159,7 @@ public class PortfolioFullTestSuite
             .ReturnsAsync(Result.Success(2000m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -202,7 +206,7 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(depositTransactionBTC);
         wallet.AddTransaction(tradeTransactionBTCtoETH);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDateBTC))
@@ -217,7 +221,7 @@ public class PortfolioFullTestSuite
             .ReturnsAsync(Result.Success(2500m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -264,14 +268,14 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(depositTransactionBTC);
         wallet.AddTransaction(tradeTransactionBTCtoUSD);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDateBTC))
             .ReturnsAsync(Result.Success(30000m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -318,14 +322,14 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(depositTransactionUSD);
         wallet.AddTransaction(tradeTransactionUSDtoBTC);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", tradeDate))
             .ReturnsAsync(Result.Success(30000m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -383,7 +387,7 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(depositTransactionBTC2);
         wallet.AddTransaction(tradeTransactionBTCtoETH);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDate1))
@@ -399,7 +403,7 @@ public class PortfolioFullTestSuite
             .ReturnsAsync(Result.Success(2500m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -463,7 +467,7 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(tradeTransactionBTCtoETH);
         wallet.AddTransaction(withdrawalTransactionETH);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDateBTC))
@@ -482,7 +486,7 @@ public class PortfolioFullTestSuite
             .ReturnsAsync(Result.Success(3000m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -498,15 +502,15 @@ public class PortfolioFullTestSuite
 
         depositTransactionBTC.ValueInDefaultCurrency.Amount.Should().Be(depositTransactionBTC.ReceivedAmount.Amount * 30000m);
         depositTransactionBTC.ValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
-        depositTransactionBTC.FeeValueInDefaultCurrency.Should().Be(Money.Empty);            
-                    
+        depositTransactionBTC.FeeValueInDefaultCurrency.Should().Be(Money.Empty);
+
         tradeTransactionBTCtoETH.ValueInDefaultCurrency.Amount.Should().Be(tradeTransactionBTCtoETH.SentAmount.Amount * 35000m);
-        tradeTransactionBTCtoETH.ValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);        
-        tradeTransactionBTCtoETH.FeeValueInDefaultCurrency.Should().Be(Money.Empty);            
+        tradeTransactionBTCtoETH.ValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
+        tradeTransactionBTCtoETH.FeeValueInDefaultCurrency.Should().Be(Money.Empty);
 
         withdrawalTransactionETH.ValueInDefaultCurrency.Amount.Should().Be(withdrawalTransactionETH.SentAmount.Amount * 3000m);
-        withdrawalTransactionETH.ValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);        
-        withdrawalTransactionETH.FeeValueInDefaultCurrency.Should().Be(Money.Empty);          
+        withdrawalTransactionETH.ValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
+        withdrawalTransactionETH.FeeValueInDefaultCurrency.Should().Be(Money.Empty);
     }
 
     [Test]
@@ -541,7 +545,7 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(depositTransactionBTC);
         wallet.AddTransaction(tradeTransactionBTCtoETH);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDateBTC))
@@ -554,7 +558,7 @@ public class PortfolioFullTestSuite
             .ReturnsAsync(Result.Success(30000m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -648,7 +652,7 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(tradeTransactionBTCtoETH2);
         wallet.AddTransaction(withdrawalTransactionETH2);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDate1))
@@ -670,7 +674,7 @@ public class PortfolioFullTestSuite
             .ReturnsAsync(Result.Success(35000m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -717,7 +721,7 @@ public class PortfolioFullTestSuite
         wallet.AddTransaction(depositTransactionBTC);
         wallet.AddTransaction(tradeTransactionBTCtoETH);
 
-        _portfolio.Wallets = new List<Wallet> { wallet };
+        _portfolio.AddWallet(wallet);
 
         _priceHistoryServiceMock
             .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", depositDateBTC))
@@ -727,7 +731,7 @@ public class PortfolioFullTestSuite
             .ReturnsAsync(Result.Success(2500m));
 
         // Act
-        var result = await _portfolio.ProcessAsync();
+        var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
 
         // Assert
         result.IsSuccess.Should().BeTrue();

@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using Portfolio.Domain;
 
 namespace Portfolio.App.HistoricalPrice
 {

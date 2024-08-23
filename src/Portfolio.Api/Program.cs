@@ -1,6 +1,9 @@
+using Microsoft.EntityFrameworkCore.Storage;
 using Portfolio.Api.Features;
 using Portfolio.Api.Services;
 using Portfolio.App;
+using Portfolio.App.HistoricalPrice;
+using Portfolio.App.HistoricalPrice.YahooFinance;
 using Portfolio.App.Services;
 using Portfolio.Domain;
 using Portfolio.Infrastructure;
@@ -40,6 +43,8 @@ namespace Portfolio.Api
 
             builder.Services.AddScoped<IWalletService, WalletService>();
             builder.Services.AddScoped<ICryptoTransactionService, CryptoTransactionService>();
+            builder.Services.AddScoped<IPriceHistoryApi>(p => new PriceHistoryApiWithRetry(new YahooFinancePriceHistoryApi(), 3));
+            builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
 
             var app = builder.Build();
 

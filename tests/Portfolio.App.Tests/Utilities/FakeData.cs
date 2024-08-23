@@ -7,7 +7,7 @@ public class FakeDataHelper
 {
     public static UserPortfolio AddPortfolio(DbContext dbContext)
     {
-        UserPortfolio userPortfolio = UserPortfolio.Create().Value;
+        UserPortfolio userPortfolio = new UserPortfolio();
         userPortfolio.Id = 1;
         dbContext.Add(userPortfolio);        
         return userPortfolio;

@@ -1,34 +1,34 @@
-using Flurl.Util;
-using Portfolio.App.HistoricalPrice;
+using CSharpFunctionalExtensions;
 using Portfolio.Domain;
-using Portfolio.Domain.Entities;
+using Portfolio.Domain.Common;
+using Portfolio.Domain.Constants;
 using Portfolio.Domain.ValueObjects;
 
-namespace Portfolio.App
+namespace Portfolio.Domain.Entities
 {
-    public delegate void DepositAddedHandler(CryptoCurrencyRawTransaction deposit, CryptoCurrencyHolding holding);
-    public delegate void WithdrawAddedHandler(CryptoCurrencyRawTransaction deposit, CryptoCurrencyHolding holding);
-    public delegate void TradeAddedHandler(CryptoCurrencyRawTransaction deposit, CryptoCurrencyHolding holding);
-
-    public class Portfolio
+    public class UserPortfolio : AggregateRoot
     {
-        private readonly IPriceHistoryService _priceHistoryService = null!;
         private List<CryptoCurrencyHolding> _holdings = new();
-
-        public event DepositAddedHandler? OnDepositAdded;
-        public event WithdrawAddedHandler? OnWithdrawAdded;
-        public event TradeAddedHandler? OnTradeAdded;
-
-        List<TaxableEvent> _taxableEvents = new();
+        private List<Wallet> _wallets = new();
+        private List<TaxableEvent> _taxableEvents = new();
 
         public string DefaultCurrency { get; private set; } = Strings.CURRENCY_USD;
-        public List<Wallet> Wallets { get; set; } = new List<Wallet>();
-        public List<CryptoCurrencyHolding> Holdings { get => _holdings; }
-        public List<TaxableEvent> TaxableEvents { get => _taxableEvents; set => _taxableEvents = value; }
 
-        public Portfolio(IPriceHistoryService priceHistoryService)
+        public IReadOnlyCollection<Wallet> Wallets => _wallets.AsReadOnly();
+        public IReadOnlyCollection<CryptoCurrencyHolding> Holdings => _holdings.AsReadOnly();
+        public IReadOnlyCollection<TaxableEvent> TaxableEvents => _taxableEvents.AsReadOnly();
+
+        public Result AddWallet(Wallet wallet)
         {
-            _priceHistoryService = priceHistoryService;
+            if (wallet == null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            if (_wallets.Any(w => w.Name == wallet.Name))
+                return Result.Failure("Wallet already exists.");
+
+            _wallets.Add(wallet);
+
+            return Result.Success();
         }
 
         public Result SetDefaultCurrency(string currencyCode)
@@ -38,29 +38,32 @@ namespace Portfolio.App
                 return Result.Failure("Currency code unknown.");
 
             DefaultCurrency = currencyCode;
-            _priceHistoryService.DefaultCurrency = currencyCode;
 
             return Result.Success();
         }
 
-        public async Task<Result> ProcessAsync()
+        public async Task<Result> CalculateTradesAsync(IPriceHistoryService priceHistoryService)
         {
             if (!Wallets.Any())
                 return Result.Failure("No wallets to process. Start by adding a wallet.");
 
+
             var transactions = GetTransactionsFromAllWallets();
-            _holdings = (await GetHoldings(transactions).ConfigureAwait(false)).ToList();
+            _holdings = (await GetHoldings(transactions, priceHistoryService).ConfigureAwait(false)).ToList();
 
             return Result.Success();
         }
+
         private IEnumerable<CryptoCurrencyRawTransaction> GetTransactionsFromAllWallets()
         {
             List<CryptoCurrencyRawTransaction> allTransactions = [.. Wallets.SelectMany(w => w.Transactions)];
             return allTransactions.OrderBy(t => t.DateTime).ToList();
         }
 
-        internal async Task<IEnumerable<CryptoCurrencyHolding>> GetHoldings(IEnumerable<CryptoCurrencyRawTransaction> transactions)
+        internal async Task<IEnumerable<CryptoCurrencyHolding>> GetHoldings(IEnumerable<CryptoCurrencyRawTransaction> transactions, IPriceHistoryService priceHistoryService)
         {
+            priceHistoryService.DefaultCurrency = DefaultCurrency;
+
             foreach (var tx in transactions)
             {
                 CryptoCurrencyHolding? sender = null;
@@ -90,14 +93,16 @@ namespace Portfolio.App
                     else
                     {
                         // Fetch the price of the sent currency in USD
-                        decimal price = await GetPriceWithRetryAsync(tx.FeeAmount.CurrencyCode, tx.DateTime);
-                        if (price == 0)
+                        decimal price = 0m;
+                        var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.FeeAmount.CurrencyCode, tx.DateTime).ConfigureAwait(false);
+                        if (priceResult.IsFailure)
                         {
                             tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-                            Log.Warning("Could not get price history for {Asset} fees. Fees calculations will be incorrect.", fees.Asset);
+                            tx.ErrorMessage = $"Could not get price history for {fees.Asset} fees. Fees calculations will be incorrect.";
                         }
                         else
                         {
+                            price = priceResult.Value;
                             tx.FeeValueInDefaultCurrency = new Money(tx.FeeAmount.Amount * price, DefaultCurrency);
                         }
                     }
@@ -119,24 +124,25 @@ namespace Portfolio.App
                     }
                     else
                     {
-                        decimal price = await GetPriceWithRetryAsync(tx.ReceivedAmount.CurrencyCode, tx.DateTime);
-                        if (price == 0)
+                        decimal price = 0m;
+                        var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.ReceivedAmount.CurrencyCode, tx.DateTime);
+                        if (priceResult.IsFailure)
                         {
                             // Inform the user that average bought price will not be correct until 
                             // he adds the price at that time manually.
                             tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-                            Log.Warning("Could not get price history for {Asset}. Average price will be incorrect.", receiver.Asset);
-                            
+                            tx.ErrorMessage = $"Could not get price history for {receiver.Asset}. Average price will be incorrect.";
+
                             price = receiver.AverageBoughtPrice; // Fallback                            
                         }
+                        else
+                            price = priceResult.Value;
 
                         tx.ValueInDefaultCurrency = new Money(tx.ReceivedAmount.Amount * price, DefaultCurrency);
 
-                        decimal newAverage = ((receiver.AverageBoughtPrice * (receiver.Balance - tx.ReceivedAmount.Amount)) + tx.ValueInDefaultCurrency.Amount) / (receiver.Balance);
+                        decimal newAverage = (receiver.AverageBoughtPrice * (receiver.Balance - tx.ReceivedAmount.Amount) + tx.ValueInDefaultCurrency.Amount) / receiver.Balance;
                         receiver.AverageBoughtPrice = newAverage;
                     }
-
-                    OnDepositAdded?.Invoke(tx, receiver);
                 }
                 else if (tx.Type == TransactionType.Withdrawal)
                 {
@@ -144,34 +150,35 @@ namespace Portfolio.App
 
                     sender = GetOrCreateHolding(tx.SentAmount.CurrencyCode);
 
-                    decimal price = await GetPriceWithRetryAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
-                    if (price == 0)
+                    decimal price = 0m;
+                    var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
+                    if (priceResult.IsFailure)
                     {
                         // Inform the user that average bought price will not be correct until 
                         // he adds the price at that time manually.
                         tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-                        Log.Warning("Could not get price history for {Asset}. Average price will be incorrect.", sender.Asset);
-                        
+                        tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
+
                         price = sender.AverageBoughtPrice; // Fallback
                     }
+                    else
+                        price = priceResult.Value;
 
                     tx.ValueInDefaultCurrency = new Money(tx.SentAmount.Amount * price, DefaultCurrency);
 
                     var taxableEventResult = TaxableEvent.Create(tx.DateTime, tx.SentAmount.CurrencyCode, sender.AverageBoughtPrice, price, tx.SentAmount.Amount, DefaultCurrency);
                     if (taxableEventResult.IsFailure)
                     {
-                        Log.Warning("Could not create taxable event for this transaction.");
-                        tx.ErrorType = ErrorType.DataCorruption;
+                        tx.ErrorMessage = $"Could not create taxable event for this transaction.";
+                        tx.ErrorType = ErrorType.TaxEventNotCreated;
                     }
-                    TaxableEvents.Add(taxableEventResult.Value);
+                    _taxableEvents.Add(taxableEventResult.Value);
 
                     sender.Balance -= tx.SentAmount.Amount;
                     if (sender.Balance == 0)
                         sender.AverageBoughtPrice = 0m;
 
                     EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
-
-                    OnWithdrawAdded?.Invoke(tx, sender);
                 }
                 else if (tx.Type == TransactionType.Trade)
                 {
@@ -197,31 +204,34 @@ namespace Portfolio.App
                     else
                     {
                         // Fetch the price of the sent currency in USD
-                        decimal price = await GetPriceWithRetryAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
-                        if (price == 0)
+                        decimal price = 0m;
+                        var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
+                        if (priceResult.IsFailure)
                         {
                             tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-                            Log.Warning("Could not get price history for {Asset}. Average price will be incorrect.", sender.Asset);
-                            
+                            tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
                             price = sender.AverageBoughtPrice; // Fallback   
                         }
+                        else
+                            price = priceResult.Value;
+
                         tradedCostInUsd = tx.SentAmount.Amount * price;
                     }
 
                     tx.ValueInDefaultCurrency = new Money(tradedCostInUsd, DefaultCurrency);
 
                     // Calculate the new average bought price for the receiver in USD
-                    decimal newAverage = ((receiver.AverageBoughtPrice * receiver.Balance) + tx.ValueInDefaultCurrency.Amount) / (receiver.Balance + tx.ReceivedAmount.Amount);
+                    decimal newAverage = (receiver.AverageBoughtPrice * receiver.Balance + tx.ValueInDefaultCurrency.Amount) / (receiver.Balance + tx.ReceivedAmount.Amount);
                     receiver.AverageBoughtPrice = newAverage;
 
                     decimal boughtPriceInUsd = tradedCostInUsd / tx.SentAmount.Amount;
                     var taxableEventResult = TaxableEvent.Create(tx.DateTime, tx.SentAmount.CurrencyCode, sender.AverageBoughtPrice, boughtPriceInUsd, tx.SentAmount.Amount, DefaultCurrency);
                     if (taxableEventResult.IsFailure)
                     {
-                        Log.Warning("Could not create taxable event for this transaction.");
-                        tx.ErrorType = ErrorType.DataCorruption;
+                        tx.ErrorMessage = $"Could not create taxable event for this transaction.";
+                        tx.ErrorType = ErrorType.TaxEventNotCreated;
                     }
-                    TaxableEvents.Add(taxableEventResult.Value);
+                    _taxableEvents.Add(taxableEventResult.Value);
 
                     receiver.Balance += tx.ReceivedAmount.Amount;
                     sender.Balance -= tx.SentAmount.Amount;
@@ -230,8 +240,6 @@ namespace Portfolio.App
                         sender.AverageBoughtPrice = 0m;
 
                     EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
-
-                    OnTradeAdded?.Invoke(tx, sender);
                 }
             }
 
@@ -242,10 +250,11 @@ namespace Portfolio.App
                     holding.CurrentPrice = new Money(1m, holding.Asset);
                 else
                 {
-                    var priceValueResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(holding.Asset, DateTime.Now).ConfigureAwait(false);
+                    var priceValueResult = await priceHistoryService.GetPriceAtCloseTimeAsync(holding.Asset, DateTime.Now).ConfigureAwait(false);
                     if (priceValueResult.IsFailure)
                     {
-                        Log.Error(priceValueResult.Error);
+                        holding.ErrorType = ErrorType.PriceHistoryUnavailable;
+                        holding.ErrorMessage = $"Could not get price history for {holding.Asset}. Average price will be incorrect.";
                         holding.CurrentPrice = new Money(0m, holding.Asset);
                         continue;
                     }
@@ -262,7 +271,7 @@ namespace Portfolio.App
             {
                 // Ensure the asset currency is correctly set... for example make sure the fiat CAD is not recognized as the Cadence crypto project with the same symbol.
                 tx.ErrorType = ErrorType.InsufficientFunds;
-                Log.Error("{Asset} Balance is under zero: {Balance}", asset, balance);
+                tx.ErrorMessage = $"{asset} Balance is under zero: {asset}";
             }
         }
 
@@ -270,81 +279,69 @@ namespace Portfolio.App
         {
             if (tx.SentAmount.Amount < 0 || tx.ReceivedAmount.Amount < 0 || tx.FeeAmount.Amount < 0)
             {
-                Log.Error("Invalid trade amounts. Fees, sent or Received amounts are non-positive in transaction: {TransactionId}", tx.TransactionIds);
+                tx.ErrorMessage = $"Invalid trade amounts. Fees, sent or Received amounts are non-positive in transaction: {tx.TransactionIds}";
                 tx.ErrorType = ErrorType.InvalidCurrency; // or another appropriate ErrorType                    
                 return false;
             }
 
             if (incoming && tx.ReceivedAmount.Amount == 0)
             {
-                Log.Warning("Received amount is zero in trade transaction: {TransactionId}", tx.TransactionIds);
+                tx.ErrorMessage = $"Received amount is zero in trade transaction: {tx.TransactionIds}";
                 tx.ErrorType = ErrorType.ManualReviewRequired;
                 return false;
             }
 
             if (!incoming && tx.SentAmount.Amount == 0)
             {
-                Log.Warning("Sent amount is zero in trade transaction: {TransactionId}", tx.TransactionIds);
+                tx.ErrorMessage = $"Sent amount is zero in trade transaction: {tx.TransactionIds}";
                 tx.ErrorType = ErrorType.ManualReviewRequired;
                 return false;
             }
             return true;
         }
 
-        private async Task<decimal> GetPriceWithRetryAsync(string currencyCode, DateTime dateTime, int maxRetries = 3)
-        {
-            int retryCount = 0;
-            while (retryCount < maxRetries)
-            {
-                var priceResult = await _priceHistoryService.GetPriceAtCloseTimeAsync(currencyCode, dateTime).ConfigureAwait(false);
-                if (priceResult.IsSuccess)
-                {
-                    return priceResult.Value;
-                }
-
-                retryCount++;
-                Log.Warning("Retrying price retrieval for {CurrencyCode} on {Date:yyyy-MM-dd}. Attempt {RetryCount}/{MaxRetries}", currencyCode, dateTime, retryCount, maxRetries);
-            }
-
-            return 0; // Indicating failure
-        }
-
-        // public void CheckForMissingTransactions()
+        // public void CheckForMissingTransactions(IEnumerable<CryptoCurrencyRawTransaction> transactions)
         // {
-        //     foreach (var holding in _holdings)
+        //     var transactionsByHolding = transactions.GroupBy(t => t.ReceivedAmount.CurrencyCode);
+        //     foreach (var txByHolding in transactionsByHolding)
         //     {
-        //         if (FiatCurrency.All.Any(f => f == holding.Asset))
+        //         var holding = _holdings.Single(h => h.Asset == txByHolding.Key);
+        //         var holdingAsset = holding.Asset;
+        //         if (FiatCurrency.All.Any(f => f == holdingAsset))
         //             continue;
 
         //         decimal expectedTotal = 0;
 
         //         // Total number of IN transactions should equal to the balance.
-        //         foreach (var tx in holding.Transactions)
-        //         {
-        //             if (tx is CryptoCurrencyDepositTransaction deposit)
+        //         foreach (var tx in txByHolding)
+        //         {                    
+        //             if (tx.Type == TransactionType.Deposit)
         //             {
-        //                 expectedTotal += deposit.Amount.Amount; //48,219
+        //                 expectedTotal += tx.ReceivedAmount.Amount;
         //             }
-        //             else if (tx is CryptoCurrencyWithdrawTransaction withdraw)
+        //             else if (tx.Type == TransactionType.Withdrawal)
         //             {
-        //                 expectedTotal -= withdraw.Amount.Amount;//15 36
-        //                 expectedTotal -= withdraw.FeeAmount.Amount;
+        //                 expectedTotal -= tx.SentAmount.Amount;
+        //                 expectedTotal -= tx.FeeAmount.Amount;
         //             }
-        //             else if (tx is CryptoCurrencyTradeTransaction trade)
+        //             else if (tx.Type == TransactionType.Trade)
         //             {
-        //                 if (trade.Amount.CurrencyCode == holding.Asset)
-        //                     expectedTotal += trade.Amount.Amount;
-        //                 else if (trade.TradeAmount.CurrencyCode == holding.Asset)
+        //                 if (tx.ReceivedAmount.CurrencyCode == holdingAsset)
+        //                     expectedTotal += tx.ReceivedAmount.Amount;
+        //                 else if (tx.SentAmount.CurrencyCode == holdingAsset)
         //                 {
-        //                     expectedTotal -= trade.TradeAmount.Amount;
-        //                     if (trade.TradeAmount.CurrencyCode == trade.FeeAmount.CurrencyCode)
-        //                         expectedTotal -= trade.FeeAmount.Amount;
+        //                     expectedTotal -= tx.SentAmount.Amount;
+        //                     if (tx.SentAmount.CurrencyCode == tx.FeeAmount.CurrencyCode)
+        //                         expectedTotal -= tx.FeeAmount.Amount;
         //                 }
         //             }
         //         }
 
         //         if (expectedTotal != holding.Balance)
-        //             Log.Warning("Missing transactions for holding {Asset}", holding.Asset);
+        //         {
+        //             holding.ErrorMessage = $"Missing transactions for holding {Asset}", holding.Asset);
+        //             holding.ErrorType = ErrorType.ManualReviewRequired; // or another appropriate ErrorType        
+        //         }                    
         //     }
         // }
 

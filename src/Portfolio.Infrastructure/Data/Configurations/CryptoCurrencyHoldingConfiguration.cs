@@ -24,9 +24,8 @@ namespace Portfolio.Infrastructure.Data.Configurations
                    .IsRequired()
                    .HasColumnType("decimal(18,8)"); // Adjust precision and scale based on your requirements
 
-       //      builder.Property(h => h.Fees)
-       //             .IsRequired()
-       //             .HasColumnType("decimal(18,8)"); // Adjust precision and scale based on your requirements
+            builder.Property(t => t.ErrorType);
+            builder.Property(t => t.ErrorMessage).HasMaxLength(250);
 
             // Configure the AverageBoughtPrice property
             builder.Property(h => h.AverageBoughtPrice)

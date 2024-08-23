@@ -827,7 +827,7 @@ public class Portfolio
         return Result.Success();
     }
 
-    public async Task<Result> ProcessAsync()
+    public async Task<Result> CalculateTradesAsync()
     {
         if (!Wallets.Any())
             return Result.Failure("No wallets to process. Start by adding a wallet.");
@@ -1104,7 +1104,7 @@ internal class Program
         if (addWalletResult.IsFailure)
             throw new Exception(addWalletResult.Error);
 
-        var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
+        var processResult = await portfolio.CalculateTradesAsync().ConfigureAwait(false);
         if (processResult.IsFailure)
             throw new Exception(processResult.Error);
 

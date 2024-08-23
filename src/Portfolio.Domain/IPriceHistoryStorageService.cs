@@ -1,4 +1,6 @@
-namespace Portfolio.App.HistoricalPrice
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.Domain
 {
     /// <summary>
     /// Interface for a service that handles storage and retrieval of historical price data.
