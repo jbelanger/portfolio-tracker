@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Portfolio.Domain;
 using Portfolio.Domain.Entities;
 
 namespace Portfolio.App.Tests.Utilities;
@@ -7,7 +8,7 @@ public class FakeDataHelper
 {
     public static UserPortfolio AddPortfolio(DbContext dbContext)
     {
-        UserPortfolio userPortfolio = new UserPortfolio();
+        UserPortfolio userPortfolio = new UserPortfolio(null);
         userPortfolio.Id = 1;
         dbContext.Add(userPortfolio);        
         return userPortfolio;

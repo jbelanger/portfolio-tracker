@@ -27,6 +27,11 @@ namespace Portfolio.Infrastructure.Data.Configurations
             builder.Property(t => t.ErrorType);
             builder.Property(t => t.ErrorMessage).HasMaxLength(250);
 
+            // Configure the Balance property
+            builder.Property(h => h.StakedBalance)
+                   .IsRequired()
+                   .HasColumnType("decimal(18,8)"); // Adjust precision and scale based on your requirements
+
             // Configure the AverageBoughtPrice property
             builder.Property(h => h.AverageBoughtPrice)
                    .HasColumnType("decimal(18,8)"); // Nullable, with precision and scale for high precision calculations

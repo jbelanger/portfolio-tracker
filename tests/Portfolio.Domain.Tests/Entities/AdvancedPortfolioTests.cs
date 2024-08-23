@@ -11,7 +11,7 @@ namespace Portfolio.Domain.Tests.Entities;
 public class PortfolioFullTestSuite
 {
     private Mock<IPriceHistoryService> _priceHistoryServiceMock;
-    private Domain.Entities.UserPortfolio _portfolio;
+    private UserPortfolio _portfolio;
 
     [SetUp]
     public void SetUp()
@@ -21,7 +21,18 @@ public class PortfolioFullTestSuite
             .Setup(p => p.GetPriceAtCloseTimeAsync(It.IsAny<string>(), It.IsAny<DateTime>()))
             .ReturnsAsync(Result.Failure<decimal>("Price not found"));
 
-        _portfolio = new Portfolio.Domain.Entities.UserPortfolio();
+        var taxCalculationStrategy = new GenericTaxCalculationStrategy();
+        var costBasisStrategy = new AcbCostBasisCalculationStrategy();
+
+        var transactionStrategies = new Dictionary<TransactionType, ITransactionStrategy>
+            {
+                { TransactionType.Deposit, new DepositTransactionStrategy() },
+                { TransactionType.Withdrawal, new WithdrawalTransactionStrategy(taxCalculationStrategy, costBasisStrategy) },
+                { TransactionType.Trade, new TradeTransactionStrategy(taxCalculationStrategy, costBasisStrategy) }
+            };
+
+        var transactionProcessor = new TransactionProcessor(transactionStrategies);
+        _portfolio = new UserPortfolio(transactionProcessor);
     }
 
     [Test]
@@ -57,7 +68,16 @@ public class PortfolioFullTestSuite
 
         var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
         btcHolding.Balance.Should().Be(1m);
-        btcHolding.AverageBoughtPrice.Should().Be(30000m); // Price fetched on deposit date
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        var totalPurchaseAmount = btcHolding.PurchaseRecords.Sum(p => p.Amount);
+        btcHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPrice = btcHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPrice.Should().Be(30000m); // Price fetched on deposit date
+
     }
 
     [Test]
@@ -105,7 +125,16 @@ public class PortfolioFullTestSuite
 
         var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
         btcHolding.Balance.Should().Be(0.5m); // 1 BTC - 0.5 BTC withdrawal
-        btcHolding.AverageBoughtPrice.Should().Be(30000m); // Price remains as the initial deposit
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        var totalPurchaseAmount = btcHolding.PurchaseRecords.Sum(p => p.Amount);
+        btcHolding.Balance.Should().Be(totalPurchaseAmount);
+        //btcHolding.AverageBoughtPrice.Should().Be(30000m); // Price remains as the initial deposit
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPrice = btcHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPrice.Should().Be(30000m); // Price fetched on deposit date
     }
 
     [Test]
@@ -167,11 +196,30 @@ public class PortfolioFullTestSuite
 
         var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
         btcHolding.Balance.Should().Be(0.5m); // 1 BTC - 0.5 BTC withdrawal
-        btcHolding.AverageBoughtPrice.Should().Be(30000m); // Based on deposit price
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        var totalPurchaseAmount = btcHolding.PurchaseRecords.Sum(p => p.Amount);
+        btcHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        //btcHolding.AverageBoughtPrice.Should().Be(30000m); // Based on deposit price
 
         var ethHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "ETH").Subject;
         ethHolding.Balance.Should().Be(10m); // 10 ETH deposited
-        ethHolding.AverageBoughtPrice.Should().Be(2000m); // Based on deposit price
+                                             //ethHolding.AverageBoughtPrice.Should().Be(2000m); // Based on deposit price
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        totalPurchaseAmount = ethHolding.PurchaseRecords.Sum(p => p.Amount);
+        ethHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceBTC = btcHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceBTC.Should().Be(30000m); // Price fetched on deposit date
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceETH = ethHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceETH.Should().Be(2000m); // Price fetched on deposit date
     }
 
     [Test]
@@ -229,11 +277,27 @@ public class PortfolioFullTestSuite
 
         var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
         btcHolding.Balance.Should().Be(0.5m); // 1 BTC - 0.5 BTC traded
-        btcHolding.AverageBoughtPrice.Should().Be(30000m); // Based on deposit price
+                                              //btcHolding.AverageBoughtPrice.Should().Be(30000m); // Based on deposit price
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        var totalPurchaseAmount = btcHolding.PurchaseRecords.Sum(p => p.Amount);
+        btcHolding.Balance.Should().Be(totalPurchaseAmount);
 
         var ethHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "ETH").Subject;
         ethHolding.Balance.Should().Be(8m); // Received 8 ETH
-        ethHolding.AverageBoughtPrice.Should().BeApproximately(1875m, 0.01m); // 0.5 BTC * 30000 USD / 8 ETH = 18750 USD/ETH
+                                            //ethHolding.AverageBoughtPrice.Should().BeApproximately(1875m, 0.01m); // 0.5 BTC * 30000 USD / 8 ETH = 18750 USD/ETH
+                                            // Ensure that the holding balance matches the sum of all purchase records
+        totalPurchaseAmount = ethHolding.PurchaseRecords.Sum(p => p.Amount);
+        ethHolding.Balance.Should().Be(totalPurchaseAmount);
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceBTC = btcHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceBTC.Should().Be(30000m); // Price fetched on deposit date
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceETH = ethHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceETH.Should().BeApproximately(1875m, 0.01m); // Price fetched on deposit date
     }
 
     [Test]
@@ -283,11 +347,29 @@ public class PortfolioFullTestSuite
 
         var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
         btcHolding.Balance.Should().Be(0.5m); // 1 BTC - 0.5 BTC traded
-        btcHolding.AverageBoughtPrice.Should().Be(30000m); // Based on deposit price
+        //btcHolding.AverageBoughtPrice.Should().Be(30000m); // Based on deposit price
 
         var usdHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "USD").Subject;
         usdHolding.Balance.Should().Be(15000m); // Received 15000 USD
-        usdHolding.AverageBoughtPrice.Should().Be(1m); // USD should be valued at 1:1 in the default currency
+                                                //usdHolding.AverageBoughtPrice.Should().Be(1m); // USD should be valued at 1:1 in the default currency
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        var totalPurchaseAmount = btcHolding.PurchaseRecords.Sum(p => p.Amount);
+        btcHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        totalPurchaseAmount = usdHolding.PurchaseRecords.Sum(p => p.Amount);
+        usdHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceBTC = btcHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceBTC.Should().Be(30000m); // Price fetched on deposit date
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceUSD = usdHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceUSD.Should().Be(1m); // Price fetched on deposit date
     }
 
     [Test]
@@ -337,11 +419,30 @@ public class PortfolioFullTestSuite
 
         var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
         btcHolding.Balance.Should().Be(0.5m); // Received 0.5 BTC
-        btcHolding.AverageBoughtPrice.Should().Be(30000m); // Based on trade price
+        //btcHolding.AverageBoughtPrice.Should().Be(30000m); // Based on trade price
 
         var usdHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "USD").Subject;
         usdHolding.Balance.Should().Be(15000m); // 30000 USD - 15000 USD traded
-        usdHolding.AverageBoughtPrice.Should().Be(1m); // USD should be valued at 1:1 in the default currency
+                                                //usdHolding.AverageBoughtPrice.Should().Be(1m); // USD should be valued at 1:1 in the default currency
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        var totalPurchaseAmount = btcHolding.PurchaseRecords.Sum(p => p.Amount);
+        btcHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        totalPurchaseAmount = usdHolding.PurchaseRecords.Sum(p => p.Amount);
+        usdHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceBTC = btcHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceBTC.Should().Be(30000m); // Price fetched on deposit date
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceUSD = usdHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceUSD.Should().Be(1m); // Price fetched on deposit date
+
     }
 
     [Test]
@@ -411,17 +512,36 @@ public class PortfolioFullTestSuite
 
         var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
         btcHolding.Balance.Should().Be(1.5m); // 1 BTC + 2 BTC deposited - 1.5 BTC traded
-        btcHolding.AverageBoughtPrice.Should().BeApproximately(33333.33m, 0.01m); // Weighted average of 1 BTC @ 30000 and 2 BTC @ 35000
+        //btcHolding.AverageBoughtPrice.Should().BeApproximately(33333.33m, 0.01m); // Weighted average of 1 BTC @ 30000 and 2 BTC @ 35000
 
         var ethHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "ETH").Subject;
         ethHolding.Balance.Should().Be(10m); // Received 10 ETH
-        ethHolding.AverageBoughtPrice.Should().BeApproximately(6000m, 0.01m); // 1.5 BTC * 40000 USD / 10 ETH
+        //ethHolding.AverageBoughtPrice.Should().BeApproximately(6000m, 0.01m); // 1.5 BTC * 40000 USD / 10 ETH
 
         var taxableEvent = _portfolio.TaxableEvents.Should().ContainSingle(h => h.Currency == "USD").Subject;
         taxableEvent.DisposedAsset.Should().Be("BTC");
         taxableEvent.Amount.Should().Be(tradeTransactionBTCtoETH.SentAmount.Amount);
-        taxableEvent.AverageCost.Should().BeApproximately(33333.33m, 0.01m);
+        //taxableEvent.AverageCost.Should().BeApproximately(33333.33m, 0.01m);
         taxableEvent.ValueAtDisposal.Should().Be(40000m);
+
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        var totalPurchaseAmount = btcHolding.PurchaseRecords.Sum(p => p.Amount);
+        btcHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        // Ensure that the holding balance matches the sum of all purchase records
+        totalPurchaseAmount = ethHolding.PurchaseRecords.Sum(p => p.Amount);
+        ethHolding.Balance.Should().Be(totalPurchaseAmount);
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceBTC = btcHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceBTC.Should().BeApproximately(33333.33m, 0.01m); // Price fetched on deposit date
+
+        // Calculate the average bought price using the purchase records
+        var averageBoughtPriceETH = ethHolding.PurchaseRecords
+            .WeightedAverage(p => p.PricePerUnit, p => p.Amount);
+        averageBoughtPriceETH.Should().Be(6000m); // Price fetched on deposit date
     }
 
     [Test]

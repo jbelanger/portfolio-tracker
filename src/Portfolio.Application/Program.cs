@@ -5,6 +5,7 @@ using Portfolio.Domain.Entities;
 using Portfolio.App.HistoricalPrice;
 using Portfolio.App.HistoricalPrice.YahooFinance;
 using Portfolio.Domain.Constants;
+using Portfolio.Domain;
 
 namespace Portfolio.App
 {
@@ -48,23 +49,23 @@ namespace Portfolio.App
 
                 var api = new YahooFinancePriceHistoryApi();
                 var svc = new PriceHistoryService(api, storage, Strings.CURRENCY_USD);
-                var portfolio = new Domain.Entities.UserPortfolio();
-                // portfolio.OnDepositAdded += CheckBalance;
-                // portfolio.OnWithdrawAdded += CheckBalance;
-                // portfolio.OnTradeAdded += CheckBalance;
+                // var portfolio = new UserPortfolio();
+                // // portfolio.OnDepositAdded += CheckBalance;
+                // // portfolio.OnWithdrawAdded += CheckBalance;
+                // // portfolio.OnTradeAdded += CheckBalance;
 
-                portfolio.AddWallet(krakenWalletResult.Value);
+                // portfolio.AddWallet(krakenWalletResult.Value);
 
-                var processResult = await portfolio.CalculateTradesAsync(svc).ConfigureAwait(false);
-                if (processResult.IsFailure)
-                    throw new Exception(processResult.Error);
+                // var processResult = await portfolio.CalculateTradesAsync(svc).ConfigureAwait(false);
+                // if (processResult.IsFailure)
+                //     throw new Exception(processResult.Error);
 
-                //portfolio.CheckForMissingTransactions();
+                // //portfolio.CheckForMissingTransactions();
 
-                foreach (var h in portfolio.Holdings.Where(h => h.Balance > 0))
-                {
-                    Log.Information($"Currency:{h.Asset}    Balance:{h.Balance:F2}     AvgPrice:{h.AverageBoughtPrice:F2}     Cost:{(h.Balance * h.AverageBoughtPrice):F2}     Value:{(h.Balance * h.CurrentPrice?.Amount):F2}");
-                }
+                // foreach (var h in portfolio.Holdings.Where(h => h.Balance > 0))
+                // {
+                //     Log.Information($"Currency:{h.Asset}    Balance:{h.Balance:F2}     AvgPrice:{h.AverageBoughtPrice:F2}     Cost:{(h.Balance * h.AverageBoughtPrice):F2}     Value:{(h.Balance * h.CurrentPrice?.Amount):F2}");
+                // }
             }
         }
 

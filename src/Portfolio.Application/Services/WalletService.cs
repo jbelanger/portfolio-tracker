@@ -1,4 +1,5 @@
 using Portfolio.App.DTOs;
+using Portfolio.Domain;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure;
 

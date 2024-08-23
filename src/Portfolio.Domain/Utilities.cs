@@ -47,13 +47,17 @@ public static class FeeHandlingUtils
 {
     public static async Task HandleFeesAsync(CryptoCurrencyRawTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
     {
-        if (tx.FeeAmount == Money.Empty) return;
+        if (tx.FeeAmount == Money.Empty)
+            return;
 
-        var fees = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
+        var feeHolding = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
 
-        bool shouldDeductFeesFromBalance = ShouldDeductFeesFromBalance(tx);
+        // Determine if fees should be deducted from the balance
+        bool shouldDeductFeesFromBalance = tx.FeeAmount.CurrencyCode != tx.ReceivedAmount.CurrencyCode;
         if (shouldDeductFeesFromBalance)
-            fees.Balance -= tx.FeeAmount.Amount;
+        {
+            DeductFeeFromHolding(tx.FeeAmount, feeHolding);
+        }
 
         if (tx.FeeAmount.CurrencyCode == portfolio.DefaultCurrency)
         {
@@ -70,16 +74,44 @@ public static class FeeHandlingUtils
             else
             {
                 tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-                tx.ErrorMessage = $"Could not get price history for {fees.Asset} fees. Fees calculations will be incorrect.";
+                tx.ErrorMessage = $"Could not get price history for {feeHolding.Asset} fees. Fees calculations will be incorrect.";
             }
         }
 
-        TransactionValidationUtils.EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
+        TransactionValidationUtils.EnsureBalanceNotNegative(tx, feeHolding.Asset, feeHolding.Balance);
     }
 
-    private static bool ShouldDeductFeesFromBalance(CryptoCurrencyRawTransaction tx)
+    private static void DeductFeeFromHolding(Money feeAmount, CryptoCurrencyHolding holding)
     {
-        // For deposits and trades, fees might not be deducted from the balance if paid in the same currency as the received amount.
-        return tx.FeeAmount.CurrencyCode != tx.ReceivedAmount.CurrencyCode || tx.Type == TransactionType.Withdrawal;
+        decimal feeAmountToDeduct = feeAmount.Amount;
+
+        for (int i = 0; i < holding.PurchaseRecords.Count; i++)
+        {
+            var record = holding.PurchaseRecords[i];
+
+            if (record.Amount >= feeAmountToDeduct)
+            {
+                holding.PurchaseRecords[i] = new PurchaseRecord(record.Amount - feeAmountToDeduct, record.PricePerUnit, record.PurchaseDate);
+                if (holding.PurchaseRecords[i].Amount == 0)
+                {
+                    holding.PurchaseRecords.RemoveAt(i);
+                }
+                feeAmountToDeduct = 0;
+                break;
+            }
+            else
+            {
+                feeAmountToDeduct -= record.Amount;
+                holding.PurchaseRecords.RemoveAt(i);
+                i--; // Adjust index after removal
+            }
+        }
+
+        holding.Balance -= feeAmount.Amount;
+
+        if (holding.Balance == 0)
+        {
+            holding.PurchaseRecords.Clear();
+        }
     }
 }

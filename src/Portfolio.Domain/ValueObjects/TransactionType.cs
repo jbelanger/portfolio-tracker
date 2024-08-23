@@ -25,6 +25,9 @@ namespace Portfolio.Domain.ValueObjects
         /// </summary>
         Withdrawal,
 
-        Fee
+        Fee,
+        Stake,
+        Unstake,
+        ClaimRewards
     }
 }

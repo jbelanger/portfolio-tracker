@@ -8,14 +8,9 @@ public class TransactionProcessor
 {
     private readonly Dictionary<TransactionType, ITransactionStrategy> _transactionStrategies;
 
-    public TransactionProcessor()
+    public TransactionProcessor(Dictionary<TransactionType, ITransactionStrategy> transactionStrategies)
     {
-        _transactionStrategies = new Dictionary<TransactionType, ITransactionStrategy>
-        {
-            { TransactionType.Deposit, new DepositTransactionStrategy() },
-            { TransactionType.Withdrawal, new WithdrawalTransactionStrategy() },
-            { TransactionType.Trade, new TradeTransactionStrategy() }
-        };
+        _transactionStrategies = transactionStrategies;
     }
 
     public async Task<Result> ProcessTransactionsAsync(IEnumerable<CryptoCurrencyRawTransaction> transactions, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
@@ -39,4 +34,3 @@ public class TransactionProcessor
         return Result.Success();
     }
 }
-

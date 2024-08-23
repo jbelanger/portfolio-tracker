@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.App.Common.Interfaces;
+using Portfolio.Domain;
 using Portfolio.Domain.Common;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure.Data.Configurations;

@@ -12,13 +12,13 @@ namespace Portfolio.Api.Features
         {
             var group = routes.MapGroup("/portfolios");
 
-            group.MapPost("/", async (PortfolioDbContext dbContext, PortfolioDto portfolio) =>
-            {
-                var up = new UserPortfolio();
-                dbContext.Portfolios.Add(up);
-                await dbContext.SaveChangesAsync();
-                return Results.Created($"/portfolios/{up.Id}", portfolio);
-            });
+            // group.MapPost("/", async (PortfolioDbContext dbContext, PortfolioDto portfolio) =>
+            // {
+            //     var up = new UserPortfolio();
+            //     dbContext.Portfolios.Add(up);
+            //     await dbContext.SaveChangesAsync();
+            //     return Results.Created($"/portfolios/{up.Id}", portfolio);
+            // });
 
             group.MapGet("/{id:long}", async (PortfolioDbContext dbContext, long id) =>
             {

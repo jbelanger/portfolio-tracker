@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Portfolio.Domain;
 
 namespace Portfolio.Infrastructure.Data.Configurations
 {
-    public class PortfolioConfiguration : IEntityTypeConfiguration<Portfolio.Domain.Entities.UserPortfolio>
+    public class PortfolioConfiguration : IEntityTypeConfiguration<UserPortfolio>
     {
-        public void Configure(EntityTypeBuilder<Portfolio.Domain.Entities.UserPortfolio> builder)
+        public void Configure(EntityTypeBuilder<UserPortfolio> builder)
         {
             // Define the table name (optional, EF Core will use the class name by default)
             builder.ToTable("UserPortfolios");

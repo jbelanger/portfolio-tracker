@@ -11,19 +11,26 @@ namespace Portfolio.Domain.Entities
         public decimal Amount { get; private set; }
         public string DisposedAsset { get; set; } = string.Empty;
         public string Currency { get; set; } = string.Empty;
+        public decimal Gain { get; private set; } // Monetary gain or loss
 
         private TaxableEvent()
-        {            
+        {
         }
 
         public static Result<TaxableEvent> Create(
-            DateTime dateTime,  
-            string asset,          
+            DateTime dateTime,
+            string asset,
             decimal averageCost,
             decimal valueAtDisposal,
             decimal amount,
-            string currency)
+            decimal gain,
+            string currency
+            )
         {
+            if (amount <= 0)
+                return Result.Failure<TaxableEvent>("Amount must be greater than zero.");
+
+
             return new TaxableEvent()
             {
                 DateTime = dateTime,
@@ -31,7 +38,8 @@ namespace Portfolio.Domain.Entities
                 AverageCost = averageCost,
                 ValueAtDisposal = valueAtDisposal,
                 Amount = amount,
-                Currency = currency
+                Currency = currency,
+                Gain = gain
             };
         }
     }
