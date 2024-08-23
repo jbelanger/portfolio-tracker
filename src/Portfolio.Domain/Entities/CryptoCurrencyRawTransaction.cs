@@ -14,17 +14,23 @@ namespace Portfolio.Domain.Entities
 
         public TransactionType Type { get; init; }
 
-        public Money? ReceivedAmount { get; private set; }
+        public Money ReceivedAmount { get; private set; } = Money.Empty;
 
-        public Money? SentAmount { get; private set; }
+        public Money SentAmount { get; private set; } = Money.Empty;
 
-        public Money? FeeAmount { get; private set; }
+        public Money FeeAmount { get; private set; } = Money.Empty;
 
         public string Account { get; init; } = string.Empty;
 
         public string Note { get; private set; } = string.Empty;
 
         public IEnumerable<string>? TransactionIds { get; init; }
+
+        public ErrorType ErrorType { get; set; } = ErrorType.None;
+
+        public Money ValueInDefaultCurrency { get; set; } = Money.Empty;
+        public Money FeeValueInDefaultCurrency { get; set; } = Money.Empty;
+
 
         /// <summary>
         /// When transaction is created from a csv import, this contains the csv lines that were used to build this transaction.
@@ -55,7 +61,7 @@ namespace Portfolio.Domain.Entities
             return Result.Success(tx)
                 .Check(t => t.SetTransactionDate(date))
                 .Check(t => t.SetNote(note))
-                .Check(t => t.SetTransactionAmounts(receivedAmount, null, feeAmount));
+                .Check(t => t.SetTransactionAmounts(receivedAmount, Money.Empty, feeAmount ?? Money.Empty));
         }
 
         public static Result<CryptoCurrencyRawTransaction> CreateWithdraw(
@@ -79,7 +85,7 @@ namespace Portfolio.Domain.Entities
             return Result.Success(tx)
                 .Check(t => t.SetTransactionDate(date))
                 .Check(t => t.SetNote(note))
-                .Check(t => t.SetTransactionAmounts(null, sentAmount, feeAmount));
+                .Check(t => t.SetTransactionAmounts(Money.Empty, sentAmount, feeAmount ?? Money.Empty));
         }
 
         public static Result<CryptoCurrencyRawTransaction> CreateTrade(
@@ -94,9 +100,6 @@ namespace Portfolio.Domain.Entities
             if (string.IsNullOrWhiteSpace(account))
                 return Result.Failure<CryptoCurrencyRawTransaction>("Account cannot be null or whitespace.");
 
-            if (feeAmount == null)
-                feeAmount = new Money(0, receivedAmount.CurrencyCode);
-
             var tx = new CryptoCurrencyRawTransaction()
             {
                 Type = TransactionType.Trade,
@@ -107,35 +110,38 @@ namespace Portfolio.Domain.Entities
             return Result.Success(tx)
                 .Check(t => t.SetTransactionDate(date))
                 .Check(t => t.SetNote(note))
-                .Check(t => t.SetTransactionAmounts(receivedAmount, sentAmount, feeAmount));
+                .Check(t => t.SetTransactionAmounts(receivedAmount, sentAmount, feeAmount ?? Money.Empty));
 
         }
 
-        public Result SetTransactionAmounts(Money? receivedAmount, Money? sentAmount, Money? feeAmount)
+        public Result SetTransactionAmounts(Money receivedAmount, Money sentAmount, Money feeAmount)
         {
-            var received = receivedAmount?.Amount ?? 0;
-            var sent = sentAmount?.Amount ?? 0;
-            var fee = feeAmount?.Amount ?? 0;
+            // var received = receivedAmount?.Amount ?? 0;
+            // var sent = sentAmount?.Amount ?? 0;
+            // var fee = feeAmount?.Amount ?? 0;
+            receivedAmount = receivedAmount ?? Money.Empty;
+            sentAmount = sentAmount ?? Money.Empty;
+            feeAmount = feeAmount ?? Money.Empty;
 
-            if (received <= 0 && (Type == TransactionType.Deposit || Type == TransactionType.Trade))
+            if ((receivedAmount == Money.Empty || receivedAmount.Amount <= 0) && (Type == TransactionType.Deposit || Type == TransactionType.Trade))
                 return Result.Failure<CryptoCurrencyRawTransaction>($"Received amount must be greater than zero.");
-            else if (received > 0 && Type == TransactionType.Withdrawal)
+            else if (receivedAmount.Amount > 0 && Type == TransactionType.Withdrawal)
                 return Result.Failure($"Received amount can not be set on a 'withdrawal' transaction.");
 
-            if (sent <= 0 && (Type == TransactionType.Withdrawal || Type == TransactionType.Trade))
+            if ((sentAmount == Money.Empty || sentAmount.Amount <= 0) && (Type == TransactionType.Withdrawal || Type == TransactionType.Trade))
                 return Result.Failure<CryptoCurrencyRawTransaction>($"Sent amount must be greater than zero.");
-            else if (sent > 0 && Type == TransactionType.Deposit)
+            else if (sentAmount.Amount > 0 && Type == TransactionType.Deposit)
                 return Result.Failure($"Sent amount can not be set on a 'deposit' transaction.");
 
-            if (feeAmount != null)
-            {
-                if (Type == TransactionType.Deposit && receivedAmount?.CurrencyCode != feeAmount.CurrencyCode)
-                    return Result.Failure($"Fees are not in the same currency as the deposit currency.");
-                else if (Type == TransactionType.Withdrawal && sentAmount?.CurrencyCode != feeAmount.CurrencyCode)
-                    return Result.Failure($"Fees are not in the same currency as the withdraw currency.");
-                else if (feeAmount.CurrencyCode != receivedAmount?.CurrencyCode && feeAmount.CurrencyCode != sentAmount?.CurrencyCode)
-                    return Result.Failure<CryptoCurrencyRawTransaction>($"Fees must be in the same currency as the received or sent amounts.");
-            }
+            // if (feeAmount != Money.Empty)
+            // {
+            //     if (Type == TransactionType.Deposit && receivedAmount.CurrencyCode != feeAmount.CurrencyCode)
+            //         return Result.Failure($"Fees are not in the same currency as the deposit currency.");
+            //     else if (Type == TransactionType.Withdrawal && sentAmount.CurrencyCode != feeAmount.CurrencyCode)
+            //         return Result.Failure($"Fees are not in the same currency as the withdraw currency.");
+            //     else if (feeAmount.CurrencyCode != receivedAmount.CurrencyCode && feeAmount.CurrencyCode != sentAmount.CurrencyCode)
+            //         return Result.Failure<CryptoCurrencyRawTransaction>($"Fees must be in the same currency as the received or sent amounts.");
+            // }
 
             ReceivedAmount = receivedAmount;
             SentAmount = sentAmount;
@@ -161,7 +167,7 @@ namespace Portfolio.Domain.Entities
             if (note?.Length > 500)
                 return Result.Failure("Note cannot be longer than 500 characters.");
             Note = note ?? string.Empty;
-            
+
             return Result.Success();
         }
 

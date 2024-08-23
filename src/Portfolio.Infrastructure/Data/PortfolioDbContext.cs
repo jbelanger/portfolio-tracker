@@ -6,6 +6,7 @@ using Portfolio.Domain.Common;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure.Data.Configurations;
 using Portfolio.Infrastructure.Identity;
+using Portfolio.Infrastructure.Persistence.Configurations;
 
 namespace Portfolio.Infrastructure
 {
@@ -57,7 +58,7 @@ namespace Portfolio.Infrastructure
             modelBuilder.ApplyConfiguration(new CryptoCurrencyHoldingConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new PortfolioConfiguration());
-
+            modelBuilder.ApplyConfiguration(new TaxableEventConfiguration());
         }
     }
 }

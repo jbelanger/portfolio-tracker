@@ -18,6 +18,8 @@
     <PackageReference Include="NUnit.Analyzers" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="FluentAssertions" Version="4.13.1" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.42.5" />
+
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Portfolio.Kraken\portfolio-kraken-parser.csproj" />
-    <ProjectReference Include="..\..\src\Portfolio.App\Portfolio.App.csproj" />
+    <ProjectReference Include="..\..\src\Portfolio.Application\Portfolio.App.csproj" />
   </ItemGroup>
 
   <ItemGroup>

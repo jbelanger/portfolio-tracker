@@ -30,44 +30,76 @@ namespace Portfolio.Infrastructure.Data.Configurations
 
                      builder.Property(t => t.CsvLinesJson);
 
-                     // Define the relationship to the Wallet (assuming a Wallet entity exists)
-                     //      builder.HasOne<Wallet>()
-                     //             .WithMany()
-                     //             .HasForeignKey(t => t.WalletId)
-                     //             .OnDelete(DeleteBehavior.Cascade);
+                     builder.Property(t => t.ErrorType);
 
                      // Configure the value objects (Money)
                      builder.OwnsOne(t => t.ReceivedAmount, money =>
                      {
                             money.Property(m => m.Amount)
-                        .HasColumnName("ReceivedAmount")
-                        .HasColumnType("decimal(18,8)");
+                                   .HasColumnName("ReceivedAmount")
+                                   .HasColumnType("decimal(18,8)");
+                            //.HasConversion(new EmptyMoneyAmountConverter());
 
                             money.Property(m => m.CurrencyCode)
-                        .HasColumnName("ReceivedAmountCurrency")
-                        .HasMaxLength(3);
+                                   .HasColumnName("ReceivedCurrency")
+                                   .HasMaxLength(3);
                      });
 
                      builder.OwnsOne(t => t.SentAmount, money =>
                      {
                             money.Property(m => m.Amount)
-                        .HasColumnName("SentAmount")
-                        .HasColumnType("decimal(18,8)");
+                                   .HasColumnName("SentAmount")
+                                   .HasColumnType("decimal(18,8)");
+                            //.HasConversion(new EmptyMoneyAmountConverter());
 
                             money.Property(m => m.CurrencyCode)
-                        .HasColumnName("SentAmountCurrency")
-                        .HasMaxLength(3);
+                                   .HasColumnName("SentCurrency")
+                                   .HasMaxLength(3);
                      });
 
                      builder.OwnsOne(t => t.FeeAmount, money =>
                      {
-                            money.Property(m => m.Amount)
-                        .HasColumnName("FeeAmount")
-                        .HasColumnType("decimal(18,8)");
+                            var x = money.Property(m => m.Amount)
+                                   .HasColumnName("FeeAmount")
+                                   .HasColumnType("decimal(18,8)");
+                            //.HasField("_amount");
+                            //.UsePropertyAccessMode(PropertyAccessMode.Field);
+                            //.IsRequired(false)
+                            //.HasConversion(new EmptyMoneyAmountConverter());
+
+                            // x.Metadata.SetPropertyAccessMode(PropertyAccessMode.Field);
+                            // x.Metadata.SetField("_amount");                                                               
+                            //x.Metadata.SetValueGeneratorFactory()
+
+                            //money.Metadata?.PrincipalToDependent?.SetField("_settings");
 
                             money.Property(m => m.CurrencyCode)
-                        .HasColumnName("FeeAmountCurrency")
-                        .HasMaxLength(3);
+                                   .HasColumnName("FeeCurrency")
+                                   .HasMaxLength(3);
+                     });
+
+                     builder.OwnsOne(t => t.ValueInDefaultCurrency, money =>
+                     {
+                            money.Property(m => m.Amount)
+                                   .HasColumnName("SentAmount")
+                                   .HasColumnType("decimal(18,8)");
+                            //.HasConversion(new EmptyMoneyAmountConverter());
+
+                            money.Property(m => m.CurrencyCode)
+                                   .HasColumnName("SentCurrency")
+                                   .HasMaxLength(3);
+                     });
+
+                     builder.OwnsOne(t => t.FeeValueInDefaultCurrency, money =>
+                     {
+                            money.Property(m => m.Amount)
+                                   .HasColumnName("SentAmount")
+                                   .HasColumnType("decimal(18,8)");
+                            //.HasConversion(new EmptyMoneyAmountConverter());
+
+                            money.Property(m => m.CurrencyCode)
+                                   .HasColumnName("SentCurrency")
+                                   .HasMaxLength(3);
                      });
 
                      // TransactionIds - assuming it's a collection of strings that needs to be stored as a JSON or CSV string
