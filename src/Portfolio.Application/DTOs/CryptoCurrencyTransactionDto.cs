@@ -1,4 +1,5 @@
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.App.DTOs
 {
@@ -25,11 +26,11 @@ namespace Portfolio.App.DTOs
                 Id = transaction.Id,
                 DateTime = transaction.DateTime,
                 Type = transaction.Type.ToString(),
-                ReceivedAmount = transaction.ReceivedAmount?.Amount,
+                ReceivedAmount = (transaction.ReceivedAmount == Money.Empty) ? null : transaction.ReceivedAmount.Amount,
                 ReceivedCurrency = transaction.ReceivedAmount?.CurrencyCode ?? string.Empty,
-                SentAmount = transaction.SentAmount?.Amount,
+                SentAmount = (transaction.SentAmount == Money.Empty) ? null : transaction.SentAmount.Amount,
                 SentCurrency = transaction.SentAmount?.CurrencyCode ?? string.Empty,
-                FeeAmount = transaction.FeeAmount?.Amount,
+                FeeAmount = (transaction.FeeAmount == Money.Empty) ? null : transaction.FeeAmount.Amount,
                 FeeCurrency = transaction.FeeAmount?.CurrencyCode ?? string.Empty,
                 Account = transaction.Account,
                 Note = transaction.Note

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Portfolio.Infrastructure;
 
@@ -10,9 +11,11 @@ using Portfolio.Infrastructure;
 namespace Portfolio.Infrastructure.DataMigrations
 {
     [DbContext(typeof(PortfolioDbContext))]
-    partial class PortfolioDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240822141821_InitialMigration4")]
+    partial class InitialMigration4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -156,7 +159,7 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("AverageBoughtPrice")
+                    b.Property<decimal?>("AverageBoughtPrice")
                         .HasColumnType("decimal(18,8)");
 
                     b.Property<decimal>("Balance")
@@ -167,9 +170,6 @@ namespace Portfolio.Infrastructure.DataMigrations
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Fees")
-                        .HasColumnType("decimal(18,8)");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("TEXT");
@@ -258,9 +258,6 @@ namespace Portfolio.Infrastructure.DataMigrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("ErrorType")
-                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("TEXT");
@@ -467,32 +464,6 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .WithMany("Holdings")
                         .HasForeignKey("UserPortfolioId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "CurrentPrice", b1 =>
-                        {
-                            b1.Property<long>("CryptoCurrencyHoldingId")
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,8)")
-                                .HasColumnName("SentAmount");
-
-                            b1.Property<string>("CurrencyCode")
-                                .IsRequired()
-                                .HasMaxLength(3)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("SentCurrency");
-
-                            b1.HasKey("CryptoCurrencyHoldingId");
-
-                            b1.ToTable("CryptoCurrencyHoldings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CryptoCurrencyHoldingId");
-                        });
-
-                    b.Navigation("CurrentPrice")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyProcessedTransaction", b =>
@@ -582,11 +553,9 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.Navigation("FeeAmount")
                         .IsRequired();
 
-                    b.Navigation("ReceivedAmount")
-                        .IsRequired();
+                    b.Navigation("ReceivedAmount");
 
-                    b.Navigation("SentAmount")
-                        .IsRequired();
+                    b.Navigation("SentAmount");
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.Wallet", b =>

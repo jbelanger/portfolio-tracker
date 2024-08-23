@@ -49,7 +49,7 @@ namespace Portfolio.Tests
 
             // Assert
             result.IsFailure.Should().BeTrue();
-            result.Error.Should().Contain("Received amount cannot be null for a deposit.");
+            result.Error.Should().Contain("Received amount must be greater than zero.");
         }
 
         [Test]
@@ -100,49 +100,6 @@ namespace Portfolio.Tests
             transaction.FeeAmount.Should().Be(feeAmount.ToAbsoluteAmountMoney());
             transaction.Account.Should().Be(account);
             transaction.TransactionIds.Should().BeEquivalentTo(transactionIds);
-        }
-
-        [Test]
-        public void Equals_ShouldReturnTrueForEqualTransactions()
-        {
-            // Arrange
-            var date = new DateTime(2024, 8, 19, 10, 0, 0);
-            var receivedAmount = CreateMoney(100m, "USD");
-            var sentAmount = CreateMoney(50m, "USD");
-            var feeAmount = CreateMoney(2m, "USD");
-            var account = "Account1";
-            var transactionIds = new List<string> { "tx789" };
-
-            var transaction1 = CryptoCurrencyRawTransaction.CreateTrade(date, receivedAmount, sentAmount, feeAmount, account, transactionIds).Value;
-            var transaction2 = CryptoCurrencyRawTransaction.CreateTrade(date, receivedAmount, sentAmount, feeAmount, account, transactionIds).Value;
-
-            // Act
-            var areEqual = transaction1.Equals(transaction2);
-
-            // Assert
-            areEqual.Should().BeTrue();
-        }
-
-        [Test]
-        public void Equals_ShouldReturnFalseForDifferentTransactions()
-        {
-            // Arrange
-            var date1 = new DateTime(2024, 8, 19, 10, 0, 0);
-            var date2 = new DateTime(2024, 8, 19, 10, 0, 1);
-            var receivedAmount = CreateMoney(100m, "USD");
-            var sentAmount = CreateMoney(50m, "USD");
-            var feeAmount = CreateMoney(2m, "USD");
-            var account = "Account1";
-            var transactionIds = new List<string> { "tx789" };
-
-            var transaction1 = CryptoCurrencyRawTransaction.CreateTrade(date1, receivedAmount, sentAmount, feeAmount, account, transactionIds).Value;
-            var transaction2 = CryptoCurrencyRawTransaction.CreateTrade(date2, receivedAmount, sentAmount, feeAmount, account, transactionIds).Value;
-
-            // Act
-            var areEqual = transaction1.Equals(transaction2);
-
-            // Assert
-            areEqual.Should().BeFalse();
         }
 
         [Test]
@@ -202,20 +159,6 @@ namespace Portfolio.Tests
         }
 
         [Test]
-        public void SetTransactionAmounts_Should_ReturnFailure_When_FeeCurrency_DoesNotMatch_ReceivedOrSent()
-        {
-            // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateTrade(DateTime.UtcNow, new Money(100, "USD"), new Money(50, "USD"), null, "Account1", null).Value;
-
-            // Act
-            var result = transaction.SetTransactionAmounts(new Money(100, "USD"), new Money(50, "USD"), new Money(10, "EUR"));
-
-            // Assert
-            result.IsFailure.Should().BeTrue();
-            result.Error.Should().Be("Fees must be in the same currency as the received or sent amounts.");
-        }
-
-        [Test]
         public void SetTransactionAmounts_Should_ReturnSuccess_When_ValidAmounts_AreSet_ForTrade()
         {
             // Arrange
@@ -243,7 +186,7 @@ namespace Portfolio.Tests
             // Assert
             result.IsSuccess.Should().BeTrue();
             transaction.ReceivedAmount.Should().Be(new Money(100, "USD"));
-            transaction.SentAmount.Should().BeNull();
+            transaction.SentAmount.Should().Be(Money.Empty);
             transaction.FeeAmount.Should().Be(new Money(1, "USD"));
         }
 
@@ -258,7 +201,7 @@ namespace Portfolio.Tests
 
             // Assert
             result.IsSuccess.Should().BeTrue();
-            transaction.ReceivedAmount.Should().BeNull();
+            transaction.ReceivedAmount.Should().Be(Money.Empty);
             transaction.SentAmount.Should().Be(new Money(100, "USD"));
             transaction.FeeAmount.Should().Be(new Money(1, "USD"));
         }

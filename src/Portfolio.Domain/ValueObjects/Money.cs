@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using CSharpFunctionalExtensions;
 
 namespace Portfolio.Domain.ValueObjects
@@ -8,7 +9,11 @@ namespace Portfolio.Domain.ValueObjects
     /// </summary>
     public class Money : ValueObject
     {
-        public decimal Amount { get; private set; }
+        //private decimal? _amount;
+        public static Money Empty => new Money(0, string.Empty);
+
+        [NotMapped]
+        public decimal Amount { get; private set; }//{ get => _amount ?? 0; private set => _amount = value == 0 ? new decimal?() : value; }
 
         public string CurrencyCode { get; private set; } = string.Empty;
 

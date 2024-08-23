@@ -64,7 +64,7 @@ namespace Portfolio.Api.Services
             }
 
             return await addTransactionResult
-                .Check(EnsureTransactionNotAlreadyExistsAsync)
+                .Check(t => EnsureTransactionNotAlreadyExistsAsync(walletId, t))
                 .Check(wallet.AddTransaction)
                 .Tap(async t => await _dbContext.SaveChangesAsync())
                 .Map(t => t.Id);
@@ -237,7 +237,7 @@ namespace Portfolio.Api.Services
                 foreach (var transaction in transactions)
                 {
                     // TODO: See if checking record existence has performance drawbacks...
-                    var addTransactionResult = await EnsureTransactionNotAlreadyExistsAsync(transaction)
+                    var addTransactionResult = await EnsureTransactionNotAlreadyExistsAsync(walletId, transaction)
                         .Bind(() => wallet.AddTransaction(transaction));
                         //.Tap(() => _dbContext.Entry(transaction).State = EntityState.Added);
 
@@ -253,17 +253,17 @@ namespace Portfolio.Api.Services
             return Result.Success();
         }
 
-        private async Task<Result> EnsureTransactionNotAlreadyExistsAsync(CryptoCurrencyRawTransaction n)
+        private async Task<Result> EnsureTransactionNotAlreadyExistsAsync(long walletId, CryptoCurrencyRawTransaction n)
         {
-            decimal? received = n.ReceivedAmount?.Amount ?? null;
-            decimal? sent = n.SentAmount?.Amount ?? null;
-            decimal? fee = n.FeeAmount?.Amount ?? null;
-            string? receivedCurrency = n.ReceivedAmount?.CurrencyCode ?? null;
-            string? sentCurrency = n.SentAmount?.CurrencyCode ?? null;
-            string? feeCurrency = n.FeeAmount?.CurrencyCode ?? null;
+            decimal received = n.ReceivedAmount.Amount;// ?? null;
+            decimal sent = n.SentAmount.Amount;// ?? null;
+            decimal fee = n.FeeAmount.Amount;// ?? null;
+            string receivedCurrency = n.ReceivedAmount.CurrencyCode;// ?? null;
+            string sentCurrency = n.SentAmount.CurrencyCode;// ?? null;
+            string feeCurrency = n.FeeAmount.CurrencyCode;// ?? null;
 
             var exists = await _dbContext.RawTransactions.AsNoTracking().AnyAsync(other =>
-                n.WalletId == other.WalletId &&
+                walletId == other.WalletId &&
                 n.DateTime == other.DateTime &&
                 n.Type == other.Type &&
                 received == other.ReceivedAmount.Amount &&

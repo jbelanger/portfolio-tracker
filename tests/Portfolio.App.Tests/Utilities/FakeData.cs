@@ -1,9 +1,5 @@
-using FluentAssertions;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Portfolio.Domain.Entities;
-using Portfolio.Infrastructure;
 
 namespace Portfolio.App.Tests.Utilities;
 
