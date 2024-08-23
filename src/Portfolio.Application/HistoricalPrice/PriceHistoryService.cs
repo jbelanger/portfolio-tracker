@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using Portfolio.Domain;
+using Portfolio.Domain.Constants;
 using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.App.HistoricalPrice

@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Portfolio.Domain;
 
 namespace Portfolio.App.HistoricalPrice.CoinGecko
 {

@@ -7,5 +7,6 @@ public enum ErrorType
     InsufficientFunds, // Attempted to trade or withdraw more than available
     InvalidCurrency, // Currency code not recognized
     DataCorruption, // General data issues, possibly due to external factors
-    ManualReviewRequired // Generic case where user needs to inspect the transaction
+    ManualReviewRequired, // Generic case where user needs to inspect the transaction
+    TaxEventNotCreated // When error creating tax event
 }

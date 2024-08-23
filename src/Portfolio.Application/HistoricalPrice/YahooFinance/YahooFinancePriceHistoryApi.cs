@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Portfolio.Domain;
+using Portfolio.Domain.Constants;
 using Portfolio.Domain.ValueObjects;
 using YahooFinanceApi;
 

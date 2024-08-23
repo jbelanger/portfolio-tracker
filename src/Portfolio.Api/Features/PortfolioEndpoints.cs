@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Portfolio.App.DTOs;
+using Portfolio.Domain;
 using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure;
 
@@ -13,7 +14,7 @@ namespace Portfolio.Api.Features
 
             group.MapPost("/", async (PortfolioDbContext dbContext, PortfolioDto portfolio) =>
             {
-                var up = UserPortfolio.Create().Value;
+                var up = new UserPortfolio();
                 dbContext.Portfolios.Add(up);
                 await dbContext.SaveChangesAsync();
                 return Results.Created($"/portfolios/{up.Id}", portfolio);
@@ -24,7 +25,7 @@ namespace Portfolio.Api.Features
                 var portfolio = await dbContext.Portfolios
                     .Include(p => p.Wallets)
                     .Include(p => p.Holdings)
-                    .Include(p => p.ProcessedTransactions)
+                    .Include("Wallets.Transactions")
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 return portfolio is not null ? Results.Ok(portfolio) : Results.NotFound();
@@ -35,7 +36,7 @@ namespace Portfolio.Api.Features
                 var portfolios = await dbContext.Portfolios
                     .Include(p => p.Wallets)
                     .Include(p => p.Holdings)
-                    .Include(p => p.ProcessedTransactions)
+                    .Include("Wallets.Transactions")
                     .ToListAsync();
 
                 return Results.Ok(portfolios);
@@ -71,7 +72,7 @@ namespace Portfolio.Api.Features
                 return Results.NoContent();
             });
 
-            group.MapPost("/{id:long}/calculate-trades", async (PortfolioDbContext dbContext, long id) =>
+            group.MapPost("/{id:long}/calculate-trades", async (PortfolioDbContext dbContext, IPriceHistoryService priceHistoryService, long id) =>
             {
                 var portfolio = await dbContext.Portfolios
                     .Include(p => p.Wallets)
@@ -82,7 +83,7 @@ namespace Portfolio.Api.Features
                     return Results.NotFound();
                 }
 
-                await portfolio.CalculateTradesAsync();
+                await portfolio.CalculateTradesAsync(priceHistoryService);
                 await dbContext.SaveChangesAsync();
 
                 return Results.Ok(portfolio);

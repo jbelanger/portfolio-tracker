@@ -1,4 +1,6 @@
-namespace Portfolio.App.HistoricalPrice
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.Domain
 {
     /// <summary>
     /// Represents a record of a cryptocurrency's price at a specific date.

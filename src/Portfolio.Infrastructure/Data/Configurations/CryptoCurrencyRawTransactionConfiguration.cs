@@ -31,6 +31,7 @@ namespace Portfolio.Infrastructure.Data.Configurations
                      builder.Property(t => t.CsvLinesJson);
 
                      builder.Property(t => t.ErrorType);
+                     builder.Property(t => t.ErrorMessage).HasMaxLength(250);
 
                      // Configure the value objects (Money)
                      builder.OwnsOne(t => t.ReceivedAmount, money =>

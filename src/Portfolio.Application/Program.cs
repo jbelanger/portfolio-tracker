@@ -4,6 +4,7 @@ using Portfolio.Transactions.Importers.Csv.Kraken;
 using Portfolio.Domain.Entities;
 using Portfolio.App.HistoricalPrice;
 using Portfolio.App.HistoricalPrice.YahooFinance;
+using Portfolio.Domain.Constants;
 
 namespace Portfolio.App
 {
@@ -47,14 +48,14 @@ namespace Portfolio.App
 
                 var api = new YahooFinancePriceHistoryApi();
                 var svc = new PriceHistoryService(api, storage, Strings.CURRENCY_USD);
-                var portfolio = new Portfolio(svc);
+                var portfolio = new Domain.Entities.UserPortfolio();
                 // portfolio.OnDepositAdded += CheckBalance;
                 // portfolio.OnWithdrawAdded += CheckBalance;
                 // portfolio.OnTradeAdded += CheckBalance;
 
-                portfolio.Wallets.Add(krakenWalletResult.Value);
+                portfolio.AddWallet(krakenWalletResult.Value);
 
-                var processResult = await portfolio.ProcessAsync().ConfigureAwait(false);
+                var processResult = await portfolio.CalculateTradesAsync(svc).ConfigureAwait(false);
                 if (processResult.IsFailure)
                     throw new Exception(processResult.Error);
 

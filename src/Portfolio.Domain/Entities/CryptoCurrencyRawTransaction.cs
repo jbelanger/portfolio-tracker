@@ -27,6 +27,8 @@ namespace Portfolio.Domain.Entities
         public IEnumerable<string>? TransactionIds { get; init; }
 
         public ErrorType ErrorType { get; set; } = ErrorType.None;
+        public string ErrorMessage { get; set; } = string.Empty;
+
 
         public Money ValueInDefaultCurrency { get; set; } = Money.Empty;
         public Money FeeValueInDefaultCurrency { get; set; } = Money.Empty;

@@ -1,4 +1,4 @@
-namespace Portfolio.App
+namespace Portfolio.Domain.Constants
 {
     public class Strings
     {
