@@ -1,103 +1,87 @@
-// using CSharpFunctionalExtensions;
-// using Portfolio.Domain.Common;
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Common;
+using Portfolio.Domain.Constants;
+using Portfolio.Domain.ValueObjects;
 
+namespace Portfolio.Domain.Entities
+{
+    public class UserPortfolio : AggregateRoot
+    {
+        private readonly TransactionProcessor _transactionProcessor;
+        private List<CryptoCurrencyHolding> _holdings = new();
+        private List<Wallet> _wallets = new();
+        private List<TaxableEvent> _taxableEvents = new();
 
-// namespace Portfolio.Domain.Entities
-// {
-//     public class UserPortfolio : AggregateRoot
-//     {
-//         private readonly List<Wallet> _wallets = new();
-//         private readonly Dictionary<string, CryptoCurrencyHolding> _holdings = new();
-//         private readonly List<CryptoCurrencyProcessedTransaction> _processedTransactions = new();
+        public string DefaultCurrency { get; private set; } = Strings.CURRENCY_USD;
 
-//         public IReadOnlyCollection<Wallet> Wallets => _wallets.AsReadOnly();
-//         public IReadOnlyCollection<CryptoCurrencyHolding> Holdings => _holdings.Values.ToList().AsReadOnly();
-//         public IReadOnlyCollection<CryptoCurrencyProcessedTransaction> ProcessedTransactions => _processedTransactions.AsReadOnly();
+        public IReadOnlyCollection<Wallet> Wallets => _wallets.AsReadOnly();
+        public IReadOnlyCollection<CryptoCurrencyHolding> Holdings => _holdings.AsReadOnly();
+        public IReadOnlyCollection<TaxableEvent> TaxableEvents => _taxableEvents.AsReadOnly();
 
-//         private UserPortfolio()
-//         {            
-//         }
-        
-//         public static Result<UserPortfolio> Create()
-//         {
-//             return new UserPortfolio();
-//         }
+        public UserPortfolio()
+        {
+            _transactionProcessor = new TransactionProcessor();
+        }
 
-//         public Result AddWallet(Wallet wallet)
-//         {
-//             if (wallet == null)
-//                 throw new ArgumentNullException(nameof(wallet));
+        public Result AddWallet(Wallet wallet)
+        {
+            if (wallet == null)
+                throw new ArgumentNullException(nameof(wallet));
 
-//             if (_wallets.Any(w => w.Name == wallet.Name))
-//                 return Result.Failure("Wallet already exists.");
+            if (_wallets.Any(w => w.Name == wallet.Name))
+                return Result.Failure("Wallet already exists.");
 
-//             _wallets.Add(wallet);
+            _wallets.Add(wallet);
 
-//             return Result.Success();
-//         }
+            return Result.Success();
+        }
 
-//         public async Task CalculateTradesAsync()
-//         {
-//             _holdings.Clear();
-//             _processedTransactions.Clear();
+        public Result SetDefaultCurrency(string currencyCode)
+        {
+            currencyCode = currencyCode.ToUpper();
+            if (!FiatCurrency.All.Any(f => f == currencyCode))
+                return Result.Failure("Currency code unknown.");
 
-//             var transactions = _wallets.SelectMany(w => w.Transactions).OrderBy(t => t.DateTime);
+            DefaultCurrency = currencyCode;
 
-//             foreach (var transaction in transactions)
-//             {
-//                 //await ProcessTransactionAsync(transaction);
-//             }
-//         }
+            return Result.Success();
+        }
 
-//         // private async Task ProcessTransactionAsync(CryptoCurrencyRawTransaction transaction)
-//         // {
-//         //     CryptoCurrencyHolding? sender = null;
-//         //     CryptoCurrencyHolding? receiver = null;
+        public async Task<Result> CalculateTradesAsync(IPriceHistoryService priceHistoryService)
+        {
+            if (!Wallets.Any())
+                return Result.Failure("No wallets to process. Start by adding a wallet.");
 
-//         //     if (transaction is CryptoCurrencyDepositTransaction deposit)
-//         //     {
-//         //         receiver = GetOrCreateHolding(deposit.Amount.CurrencyCode);
-//         //         receiver.Balance += deposit.Amount.Amount;
-//         //     }
+            var transactions = GetTransactionsFromAllWallets();
+            var result = await _transactionProcessor.ProcessTransactionsAsync(transactions, this, priceHistoryService);
 
-//         //     if (transaction is CryptoCurrencyWithdrawTransaction withdraw)
-//         //     {
-//         //         sender = GetOrCreateHolding(withdraw.Amount.CurrencyCode);
-//         //         sender.Balance -= withdraw.Amount.Amount;
-//         //     }
+            if (result.IsFailure)
+            {
+                return result;
+            }
 
-//         //     if (transaction is CryptoCurrencyTradeTransaction trade)
-//         //     {
-//         //         receiver = GetOrCreateHolding(trade.Amount.CurrencyCode);
-//         //         sender = GetOrCreateHolding(trade.TradeAmount.CurrencyCode);
+            return Result.Success();
+        }
 
-//         //         sender.Balance -= trade.TradeAmount.Amount;
-//         //         receiver.Balance += trade.Amount.Amount;
+        internal CryptoCurrencyHolding GetOrCreateHolding(string currencyCode)
+        {
+            var holding = _holdings.SingleOrDefault(h => h.Asset == currencyCode);
+            if (holding == null)
+            {
+                holding = new CryptoCurrencyHolding(currencyCode);
+                _holdings.Add(holding);
+            }
+            return holding;
+        }
 
-//         //         // Calculate new average bought price for the receiver
-//         //         decimal tradedCost = trade.TradeAmount.Amount * (sender.AverageBoughtPrice ?? 0);
-//         //         decimal boughtPrice = tradedCost / trade.Amount.Amount;
+        internal void AddTaxableEvent(TaxableEvent taxableEvent)
+        {
+            _taxableEvents.Add(taxableEvent);
+        }
 
-//         //         receiver.AverageBoughtPrice = ((receiver.AverageBoughtPrice ?? 0) * receiver.Balance + boughtPrice * trade.Amount.Amount) / receiver.Balance;
-//         //     }
-
-//         //     // Create and store processed transaction
-//         //     var holding = receiver ?? sender;
-//         //     if (holding != null)
-//         //     {
-//         //         var processedTransaction = ProcessedTransaction.CreateFromTransaction(_wallets.First(w => w.Transactions.Contains(transaction)), holding, transaction);
-//         //         _processedTransactions.Add(processedTransaction);
-//         //     }
-//         // }
-
-//         private CryptoCurrencyHolding GetOrCreateHolding(string currencyCode)
-//         {
-//             if (!_holdings.TryGetValue(currencyCode, out var holding))
-//             {
-//                 holding = new CryptoCurrencyHolding(currencyCode);
-//                 _holdings[currencyCode] = holding;
-//             }
-//             return holding;
-//         }
-//     }
-// }
+        private IEnumerable<CryptoCurrencyRawTransaction> GetTransactionsFromAllWallets()
+        {
+            return Wallets.SelectMany(w => w.Transactions).OrderBy(t => t.DateTime).ToList();
+        }
+    }
+}
