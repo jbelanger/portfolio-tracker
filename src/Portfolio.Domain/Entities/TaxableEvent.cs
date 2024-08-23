@@ -1,6 +1,5 @@
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Common;
-using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Domain.Entities
 {
