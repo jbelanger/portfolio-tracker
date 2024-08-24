@@ -1,88 +1,99 @@
-
+using CSharpFunctionalExtensions;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 
 namespace Portfolio.Domain.Strategies.CostBasis
 {
     public class LifoCostBasisCalculationStrategy : ICostBasisCalculationStrategy
     {
-        public decimal CalculateCostBasis(IEnumerable<AssetHolding> holdings, FinancialTransaction tx)
+        public Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx)
         {
-            var sortedHoldings = holdings.OrderByDescending(h => h.PurchaseRecords.First().PurchaseDate).ToList();
-            return CalculateCostFromHoldings(sortedHoldings, tx);
+            var sortedRecords = holding.PurchaseRecords.OrderByDescending(r => r.PurchaseDate).ToList();
+            return CalculateCostFromRecords(sortedRecords, tx);
         }
 
-        private decimal CalculateCostFromHoldings(List<AssetHolding> sortedHoldings, FinancialTransaction tx)
+        private Result<decimal> CalculateCostFromRecords(List<PurchaseRecord> sortedRecords, FinancialTransaction tx)
         {
             decimal totalCost = 0m;
             decimal amountToMatch = tx.SentAmount.Amount;
 
-            foreach (var holding in sortedHoldings)
+            foreach (var record in sortedRecords)
             {
-                foreach (var record in holding.PurchaseRecords.OrderByDescending(r => r.PurchaseDate))
-                {
-                    if (amountToMatch <= 0)
-                        break;
+                if (amountToMatch <= 0)
+                    break;
 
-                    var matchAmount = Math.Min(record.Amount, amountToMatch);
-                    totalCost += matchAmount * record.PricePerUnit;
-                    amountToMatch -= matchAmount;
-                }
+                var matchAmount = Math.Min(record.Amount, amountToMatch);
+                totalCost += matchAmount * record.PricePerUnit;
+                amountToMatch -= matchAmount;
+            }
+
+            if (amountToMatch > 0)
+            {
+                tx.ErrorType = ErrorType.InsufficientFunds;
+                tx.ErrorMessage = $"Insufficient holdings to match the transaction amount. Unable to match {amountToMatch} {tx.SentAmount.CurrencyCode}.";
+                return Result.Failure<decimal>($"Insufficient holdings to match the transaction amount. Unable to match {amountToMatch} {tx.SentAmount.CurrencyCode}.");
             }
 
             return totalCost;
         }
     }
 }
+using CSharpFunctionalExtensions;
 using Portfolio.Domain.Entities;
 
 namespace Portfolio.Domain.Strategies.CostBasis
 {
     public class AcbCostBasisCalculationStrategy : ICostBasisCalculationStrategy
     {
-        public decimal CalculateCostBasis(IEnumerable<AssetHolding> holdings, FinancialTransaction tx)
+        public Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx)
         {
-            var holding = holdings.First(); // Assuming one holding per asset type in the portfolio
             return holding.AverageBoughtPrice * tx.SentAmount.Amount;
         }
     }
 }
-using Portfolio.Domain.Entities;
+using CSharpFunctionalExtensions;
 
-namespace Portfolio.Domain.Strategies.CostBasis
+namespace Portfolio.Domain.Entities
 {
     public interface ICostBasisCalculationStrategy
     {
-        decimal CalculateCostBasis(IEnumerable<AssetHolding> holdings, FinancialTransaction tx);
+        Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx);
     }
 }
+using CSharpFunctionalExtensions;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 
 namespace Portfolio.Domain.Strategies.CostBasis
 {
     public class FifoCostBasisCalculationStrategy : ICostBasisCalculationStrategy
     {
-        public decimal CalculateCostBasis(IEnumerable<AssetHolding> holdings, FinancialTransaction tx)
+        public Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx)
         {
-            var sortedHoldings = holdings.OrderBy(h => h.PurchaseRecords.First().PurchaseDate).ToList();
-            return CalculateCostFromHoldings(sortedHoldings, tx);
+            var sortedRecords = holding.PurchaseRecords.OrderBy(r => r.PurchaseDate).ToList();
+            return CalculateCostFromRecords(sortedRecords, tx);
         }
 
-        private decimal CalculateCostFromHoldings(List<AssetHolding> sortedHoldings, FinancialTransaction tx)
+        private Result<decimal> CalculateCostFromRecords(List<PurchaseRecord> sortedRecords, FinancialTransaction tx)        
         {
             decimal totalCost = 0m;
             decimal amountToMatch = tx.SentAmount.Amount;
 
-            foreach (var holding in sortedHoldings)
+            foreach (var record in sortedRecords)
             {
-                foreach (var record in holding.PurchaseRecords.OrderBy(r => r.PurchaseDate))
-                {
-                    if (amountToMatch <= 0)
-                        break;
+                if (amountToMatch <= 0)
+                    break;
 
-                    var matchAmount = Math.Min(record.Amount, amountToMatch);
-                    totalCost += matchAmount * record.PricePerUnit;
-                    amountToMatch -= matchAmount;
-                }
+                var matchAmount = Math.Min(record.Amount, amountToMatch);
+                totalCost += matchAmount * record.PricePerUnit;
+                amountToMatch -= matchAmount;
+            }
+
+            if (amountToMatch > 0)
+            {
+                tx.ErrorType = ErrorType.InsufficientFunds;
+                tx.ErrorMessage = $"Insufficient holdings to match the transaction amount. Unable to match {amountToMatch} {tx.SentAmount.CurrencyCode}.";
+                return Result.Failure<decimal>($"Insufficient holdings to match the transaction amount. Unable to match {amountToMatch} {tx.SentAmount.CurrencyCode}.");
             }
 
             return totalCost;
@@ -105,25 +116,31 @@ namespace Portfolio.Domain.Strategies.Transactions
 
             var sender = portfolio.GetOrCreateHolding(tx.SentAmount.CurrencyCode);
             var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
+
+            decimal price;
             if (priceResult.IsSuccess)
             {
-                decimal price = priceResult.Value;
-                tx.ValueInDefaultCurrency = new Money(tx.SentAmount.Amount * price, portfolio.DefaultCurrency);
-
-                portfolio.RecordFinancialEvent(tx, sender, price);
+                price = priceResult.Value;
             }
             else
             {
                 tx.ErrorType = ErrorType.PriceHistoryUnavailable;
                 tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
+                price = sender.AverageBoughtPrice;// Fallback to average bought price                
             }
 
-            sender.Balance -= tx.SentAmount.Amount;
-            if (sender.Balance == 0)
-                sender.AverageBoughtPrice = 0m;
+            tx.ValueInDefaultCurrency = new Money(tx.SentAmount.Amount * price, portfolio.DefaultCurrency);
 
-            EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
+            portfolio.RecordFinancialEvent(tx, sender, price);            
 
+            UpdateBalance(tx, sender);
+            HandleFees(tx, portfolio, priceHistoryService);
+
+            return Result.Success();
+        }
+
+        private async void HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
             if (tx.FeeAmount != Money.Empty)
             {
                 var fees = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
@@ -150,8 +167,15 @@ namespace Portfolio.Domain.Strategies.Transactions
 
                 EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
             }
+        }
 
-            return Result.Success();
+        private static void UpdateBalance(FinancialTransaction tx, AssetHolding sender)
+        {
+            sender.Balance -= tx.SentAmount.Amount;
+            if (sender.Balance == 0)
+                sender.AverageBoughtPrice = 0m;
+
+            EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
         }
 
         private static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
@@ -178,6 +202,7 @@ namespace Portfolio.Domain.Strategies.Transactions
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.Enums;
+using Portfolio.Domain.Events;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.ValueObjects;
 
@@ -192,9 +217,9 @@ namespace Portfolio.Domain.Strategies.Transactions
 
             var receiver = portfolio.GetOrCreateHolding(tx.ReceivedAmount.CurrencyCode);
             var sender = portfolio.GetOrCreateHolding(tx.SentAmount.CurrencyCode);
-
-            decimal price = 0m;
             var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
+
+            decimal price;
             if (priceResult.IsSuccess)
             {
                 price = priceResult.Value;
@@ -570,6 +595,32 @@ namespace Portfolio.Domain
         }
     }
 }
+using Portfolio.Domain.Common;
+using Portfolio.Domain.Entities;
+
+namespace Portfolio.Domain.Events
+{
+    public class FinancialEventAdded : BaseEvent
+    {
+        public FinancialTransaction Transaction { get; }
+        public AssetHolding Holding { get; }
+        public decimal MarketPricePerUnit { get; }
+        public string ErrorMessage { get; }
+
+        public FinancialEventAdded(
+            FinancialTransaction transaction,
+            AssetHolding holding,
+            decimal marketPricePerUnit,
+            string errorMessage = "")
+        {
+            Transaction = transaction ?? throw new ArgumentNullException(nameof(transaction));
+            Holding = holding ?? throw new ArgumentNullException(nameof(holding));
+            MarketPricePerUnit = marketPricePerUnit;
+            ErrorMessage = errorMessage ?? string.Empty;
+        }
+
+    }
+}
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.Enums;
@@ -649,6 +700,7 @@ using CSharpFunctionalExtensions;
 using Portfolio.Domain.Common;
 using Portfolio.Domain.Constants;
 using Portfolio.Domain.Enums;
+using Portfolio.Domain.Events;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.Services;
 using Portfolio.Domain.Strategies.CostBasis;
@@ -750,32 +802,43 @@ namespace Portfolio.Domain.Entities
             AssetHolding holding,
             decimal marketPricePerUnit
         )
-        {
+        {           
             if (transaction.SentAmount.IsFiatCurrency)
             {
                 return;
             }
 
-            var costBasisPerUnit = _costBasisStrategy.CalculateCostBasis([holding], transaction) / transaction.SentAmount.Amount;
+            Result result = Result.Success();
 
-            var financialEventResult = FinancialEvent.Create(
-                transaction.DateTime,
-                transaction.SentAmount.CurrencyCode,
-                costBasisPerUnit,
-                marketPricePerUnit,
-                transaction.SentAmount.Amount,
-                DefaultCurrency
-            );
-
-            if (financialEventResult.IsSuccess)
-            {
-                _financialEvents.Add(financialEventResult.Value);
-            }
+            var costBasisPerUnitResult = _costBasisStrategy.CalculateCostBasis(holding, transaction);
+            if (costBasisPerUnitResult.IsFailure)
+                result = Result.Failure(costBasisPerUnitResult.Error);
             else
             {
-                transaction.ErrorMessage = "Could not create financial event for this transaction.";
-                transaction.ErrorType = ErrorType.EventCreationFailed;
+                var costBasisPerUnit = costBasisPerUnitResult.Value / transaction.SentAmount.Amount;
+
+                var financialEventResult = FinancialEvent.Create(
+                    transaction.DateTime,
+                    transaction.SentAmount.CurrencyCode,
+                    costBasisPerUnit,
+                    marketPricePerUnit,
+                    transaction.SentAmount.Amount,
+                    DefaultCurrency
+                );
+
+                if (financialEventResult.IsSuccess)
+                {
+                    _financialEvents.Add(financialEventResult.Value);
+                }
+                else
+                {
+                    transaction.ErrorMessage = "Could not create financial event for this transaction.";
+                    transaction.ErrorType = ErrorType.EventCreationFailed;
+                    result = financialEventResult;
+                }
             }
+
+            AddDomainEvent(new FinancialEventAdded(transaction, holding, marketPricePerUnit, result.IsFailure ? result.Error: string.Empty));                    
         }
 
         private IEnumerable<FinancialTransaction> GetTransactionsFromAllWallets()
@@ -855,7 +918,7 @@ namespace Portfolio.Domain.Entities
 
         public string CsvLinesJson { get; set; } = string.Empty;
 
-        protected FinancialTransaction() { }
+        internal FinancialTransaction() { }
 
         public static Result<FinancialTransaction> CreateDeposit(
             DateTime date,

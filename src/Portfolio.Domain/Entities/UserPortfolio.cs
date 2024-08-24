@@ -112,6 +112,9 @@ namespace Portfolio.Domain.Entities
             decimal marketPricePerUnit
         )
         {           
+            if(transaction.Type == TransactionType.Deposit)
+                return;
+
             // Check if the transaction involves a fiat currency and is a purchase (fiat-to-asset)
             if (transaction.SentAmount.IsFiatCurrency)
             {
