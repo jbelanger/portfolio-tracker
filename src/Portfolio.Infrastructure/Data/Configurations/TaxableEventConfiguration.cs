@@ -26,7 +26,7 @@ namespace Portfolio.Infrastructure.Persistence.Configurations
                 .HasColumnType("decimal(18,8)")
                 .IsRequired();
 
-            builder.Property(te => te.Amount)
+            builder.Property(te => te.Quantity)
                 .HasColumnType("decimal(18,8)")
                 .IsRequired();
 

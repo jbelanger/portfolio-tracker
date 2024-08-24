@@ -168,8 +168,13 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Fees")
-                        .HasColumnType("decimal(18,8)");
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ErrorType")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("TEXT");
@@ -185,54 +190,6 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.HasIndex("UserPortfolioId");
 
                     b.ToTable("CryptoCurrencyHoldings", (string)null);
-                });
-
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyProcessedTransaction", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Asset")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal?>("AveragePriceAtTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal?>("BalanceAfterTransaction")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("UserPortfolioId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("WalletName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserPortfolioId");
-
-                    b.ToTable("CryptoCurrencyProcessedTransaction");
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyRawTransaction", b =>
@@ -257,6 +214,11 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ErrorType")
@@ -290,6 +252,92 @@ namespace Portfolio.Infrastructure.DataMigrations
                     b.ToTable("CryptoCurrencyRawTransactions", (string)null);
                 });
 
+            modelBuilder.Entity("Portfolio.Domain.Entities.PurchaseRecord", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("CryptoCurrencyHoldingId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("PricePerUnit")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CryptoCurrencyHoldingId");
+
+                    b.ToTable("PurchaseRecord");
+                });
+
+            modelBuilder.Entity("Portfolio.Domain.Entities.TaxableEvent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("AverageCost")
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DisposedAsset")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<long?>("UserPortfolioId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("ValueAtDisposal")
+                        .HasColumnType("decimal(18,8)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserPortfolioId");
+
+                    b.ToTable("TaxableEvents", (string)null);
+                });
+
             modelBuilder.Entity("Portfolio.Domain.Entities.UserPortfolio", b =>
                 {
                     b.Property<long>("Id")
@@ -300,6 +348,10 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DefaultCurrency")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("LastModified")
@@ -495,13 +547,6 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyProcessedTransaction", b =>
-                {
-                    b.HasOne("Portfolio.Domain.Entities.UserPortfolio", null)
-                        .WithMany("ProcessedTransactions")
-                        .HasForeignKey("UserPortfolioId");
-                });
-
             modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyRawTransaction", b =>
                 {
                     b.HasOne("Portfolio.Domain.Entities.Wallet", null)
@@ -524,6 +569,27 @@ namespace Portfolio.Infrastructure.DataMigrations
                                 .HasMaxLength(3)
                                 .HasColumnType("TEXT")
                                 .HasColumnName("FeeCurrency");
+
+                            b1.HasKey("CryptoCurrencyRawTransactionId");
+
+                            b1.ToTable("CryptoCurrencyRawTransactions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CryptoCurrencyRawTransactionId");
+                        });
+
+                    b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "FeeValueInDefaultCurrency", b1 =>
+                        {
+                            b1.Property<long>("CryptoCurrencyRawTransactionId")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("decimal(18,8)");
+
+                            b1.Property<string>("CurrencyCode")
+                                .IsRequired()
+                                .HasMaxLength(3)
+                                .HasColumnType("TEXT");
 
                             b1.HasKey("CryptoCurrencyRawTransactionId");
 
@@ -579,7 +645,31 @@ namespace Portfolio.Infrastructure.DataMigrations
                                 .HasForeignKey("CryptoCurrencyRawTransactionId");
                         });
 
+                    b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "ValueInDefaultCurrency", b1 =>
+                        {
+                            b1.Property<long>("CryptoCurrencyRawTransactionId")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("decimal(18,8)");
+
+                            b1.Property<string>("CurrencyCode")
+                                .IsRequired()
+                                .HasMaxLength(3)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("CryptoCurrencyRawTransactionId");
+
+                            b1.ToTable("CryptoCurrencyRawTransactions");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CryptoCurrencyRawTransactionId");
+                        });
+
                     b.Navigation("FeeAmount")
+                        .IsRequired();
+
+                    b.Navigation("FeeValueInDefaultCurrency")
                         .IsRequired();
 
                     b.Navigation("ReceivedAmount")
@@ -587,6 +677,24 @@ namespace Portfolio.Infrastructure.DataMigrations
 
                     b.Navigation("SentAmount")
                         .IsRequired();
+
+                    b.Navigation("ValueInDefaultCurrency")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Portfolio.Domain.Entities.PurchaseRecord", b =>
+                {
+                    b.HasOne("Portfolio.Domain.Entities.CryptoCurrencyHolding", null)
+                        .WithMany("PurchaseRecords")
+                        .HasForeignKey("CryptoCurrencyHoldingId");
+                });
+
+            modelBuilder.Entity("Portfolio.Domain.Entities.TaxableEvent", b =>
+                {
+                    b.HasOne("Portfolio.Domain.Entities.UserPortfolio", null)
+                        .WithMany("TaxableEvents")
+                        .HasForeignKey("UserPortfolioId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Portfolio.Domain.Entities.Wallet", b =>
@@ -598,11 +706,16 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Portfolio.Domain.Entities.CryptoCurrencyHolding", b =>
+                {
+                    b.Navigation("PurchaseRecords");
+                });
+
             modelBuilder.Entity("Portfolio.Domain.Entities.UserPortfolio", b =>
                 {
                     b.Navigation("Holdings");
 
-                    b.Navigation("ProcessedTransactions");
+                    b.Navigation("TaxableEvents");
 
                     b.Navigation("Wallets");
                 });

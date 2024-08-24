@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Portfolio.Api.Services;
 using Portfolio.App;
 using Portfolio.App.DTOs;
-using Portfolio.Domain.Entities;
-using Portfolio.Transactions.Importers.Csv.Kraken;
 
 namespace Portfolio.Api.Features
 {

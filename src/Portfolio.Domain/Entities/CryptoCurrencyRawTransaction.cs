@@ -173,6 +173,17 @@ namespace Portfolio.Domain.Entities
             return Result.Success();
         }
 
+        public Money GetRelevantTransactionAmount()
+        {
+            return Type switch
+            {
+                TransactionType.Deposit => ReceivedAmount,
+                TransactionType.Withdrawal => SentAmount,
+                TransactionType.Trade => SentAmount, // Typically, SentAmount is used for trade cost basis
+                _ => throw new NotSupportedException($"Transaction type {Type} is not supported.")
+            };
+        }
+
         // public override bool Equals(object? obj)
         // {
         //     if (obj is not CryptoCurrencyRawTransaction other)
