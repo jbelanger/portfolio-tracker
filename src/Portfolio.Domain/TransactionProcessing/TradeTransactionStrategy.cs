@@ -13,12 +13,25 @@ public class TradeTransactionStrategy : ITransactionStrategy
         var receiver = portfolio.GetOrCreateHolding(tx.ReceivedAmount.CurrencyCode);
         var sender = portfolio.GetOrCreateHolding(tx.SentAmount.CurrencyCode);
 
-        var tradedCostInUsd = await CalculateTradedCostInUsdAsync(tx, sender, portfolio, priceHistoryService);
+        decimal price = 0m;
+        var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
+        if (priceResult.IsSuccess)
+        {
+            price = priceResult.Value;
+        }
+        else
+        {
+            tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+            tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
+            price = sender.AverageBoughtPrice;// Fallback to average bought price
+        }
+
+        var tradedCostInUsd = CalculateTradedCostInUsd(tx, portfolio, price);
         tx.ValueInDefaultCurrency = new Money(tradedCostInUsd, portfolio.DefaultCurrency);
 
         UpdateReceiverAverageBoughtPrice(tx, receiver);
-
-        CreateTaxableEvent(tx, sender, portfolio, tradedCostInUsd);
+        
+        portfolio.AddTaxableEvent(tx, sender, price);
 
         UpdateBalances(tx, receiver, sender);
         HandleFees(tx, portfolio, priceHistoryService);
@@ -37,7 +50,7 @@ public class TradeTransactionStrategy : ITransactionStrategy
         return true;
     }
 
-    private async Task<decimal> CalculateTradedCostInUsdAsync(CryptoCurrencyRawTransaction tx, CryptoCurrencyHolding sender, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+    private decimal CalculateTradedCostInUsd(CryptoCurrencyRawTransaction tx, UserPortfolio portfolio, decimal price)
     {
         if (tx.ReceivedAmount.CurrencyCode == portfolio.DefaultCurrency)
         {
@@ -48,38 +61,14 @@ public class TradeTransactionStrategy : ITransactionStrategy
             return tx.SentAmount.Amount;
         }
         else
-        {
-            var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
-            if (priceResult.IsSuccess)
-            {
-                return tx.SentAmount.Amount * priceResult.Value;
-            }
-            else
-            {
-                tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-                tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
-                return sender.AverageBoughtPrice * tx.SentAmount.Amount; // Fallback to average bought price
-            }
+        {            
+            return tx.SentAmount.Amount * price;
         }
     }
 
     private static void UpdateReceiverAverageBoughtPrice(CryptoCurrencyRawTransaction tx, CryptoCurrencyHolding receiver)
     {
         receiver.AverageBoughtPrice = (receiver.AverageBoughtPrice * receiver.Balance + tx.ValueInDefaultCurrency.Amount) / (receiver.Balance + tx.ReceivedAmount.Amount);
-    }
-
-    private void CreateTaxableEvent(CryptoCurrencyRawTransaction tx, CryptoCurrencyHolding sender, UserPortfolio portfolio, decimal tradedCostInUsd)
-    {
-        var taxableEventResult = TaxableEvent.Create(tx.DateTime, tx.SentAmount.CurrencyCode, sender.AverageBoughtPrice, tradedCostInUsd / tx.SentAmount.Amount, tx.SentAmount.Amount, portfolio.DefaultCurrency);
-        if (taxableEventResult.IsSuccess)
-        {
-            portfolio.AddTaxableEvent(taxableEventResult.Value);
-        }
-        else
-        {
-            tx.ErrorMessage = "Could not create taxable event for this transaction.";
-            tx.ErrorType = ErrorType.TaxEventNotCreated;
-        }
     }
 
     private static void UpdateBalances(CryptoCurrencyRawTransaction tx, CryptoCurrencyHolding receiver, CryptoCurrencyHolding sender)

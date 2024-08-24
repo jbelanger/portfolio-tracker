@@ -11,7 +11,7 @@ namespace Portfolio.Domain.Tests.Entities;
 public class PortfolioFullTestSuite
 {
     private Mock<IPriceHistoryService> _priceHistoryServiceMock;
-    private Domain.Entities.UserPortfolio _portfolio;
+    private UserPortfolio _portfolio;
 
     [SetUp]
     public void SetUp()
@@ -21,7 +21,7 @@ public class PortfolioFullTestSuite
             .Setup(p => p.GetPriceAtCloseTimeAsync(It.IsAny<string>(), It.IsAny<DateTime>()))
             .ReturnsAsync(Result.Failure<decimal>("Price not found"));
 
-        _portfolio = new Portfolio.Domain.Entities.UserPortfolio();
+        _portfolio = new UserPortfolio();
     }
 
     [Test]
@@ -419,7 +419,7 @@ public class PortfolioFullTestSuite
 
         var taxableEvent = _portfolio.TaxableEvents.Should().ContainSingle(h => h.Currency == "USD").Subject;
         taxableEvent.DisposedAsset.Should().Be("BTC");
-        taxableEvent.Amount.Should().Be(tradeTransactionBTCtoETH.SentAmount.Amount);
+        taxableEvent.Quantity.Should().Be(tradeTransactionBTCtoETH.SentAmount.Amount);
         taxableEvent.AverageCost.Should().BeApproximately(33333.33m, 0.01m);
         taxableEvent.ValueAtDisposal.Should().Be(40000m);
     }

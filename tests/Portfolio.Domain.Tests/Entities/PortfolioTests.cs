@@ -26,7 +26,7 @@ namespace Portfolio.Domain.Tests.Entities
         [Test]
         public async Task ProcessAsync_Should_UpdateBalanceAndAveragePrice_OnDeposit()
         {
-            // Arrange
+            // Arrange            
             var transactionDate = new DateTime(2024, 8, 22);
             var depositAmount = new Money(1m, "BTC");
             var feeAmount = new Money(0.1m, "BTC");
@@ -58,6 +58,10 @@ namespace Portfolio.Domain.Tests.Entities
             var holding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
             holding.Balance.Should().Be(1m);
             holding.AverageBoughtPrice.Should().Be(25000m);
+            
+            var purchaseRecord = holding.PurchaseRecords.Should().ContainSingle().Subject;            
+            PortfolioTestUtils.EnsurePurchaseRecord(purchaseRecord, transaction.ReceivedAmount.Amount, 25000m, transaction.DateTime);
+
             transaction.ValueInDefaultCurrency.Amount.Should().Be(transaction.ReceivedAmount.Amount * 25000m);
             transaction.ValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
             transaction.FeeValueInDefaultCurrency.Amount.Should().Be(transaction.FeeAmount.Amount * 25000m);
@@ -130,144 +134,14 @@ namespace Portfolio.Domain.Tests.Entities
             withdrawalTransaction.FeeValueInDefaultCurrency.Amount.Should().Be(withdrawalTransaction.FeeAmount.Amount * 35000m);
             withdrawalTransaction.FeeValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
 
+            // If strategy is Adjusted Cost Base (ACB)...
             var taxableEvent = _portfolio.TaxableEvents.Should().ContainSingle(h => h.Currency == "USD").Subject;
-            taxableEvent.Amount.Should().Be(1m);
+            taxableEvent.Quantity.Should().Be(1m);
             taxableEvent.AverageCost.Should().Be(25000m);
             taxableEvent.ValueAtDisposal.Should().Be(35000m);
 
             _priceHistoryServiceMock.Verify(p => p.GetPriceAtCloseTimeAsync("BTC", depositDate), Times.AtLeast(1));
             _priceHistoryServiceMock.Verify(p => p.GetPriceAtCloseTimeAsync("BTC", withdrawalDate), Times.AtLeast(1));
-        }
-
-        [Test]
-        public async Task ProcessAsync_Should_HandleTrade_WithFeeOnSender()
-        {
-            // Arrange
-            var depositDate = new DateTime(2024, 8, 21);
-            var tradeDate = new DateTime(2024, 8, 22);
-
-            var depositAmount = new Money(2m, "ETH"); // First deposit 2 ETH
-            var sentAmount = new Money(1m, "ETH");
-            var receivedAmount = new Money(0.1m, "BTC");
-            var tradeFee = new Money(0.01m, "ETH");
-
-            var depositTransaction = CryptoCurrencyRawTransaction.CreateDeposit(
-                depositDate,
-                depositAmount,
-                Money.Empty, // No fee on deposit
-                "deposit-1",
-                [],
-                "").Value;
-
-            var tradeTransaction = CryptoCurrencyRawTransaction.CreateTrade(
-                tradeDate,
-                receivedAmount,
-                sentAmount,
-                tradeFee,
-                "a",
-                [],
-                "").Value;
-
-            var wallet = Wallet.Create("Test Wallet").Value;
-            wallet.AddTransaction(depositTransaction);
-            wallet.AddTransaction(tradeTransaction);
-
-            _portfolio.AddWallet(wallet);
-
-            _priceHistoryServiceMock
-                .Setup(p => p.GetPriceAtCloseTimeAsync("ETH", depositDate))
-                .ReturnsAsync(Result.Success(2000m));
-
-            _priceHistoryServiceMock
-                .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", tradeDate))
-                .ReturnsAsync(Result.Success(25000m));
-
-            _priceHistoryServiceMock
-                .Setup(p => p.GetPriceAtCloseTimeAsync("ETH", tradeDate))
-                .ReturnsAsync(Result.Success(2500m));
-
-            // Act
-            var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
-
-            // Assert
-            result.IsSuccess.Should().BeTrue();
-            _portfolio.Holdings.Should().HaveCount(2);
-
-            var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
-            btcHolding.Balance.Should().Be(0.1m);
-            btcHolding.AverageBoughtPrice.Should().BeApproximately(25000m, 0.01m); // 1 ETH * 2000 / 0.1 BTC = 20000 USD
-
-            var ethHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "ETH").Subject;
-            ethHolding.Balance.Should().Be(0.99m); // 2 ETH - 1 ETH trade - 0.01 ETH fee
-
-            depositTransaction.ValueInDefaultCurrency.Amount.Should().Be(depositTransaction.ReceivedAmount.Amount * 2000m);
-            depositTransaction.ValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
-            depositTransaction.FeeValueInDefaultCurrency.Should().Be(Money.Empty);
-
-            tradeTransaction.ValueInDefaultCurrency.Amount.Should().Be(tradeTransaction.SentAmount.Amount * 2500m);
-            tradeTransaction.ValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
-            tradeTransaction.FeeValueInDefaultCurrency.Amount.Should().Be(tradeTransaction.FeeAmount.Amount * 2500m);
-            tradeTransaction.FeeValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
-
-            var taxableEvent = _portfolio.TaxableEvents.Should().ContainSingle(h => h.Currency == "USD").Subject;
-            taxableEvent.DisposedAsset.Should().Be("ETH");
-            taxableEvent.Amount.Should().Be(tradeTransaction.SentAmount.Amount);
-            taxableEvent.AverageCost.Should().BeApproximately(2000m, 0.01m);
-            taxableEvent.ValueAtDisposal.Should().Be(2500m);
-
-            _priceHistoryServiceMock.Verify(p => p.GetPriceAtCloseTimeAsync("ETH", depositDate), Times.AtLeastOnce());
-            _priceHistoryServiceMock.Verify(p => p.GetPriceAtCloseTimeAsync("ETH", tradeDate), Times.AtLeastOnce());
-        }
-
-
-        [Test]
-        public async Task ProcessAsync_Should_HandleTrade_WithFeeOnReceiver()
-        {
-            // Arrange
-            var tradeDate = new DateTime(2024, 8, 22);
-
-            var sentAmount = new Money(1m, "ETH");
-            var receivedAmount = new Money(0.09m, "BTC");
-            var tradeFee = new Money(0.01m, "BTC");
-
-            var tradeTransaction = CryptoCurrencyRawTransaction.CreateTrade(
-                tradeDate,
-                receivedAmount,
-                sentAmount,
-                tradeFee,
-                "a",
-                [],
-                "").Value;
-
-            var wallet = Wallet.Create("Test Wallet").Value;
-            wallet.AddTransaction(tradeTransaction);
-
-            _portfolio.AddWallet(wallet);
-
-            _priceHistoryServiceMock
-                .Setup(p => p.GetPriceAtCloseTimeAsync("BTC", tradeDate))
-                .ReturnsAsync(Result.Success(25000m));
-
-            _priceHistoryServiceMock
-                .Setup(p => p.GetPriceAtCloseTimeAsync("ETH", tradeDate))
-                .ReturnsAsync(Result.Success(2000m));
-
-            // Act
-            var result = await _portfolio.CalculateTradesAsync(_priceHistoryServiceMock.Object);
-
-            // Assert
-            result.IsSuccess.Should().BeTrue();
-            _portfolio.Holdings.Should().HaveCount(2);
-
-            var btcHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "BTC").Subject;
-            btcHolding.Balance.Should().Be(0.09m); // 0.1 BTC - 0.01 BTC fee
-            btcHolding.AverageBoughtPrice.Should().BeApproximately(22222.22m, 0.01m); // (1 ETH * 2000) / 0.09 BTC = 22222.22 USD
-
-            var ethHolding = _portfolio.Holdings.Should().ContainSingle(h => h.Asset == "ETH").Subject;
-            ethHolding.Balance.Should().Be(-1m); // 1 ETH - 1 ETH sent
-
-            //_priceHistoryServiceMock.Verify(p => p.GetPriceAtCloseTimeAsync("BTC", tradeDate), Times.Once);
-            _priceHistoryServiceMock.Verify(p => p.GetPriceAtCloseTimeAsync("ETH", tradeDate), Times.Once);
         }
 
         [Test]

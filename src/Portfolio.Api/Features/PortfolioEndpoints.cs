@@ -75,7 +75,9 @@ namespace Portfolio.Api.Features
             group.MapPost("/{id:long}/calculate-trades", async (PortfolioDbContext dbContext, IPriceHistoryService priceHistoryService, long id) =>
             {
                 var portfolio = await dbContext.Portfolios
-                    .Include(p => p.Wallets)
+                    .Include(p => p.Holdings)
+                    .Include("Wallets.Transactions")
+                    .Include(p => p.TaxableEvents)                    
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (portfolio is null)

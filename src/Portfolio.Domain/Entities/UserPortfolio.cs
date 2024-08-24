@@ -11,6 +11,7 @@ namespace Portfolio.Domain.Entities
         private List<CryptoCurrencyHolding> _holdings = new();
         private List<Wallet> _wallets = new();
         private List<TaxableEvent> _taxableEvents = new();
+        private ICostBasisCalculationStrategy _costBasisStrategy = new AcbCostBasisCalculationStrategy();
 
         public string DefaultCurrency { get; private set; } = Strings.CURRENCY_USD;
 
@@ -21,6 +22,11 @@ namespace Portfolio.Domain.Entities
         public UserPortfolio()
         {
             _transactionProcessor = new TransactionProcessor();
+        }
+
+        public void SetCostBasisStrategy(ICostBasisCalculationStrategy strategy)
+        {            
+            _costBasisStrategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
         }
 
         public Result AddWallet(Wallet wallet)
@@ -74,9 +80,23 @@ namespace Portfolio.Domain.Entities
             return holding;
         }
 
-        internal void AddTaxableEvent(TaxableEvent taxableEvent)
-        {
-            _taxableEvents.Add(taxableEvent);
+        internal void AddTaxableEvent(
+            CryptoCurrencyRawTransaction tx,
+            CryptoCurrencyHolding holding,
+            decimal price
+            )
+        {            
+            var costBasis = _costBasisStrategy.CalculateCostBasis([holding], tx);
+            var taxableEventResult = TaxableEvent.Create(tx.DateTime, tx.SentAmount.CurrencyCode, costBasis, price, tx.SentAmount.Amount, DefaultCurrency);
+            if (taxableEventResult.IsSuccess)
+            {
+                _taxableEvents.Add(taxableEventResult.Value);
+            }
+            else
+            {
+                tx.ErrorMessage = "Could not create taxable event for this transaction.";
+                tx.ErrorType = ErrorType.TaxEventNotCreated;
+            }
         }
 
         private IEnumerable<CryptoCurrencyRawTransaction> GetTransactionsFromAllWallets()

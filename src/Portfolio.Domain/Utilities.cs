@@ -1,4 +1,3 @@
-using Portfolio.Domain;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.ValueObjects;
 

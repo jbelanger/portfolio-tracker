@@ -8,7 +8,7 @@ namespace Portfolio.Domain.Entities
         public DateTime DateTime { get; private set; }
         public decimal AverageCost { get; private set; }
         public decimal ValueAtDisposal { get; private set; }
-        public decimal Amount { get; private set; }
+        public decimal Quantity { get; private set; }
         public string DisposedAsset { get; set; } = string.Empty;
         public string Currency { get; set; } = string.Empty;
 
@@ -21,7 +21,7 @@ namespace Portfolio.Domain.Entities
             string asset,          
             decimal averageCost,
             decimal valueAtDisposal,
-            decimal amount,
+            decimal quantity,
             string currency)
         {
             return new TaxableEvent()
@@ -30,8 +30,8 @@ namespace Portfolio.Domain.Entities
                 DisposedAsset = asset,
                 AverageCost = averageCost,
                 ValueAtDisposal = valueAtDisposal,
-                Amount = amount,
-                Currency = currency
+                Quantity = quantity,
+                Currency = currency            
             };
         }
     }

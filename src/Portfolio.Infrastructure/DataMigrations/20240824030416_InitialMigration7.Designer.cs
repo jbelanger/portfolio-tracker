@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Portfolio.Infrastructure;
 
@@ -10,9 +11,11 @@ using Portfolio.Infrastructure;
 namespace Portfolio.Infrastructure.DataMigrations
 {
     [DbContext(typeof(PortfolioDbContext))]
-    partial class PortfolioDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240824030416_InitialMigration7")]
+    partial class InitialMigration7
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -584,12 +587,16 @@ namespace Portfolio.Infrastructure.DataMigrations
                                 .HasColumnType("INTEGER");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,8)");
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasColumnType("decimal(18,8)")
+                                .HasColumnName("SentAmount");
 
                             b1.Property<string>("CurrencyCode")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasMaxLength(3)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("TEXT")
+                                .HasColumnName("SentCurrency");
 
                             b1.HasKey("CryptoCurrencyRawTransactionId");
 
@@ -628,11 +635,13 @@ namespace Portfolio.Infrastructure.DataMigrations
                                 .HasColumnType("INTEGER");
 
                             b1.Property<decimal>("Amount")
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasColumnType("decimal(18,8)")
                                 .HasColumnName("SentAmount");
 
                             b1.Property<string>("CurrencyCode")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasMaxLength(3)
                                 .HasColumnType("TEXT")
                                 .HasColumnName("SentCurrency");
@@ -651,12 +660,16 @@ namespace Portfolio.Infrastructure.DataMigrations
                                 .HasColumnType("INTEGER");
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,8)");
+                                .ValueGeneratedOnUpdateSometimes()
+                                .HasColumnType("decimal(18,8)")
+                                .HasColumnName("SentAmount");
 
                             b1.Property<string>("CurrencyCode")
                                 .IsRequired()
+                                .ValueGeneratedOnUpdateSometimes()
                                 .HasMaxLength(3)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("TEXT")
+                                .HasColumnName("SentCurrency");
 
                             b1.HasKey("CryptoCurrencyRawTransactionId");
 

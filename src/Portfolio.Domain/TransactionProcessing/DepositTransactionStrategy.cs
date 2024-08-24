@@ -16,6 +16,7 @@ public class DepositTransactionStrategy : ITransactionStrategy
         if (tx.ReceivedAmount.CurrencyCode == portfolio.DefaultCurrency)
         {
             receiver.AverageBoughtPrice = 1;
+            receiver.AddPurchase(tx.ReceivedAmount.Amount, 1, tx.DateTime);
             tx.ValueInDefaultCurrency = new Money(tx.ReceivedAmount.Amount, portfolio.DefaultCurrency);
         }
         else
@@ -26,6 +27,7 @@ public class DepositTransactionStrategy : ITransactionStrategy
                 decimal price = priceResult.Value;
                 tx.ValueInDefaultCurrency = new Money(tx.ReceivedAmount.Amount * price, portfolio.DefaultCurrency);
                 receiver.AverageBoughtPrice = (receiver.AverageBoughtPrice * (receiver.Balance - tx.ReceivedAmount.Amount) + tx.ValueInDefaultCurrency.Amount) / receiver.Balance;
+                receiver.AddPurchase(tx.ReceivedAmount.Amount, price, tx.DateTime);
             }
             else
             {
@@ -34,36 +36,7 @@ public class DepositTransactionStrategy : ITransactionStrategy
             }
         }
 
-        // Handle Fees
-        if (tx.FeeAmount != Money.Empty)
-        {
-            var fees = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
-            bool shouldDeductFeesFromBalance = tx.FeeAmount.CurrencyCode != tx.ReceivedAmount.CurrencyCode;
-
-            if (shouldDeductFeesFromBalance)
-                fees.Balance -= tx.FeeAmount.Amount;
-
-            if (tx.FeeAmount.CurrencyCode == portfolio.DefaultCurrency)
-            {
-                tx.FeeValueInDefaultCurrency = tx.FeeAmount;
-            }
-            else
-            {
-                var feePriceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.FeeAmount.CurrencyCode, tx.DateTime);
-                if (feePriceResult.IsSuccess)
-                {
-                    decimal feePrice = feePriceResult.Value;
-                    tx.FeeValueInDefaultCurrency = new Money(tx.FeeAmount.Amount * feePrice, portfolio.DefaultCurrency);
-                }
-                else
-                {
-                    tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-                    tx.ErrorMessage = $"Could not get price history for {fees.Asset} fees. Fees calculations will be incorrect.";
-                }
-            }
-
-            EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
-        }
+        await FeeHandlingUtils.HandleFeesAsync(tx, portfolio, priceHistoryService);
 
         return Result.Success();
     }

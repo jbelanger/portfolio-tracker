@@ -82,24 +82,24 @@ namespace Portfolio.Infrastructure.Data.Configurations
                      builder.OwnsOne(t => t.ValueInDefaultCurrency, money =>
                      {
                             money.Property(m => m.Amount)
-                                   .HasColumnName("SentAmount")
+                                   //.HasColumnName("ValueInDefaultCurrency")
                                    .HasColumnType("decimal(18,8)");
                             //.HasConversion(new EmptyMoneyAmountConverter());
 
                             money.Property(m => m.CurrencyCode)
-                                   .HasColumnName("SentCurrency")
+                                   //.HasColumnName("ValueInDefaultCurrency")
                                    .HasMaxLength(3);
                      });
 
                      builder.OwnsOne(t => t.FeeValueInDefaultCurrency, money =>
                      {
                             money.Property(m => m.Amount)
-                                   .HasColumnName("SentAmount")
+                                   //.HasColumnName("SentAmount")
                                    .HasColumnType("decimal(18,8)");
                             //.HasConversion(new EmptyMoneyAmountConverter());
 
                             money.Property(m => m.CurrencyCode)
-                                   .HasColumnName("SentCurrency")
+                                   //.HasColumnName("SentCurrency")
                                    .HasMaxLength(3);
                      });
 

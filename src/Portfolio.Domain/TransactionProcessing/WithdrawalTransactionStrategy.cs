@@ -17,16 +17,7 @@ public class WithdrawalTransactionStrategy : ITransactionStrategy
             decimal price = priceResult.Value;
             tx.ValueInDefaultCurrency = new Money(tx.SentAmount.Amount * price, portfolio.DefaultCurrency);
 
-            var taxableEventResult = TaxableEvent.Create(tx.DateTime, tx.SentAmount.CurrencyCode, sender.AverageBoughtPrice, price, tx.SentAmount.Amount, portfolio.DefaultCurrency);
-            if (taxableEventResult.IsSuccess)
-            {
-                portfolio.AddTaxableEvent(taxableEventResult.Value);
-            }
-            else
-            {
-                tx.ErrorMessage = "Could not create taxable event for this transaction.";
-                tx.ErrorType = ErrorType.TaxEventNotCreated;
-            }
+            portfolio.AddTaxableEvent(tx, sender, price);
         }
         else
         {
