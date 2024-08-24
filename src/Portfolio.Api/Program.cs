@@ -44,7 +44,7 @@ namespace Portfolio.Api
             builder.Services.AddScoped<ICryptoTransactionService, CryptoTransactionService>();
             builder.Services.AddScoped<IPriceHistoryApi>(p => new PriceHistoryApiWithRetry(new YahooFinancePriceHistoryApi(), 3));
             builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
-            builder.Services.AddScoped<IPriceHistoryStorageService>(s => new SQLitePriceHistoryStorageService("portfolio.db"));
+            builder.Services.AddScoped<IPriceHistoryStorageService, DbContextPriceHistoryStorageService>();
 
 
             var app = builder.Build();

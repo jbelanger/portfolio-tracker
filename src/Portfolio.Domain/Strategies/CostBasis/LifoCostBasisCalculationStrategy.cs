@@ -11,6 +11,8 @@ namespace Portfolio.Domain.Strategies.CostBasis
     /// </summary>
     public class LifoCostBasisCalculationStrategy : ICostBasisCalculationStrategy
     {
+        public string Name => "LIFO";
+
         /// <summary>
         /// Calculates the cost basis of an asset using the LIFO (Last In, First Out) method.
         /// </summary>

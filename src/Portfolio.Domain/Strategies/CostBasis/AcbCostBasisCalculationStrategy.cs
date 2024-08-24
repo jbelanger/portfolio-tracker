@@ -11,6 +11,8 @@ namespace Portfolio.Domain.Strategies.CostBasis
     /// </summary>
     public class AcbCostBasisCalculationStrategy : ICostBasisCalculationStrategy
     {
+        public string Name => "ACB";
+
         /// <summary>
         /// Calculates the cost basis of an asset using the Average Cost Basis (ACB) method.
         /// </summary>

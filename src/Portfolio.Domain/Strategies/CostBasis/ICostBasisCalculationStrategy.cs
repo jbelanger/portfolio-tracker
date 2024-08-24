@@ -9,6 +9,8 @@ namespace Portfolio.Domain.Entities
     /// </summary>
     public interface ICostBasisCalculationStrategy
     {
+        public string Name { get; }
+
         /// <summary>
         /// Calculates the cost basis of an asset using a specific calculation strategy.
         /// </summary>

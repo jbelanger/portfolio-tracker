@@ -6,7 +6,7 @@ namespace Portfolio.App.DTOs
     {
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public IEnumerable<CryptoCurrencyTransactionDto> Transactions { get; set; } = new List<CryptoCurrencyTransactionDto>();
+        public List<TransactionDto> Transactions { get; set; } = new();
 
         public static WalletDto From(Wallet wallet)
         {
@@ -14,7 +14,7 @@ namespace Portfolio.App.DTOs
             {
                 Id = wallet.Id,
                 Name = wallet.Name,
-                Transactions = wallet.Transactions.Select(t => CryptoCurrencyTransactionDto.From(t)).ToList()
+                Transactions = wallet.Transactions.Select(TransactionDto.From).ToList()
             };
         }
     }

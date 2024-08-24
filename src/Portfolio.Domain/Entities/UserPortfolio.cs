@@ -69,6 +69,9 @@ namespace Portfolio.Domain.Entities
 
             DefaultCurrency = currencyCode;
 
+            // Needs to recalculate all the trades
+            AddDomainEvent(new TradesRecalculationNeededEvent(this));
+
             return Result.Success();
         }
 
@@ -76,6 +79,9 @@ namespace Portfolio.Domain.Entities
         {
             if (!Wallets.Any())
                 return Result.Failure("No wallets to process. Start by adding a wallet.");
+
+            _holdings.Clear();
+            _financialEvents.Clear();
 
             var transactions = GetTransactionsFromAllWallets();
             var result = await _transactionProcessor.ProcessTransactionsAsync(transactions, this, priceHistoryService);

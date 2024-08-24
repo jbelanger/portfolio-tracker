@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Portfolio.App.Common.Interfaces;
 using Portfolio.Domain.Common;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.ValueObjects;
 using Portfolio.Infrastructure.Data.Configurations;
 using Portfolio.Infrastructure.Identity;
 using Portfolio.Infrastructure.Persistence.Configurations;
@@ -23,7 +24,8 @@ namespace Portfolio.Infrastructure
         public DbSet<UserPortfolio> Portfolios { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<AssetHolding> Holdings { get; set; }
-        public DbSet<FinancialTransaction> RawTransactions { get; set; }
+        public DbSet<FinancialTransaction> Transactions { get; set; }
+        public DbSet<PriceRecord> PriceHistoryRecords { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -56,6 +58,7 @@ namespace Portfolio.Infrastructure
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new PortfolioConfiguration());
             modelBuilder.ApplyConfiguration(new FinancialEventConfiguration());
+            modelBuilder.ApplyConfiguration(new PriceRecordConfiguration());
         }
     }
 }

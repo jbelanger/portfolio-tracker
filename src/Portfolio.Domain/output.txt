@@ -1,3 +1,47 @@
+using System;
+using System.Reflection;
+[assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute(".NETCoreApp,Version=v8.0", FrameworkDisplayName = ".NET 8.0")]
+global using global::System;
+global using global::System.Collections.Generic;
+global using global::System.IO;
+global using global::System.Linq;
+global using global::System.Net.Http;
+global using global::System.Threading;
+global using global::System.Threading.Tasks;
+
+using System;
+using System.Reflection;
+
+[assembly: System.Reflection.AssemblyCompanyAttribute("Portfolio.Domain")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b939afd4dad8882c516038f6d4d9b6d835809e0d")]
+[assembly: System.Reflection.AssemblyProductAttribute("Portfolio.Domain")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Portfolio.Domain")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Portfolio.Domain.Tests")]
+
+
+global using global::System;
+global using global::System.Collections.Generic;
+global using global::System.IO;
+global using global::System.Linq;
+global using global::System.Net.Http;
+global using global::System.Threading;
+global using global::System.Threading.Tasks;
+
+using System;
+using System.Reflection;
+
+[assembly: System.Reflection.AssemblyCompanyAttribute("Portfolio.Shared")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9cb887642bcb17c71c06f2d64730127665cdee41")]
+[assembly: System.Reflection.AssemblyProductAttribute("Portfolio.Shared")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Portfolio.Shared")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+
+
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.Enums;
@@ -803,6 +847,9 @@ namespace Portfolio.Domain.Entities
             decimal marketPricePerUnit
         )
         {           
+            if(transaction.Type == TransactionType.Deposit)
+                return;
+
             if (transaction.SentAmount.IsFiatCurrency)
             {
                 return;
