@@ -22,8 +22,8 @@ namespace Portfolio.Infrastructure
 
         public DbSet<UserPortfolio> Portfolios { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
-        public DbSet<CryptoCurrencyHolding> Holdings { get; set; }
-        public DbSet<CryptoCurrencyRawTransaction> RawTransactions { get; set; }
+        public DbSet<AssetHolding> Holdings { get; set; }
+        public DbSet<FinancialTransaction> RawTransactions { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -51,14 +51,11 @@ namespace Portfolio.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new CryptoCurrencyRawTransactionConfiguration());  
-            //modelBuilder.ApplyConfiguration(new CryptoCurrencyProcessedTransactionConfiguration());            
-            // modelBuilder.ApplyConfiguration(new CryptoCurrencyTransactionConfiguration());            
-            // modelBuilder.ApplyConfiguration(new CryptoCurrencyTradeTransactionConfiguration());
-            modelBuilder.ApplyConfiguration(new CryptoCurrencyHoldingConfiguration());
+            modelBuilder.ApplyConfiguration(new FinancialTransactionConfiguration());  
+            modelBuilder.ApplyConfiguration(new AssetHoldingConfiguration());
             modelBuilder.ApplyConfiguration(new WalletConfiguration());
             modelBuilder.ApplyConfiguration(new PortfolioConfiguration());
-            modelBuilder.ApplyConfiguration(new TaxableEventConfiguration());
+            modelBuilder.ApplyConfiguration(new FinancialEventConfiguration());
         }
     }
 }

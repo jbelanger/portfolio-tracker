@@ -7,8 +7,8 @@ namespace Portfolio.Domain.Entities
     {
         public string Name { get; init; } = string.Empty;
         public long PortfolioId { get; set; }
-        private readonly List<CryptoCurrencyRawTransaction> _transactions = new();
-        public IReadOnlyCollection<CryptoCurrencyRawTransaction> Transactions => _transactions.AsReadOnly();
+        private readonly List<FinancialTransaction> _transactions = new();
+        public IReadOnlyCollection<FinancialTransaction> Transactions => _transactions.AsReadOnly();
 
         private Wallet() { }
 
@@ -22,7 +22,7 @@ namespace Portfolio.Domain.Entities
             };
         }
 
-        public Result AddTransaction(CryptoCurrencyRawTransaction transaction)
+        public Result AddTransaction(FinancialTransaction transaction)
         {
             if (transaction == null)
                 return Result.Failure("Transaction cannot be null.");
@@ -33,7 +33,7 @@ namespace Portfolio.Domain.Entities
             return Result.Success();
         }
 
-        public Result RemoveTransaction(CryptoCurrencyRawTransaction transaction)
+        public Result RemoveTransaction(FinancialTransaction transaction)
         {
             if (transaction == null)
                 return Result.Failure("Transaction cannot be null.");
@@ -46,7 +46,7 @@ namespace Portfolio.Domain.Entities
             return Result.Success();
         }
 
-        public bool IsSameTransaction(CryptoCurrencyRawTransaction obj, CryptoCurrencyRawTransaction other)
+        public bool IsSameTransaction(FinancialTransaction obj, FinancialTransaction other)
         {
             return obj.DateTime.TruncateToSecond() == other.DateTime.TruncateToSecond() &&
                    obj.Type == other.Type &&

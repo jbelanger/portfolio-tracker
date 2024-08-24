@@ -31,7 +31,7 @@ public class PortfolioFullTestSuite
         var transactionDate = new DateTime(2024, 8, 22);
         var depositAmount = new Money(1m, "BTC");
 
-        var transaction = CryptoCurrencyRawTransaction.CreateDeposit(
+        var transaction = FinancialTransaction.CreateDeposit(
             transactionDate,
             depositAmount,
             Money.Empty,
@@ -70,7 +70,7 @@ public class PortfolioFullTestSuite
         var depositAmount = new Money(1m, "BTC");
         var withdrawalAmount = new Money(0.5m, "BTC");
 
-        var depositTransaction = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransaction = FinancialTransaction.CreateDeposit(
             depositDate,
             depositAmount,
             Money.Empty,
@@ -78,7 +78,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var withdrawalTransaction = CryptoCurrencyRawTransaction.CreateWithdraw(
+        var withdrawalTransaction = FinancialTransaction.CreateWithdraw(
             withdrawalDate,
             withdrawalAmount,
             Money.Empty,
@@ -120,7 +120,7 @@ public class PortfolioFullTestSuite
         var depositAmountETH = new Money(10m, "ETH");
         var withdrawalAmountBTC = new Money(0.5m, "BTC");
 
-        var depositTransactionBTC = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC = FinancialTransaction.CreateDeposit(
             depositDateBTC,
             depositAmountBTC,
             Money.Empty,
@@ -128,7 +128,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var depositTransactionETH = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionETH = FinancialTransaction.CreateDeposit(
             depositDateETH,
             depositAmountETH,
             Money.Empty,
@@ -136,7 +136,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var withdrawalTransactionBTC = CryptoCurrencyRawTransaction.CreateWithdraw(
+        var withdrawalTransactionBTC = FinancialTransaction.CreateWithdraw(
             withdrawalDateBTC,
             withdrawalAmountBTC,
             Money.Empty,
@@ -185,7 +185,7 @@ public class PortfolioFullTestSuite
         var tradeBTCtoETH = new Money(0.5m, "BTC");
         var receivedETH = new Money(8m, "ETH");
 
-        var depositTransactionBTC = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC = FinancialTransaction.CreateDeposit(
             depositDateBTC,
             depositAmountBTC,
             Money.Empty,
@@ -193,7 +193,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionBTCtoETH = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionBTCtoETH = FinancialTransaction.CreateTrade(
             tradeDate,
             receivedETH,
             tradeBTCtoETH,
@@ -247,7 +247,7 @@ public class PortfolioFullTestSuite
         var tradeBTCtoUSD = new Money(0.5m, "BTC");
         var receivedUSD = new Money(15000m, "USD");
 
-        var depositTransactionBTC = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC = FinancialTransaction.CreateDeposit(
             depositDateBTC,
             depositAmountBTC,
             Money.Empty,
@@ -255,7 +255,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionBTCtoUSD = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionBTCtoUSD = FinancialTransaction.CreateTrade(
             tradeDate,
             receivedUSD,
             tradeBTCtoUSD,
@@ -301,7 +301,7 @@ public class PortfolioFullTestSuite
         var tradeUSDtoBTC = new Money(15000m, "USD");
         var receivedBTC = new Money(0.5m, "BTC");
 
-        var depositTransactionUSD = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionUSD = FinancialTransaction.CreateDeposit(
             depositDateUSD,
             depositAmountUSD,
             Money.Empty,
@@ -309,7 +309,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionUSDtoBTC = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionUSDtoBTC = FinancialTransaction.CreateTrade(
             tradeDate,
             receivedBTC,
             tradeUSDtoBTC,
@@ -357,7 +357,7 @@ public class PortfolioFullTestSuite
         var tradeBTCtoETH = new Money(1.5m, "BTC");
         var receivedETH = new Money(10m, "ETH");
 
-        var depositTransactionBTC1 = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC1 = FinancialTransaction.CreateDeposit(
             depositDate1,
             depositAmountBTC1,
             Money.Empty,
@@ -365,7 +365,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var depositTransactionBTC2 = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC2 = FinancialTransaction.CreateDeposit(
             depositDate2,
             depositAmountBTC2,
             Money.Empty,
@@ -373,7 +373,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionBTCtoETH = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionBTCtoETH = FinancialTransaction.CreateTrade(
             tradeDate,
             receivedETH,
             tradeBTCtoETH,
@@ -417,11 +417,11 @@ public class PortfolioFullTestSuite
         ethHolding.Balance.Should().Be(10m); // Received 10 ETH
         ethHolding.AverageBoughtPrice.Should().BeApproximately(6000m, 0.01m); // 1.5 BTC * 40000 USD / 10 ETH
 
-        var taxableEvent = _portfolio.TaxableEvents.Should().ContainSingle(h => h.Currency == "USD").Subject;
-        taxableEvent.DisposedAsset.Should().Be("BTC");
-        taxableEvent.Quantity.Should().Be(tradeTransactionBTCtoETH.SentAmount.Amount);
-        taxableEvent.AverageCost.Should().BeApproximately(33333.33m, 0.01m);
-        taxableEvent.ValueAtDisposal.Should().Be(40000m);
+        var taxableEvent = _portfolio.FinancialEvents.Should().ContainSingle(h => h.BaseCurrency == "USD").Subject;
+        taxableEvent.AssetSymbol.Should().Be("BTC");
+        taxableEvent.Amount.Should().Be(tradeTransactionBTCtoETH.SentAmount.Amount);
+        taxableEvent.CostBasisPerUnit.Should().BeApproximately(33333.33m, 0.01m);
+        taxableEvent.MarketPricePerUnit.Should().Be(40000m);
     }
 
     [Test]
@@ -437,7 +437,7 @@ public class PortfolioFullTestSuite
         var receivedETH = new Money(15m, "ETH");
         var withdrawalAmountETH = new Money(5m, "ETH");
 
-        var depositTransactionBTC = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC = FinancialTransaction.CreateDeposit(
             depositDateBTC,
             depositAmountBTC,
             Money.Empty,
@@ -445,7 +445,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionBTCtoETH = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionBTCtoETH = FinancialTransaction.CreateTrade(
             tradeDate,
             receivedETH,
             tradeBTCtoETH,
@@ -454,7 +454,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var withdrawalTransactionETH = CryptoCurrencyRawTransaction.CreateWithdraw(
+        var withdrawalTransactionETH = FinancialTransaction.CreateWithdraw(
             withdrawalDate,
             withdrawalAmountETH,
             Money.Empty,
@@ -524,7 +524,7 @@ public class PortfolioFullTestSuite
         var tradeBTCtoETH = new Money(5000m, "BTC");
         var receivedETH = new Money(75000m, "ETH");
 
-        var depositTransactionBTC = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC = FinancialTransaction.CreateDeposit(
             depositDateBTC,
             depositAmountBTC,
             Money.Empty,
@@ -532,7 +532,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionBTCtoETH = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionBTCtoETH = FinancialTransaction.CreateTrade(
             tradeDate,
             receivedETH,
             tradeBTCtoETH,
@@ -594,7 +594,7 @@ public class PortfolioFullTestSuite
         var receivedETH2 = new Money(10m, "ETH");
         var withdrawalAmountETH2 = new Money(6m, "ETH");
 
-        var depositTransactionBTC1 = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC1 = FinancialTransaction.CreateDeposit(
             depositDate1,
             depositAmountBTC1,
             Money.Empty,
@@ -602,7 +602,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionBTCtoETH1 = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionBTCtoETH1 = FinancialTransaction.CreateTrade(
             tradeDate1,
             receivedETH1,
             tradeBTCtoETH1,
@@ -611,7 +611,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var withdrawalTransactionETH1 = CryptoCurrencyRawTransaction.CreateWithdraw(
+        var withdrawalTransactionETH1 = FinancialTransaction.CreateWithdraw(
             withdrawalDate1,
             withdrawalAmountETH1,
             Money.Empty,
@@ -619,7 +619,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var depositTransactionBTC2 = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC2 = FinancialTransaction.CreateDeposit(
             depositDate2,
             depositAmountBTC2,
             Money.Empty,
@@ -627,7 +627,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionBTCtoETH2 = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionBTCtoETH2 = FinancialTransaction.CreateTrade(
             tradeDate2,
             receivedETH2,
             tradeBTCtoETH2,
@@ -636,7 +636,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var withdrawalTransactionETH2 = CryptoCurrencyRawTransaction.CreateWithdraw(
+        var withdrawalTransactionETH2 = FinancialTransaction.CreateWithdraw(
             withdrawalDate2,
             withdrawalAmountETH2,
             Money.Empty,
@@ -700,7 +700,7 @@ public class PortfolioFullTestSuite
         var tradeBTCtoETH = new Money(2m, "BTC"); // More BTC than available in balance
         var receivedETH = new Money(16m, "ETH");
 
-        var depositTransactionBTC = CryptoCurrencyRawTransaction.CreateDeposit(
+        var depositTransactionBTC = FinancialTransaction.CreateDeposit(
             depositDateBTC,
             depositAmountBTC,
             Money.Empty,
@@ -708,7 +708,7 @@ public class PortfolioFullTestSuite
             [],
             "").Value;
 
-        var tradeTransactionBTCtoETH = CryptoCurrencyRawTransaction.CreateTrade(
+        var tradeTransactionBTCtoETH = FinancialTransaction.CreateTrade(
             tradeDate,
             receivedETH,
             tradeBTCtoETH,

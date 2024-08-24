@@ -5,7 +5,7 @@ namespace Portfolio.Domain.Entities
 {
     /// <summary>
     /// Represents a cryptocurrency transaction, which can be a trade, deposit, or withdrawal.
-    /// </summary>
+    /// </summary>    
     public abstract class CryptoCurrencyTransaction : BaseAuditableEntity, ICryptoCurrencyTransaction
     {
         public Money UnitValue { get; set; }

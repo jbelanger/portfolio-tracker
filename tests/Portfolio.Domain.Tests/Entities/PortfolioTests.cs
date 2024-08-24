@@ -31,7 +31,7 @@ namespace Portfolio.Domain.Tests.Entities
             var depositAmount = new Money(1m, "BTC");
             var feeAmount = new Money(0.1m, "BTC");
 
-            var transaction = CryptoCurrencyRawTransaction.CreateDeposit(
+            var transaction = FinancialTransaction.CreateDeposit(
                 transactionDate,
                 depositAmount,
                 feeAmount,
@@ -83,7 +83,7 @@ namespace Portfolio.Domain.Tests.Entities
             var depositFee = new Money(0.1m, "BTC");
             var withdrawalFee = new Money(0.05m, "BTC");
 
-            var depositTransaction = CryptoCurrencyRawTransaction.CreateDeposit(
+            var depositTransaction = FinancialTransaction.CreateDeposit(
                 depositDate,
                 depositAmount,
                 depositFee,
@@ -91,7 +91,7 @@ namespace Portfolio.Domain.Tests.Entities
                 [],
                 "").Value;
 
-            var withdrawalTransaction = CryptoCurrencyRawTransaction.CreateWithdraw(
+            var withdrawalTransaction = FinancialTransaction.CreateWithdraw(
                 withdrawalDate,
                 withdrawalAmount,
                 withdrawalFee,
@@ -135,10 +135,10 @@ namespace Portfolio.Domain.Tests.Entities
             withdrawalTransaction.FeeValueInDefaultCurrency.CurrencyCode.Should().Be(_portfolio.DefaultCurrency);
 
             // If strategy is Adjusted Cost Base (ACB)...
-            var taxableEvent = _portfolio.TaxableEvents.Should().ContainSingle(h => h.Currency == "USD").Subject;
-            taxableEvent.Quantity.Should().Be(1m);
-            taxableEvent.AverageCost.Should().Be(25000m);
-            taxableEvent.ValueAtDisposal.Should().Be(35000m);
+            var taxableEvent = _portfolio.FinancialEvents.Should().ContainSingle(h => h.BaseCurrency == "USD").Subject;
+            taxableEvent.Amount.Should().Be(1m);
+            taxableEvent.CostBasisPerUnit.Should().Be(25000m);
+            taxableEvent.MarketPricePerUnit.Should().Be(35000m);
 
             _priceHistoryServiceMock.Verify(p => p.GetPriceAtCloseTimeAsync("BTC", depositDate), Times.AtLeast(1));
             _priceHistoryServiceMock.Verify(p => p.GetPriceAtCloseTimeAsync("BTC", withdrawalDate), Times.AtLeast(1));
@@ -152,7 +152,7 @@ namespace Portfolio.Domain.Tests.Entities
             var depositAmount = new Money(1m, "BTC");
             var feeAmount = new Money(0.1m, "BTC");
 
-            var transaction = CryptoCurrencyRawTransaction.CreateDeposit(
+            var transaction = FinancialTransaction.CreateDeposit(
                 transactionDate,
                 depositAmount,
                 feeAmount,
@@ -193,7 +193,7 @@ namespace Portfolio.Domain.Tests.Entities
             var depositFee = new Money(0.1m, "BTC");
             var withdrawalFee = new Money(0m, "BTC");
 
-            var depositTransaction = CryptoCurrencyRawTransaction.CreateDeposit(
+            var depositTransaction = FinancialTransaction.CreateDeposit(
                 depositDate,
                 depositAmount,
                 depositFee,
@@ -201,7 +201,7 @@ namespace Portfolio.Domain.Tests.Entities
                 [],
                 "").Value;
 
-            var withdrawalTransaction = CryptoCurrencyRawTransaction.CreateWithdraw(
+            var withdrawalTransaction = FinancialTransaction.CreateWithdraw(
                 withdrawalDate,
                 withdrawalAmount,
                 withdrawalFee,

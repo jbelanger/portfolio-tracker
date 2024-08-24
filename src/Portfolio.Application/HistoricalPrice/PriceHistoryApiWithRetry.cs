@@ -22,8 +22,8 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
         /// <param name="symbolPair">The trading pair symbol, e.g., "BTC/USD".</param>
         /// <param name="startDate">The start date for fetching data.</param>
         /// <param name="endDate">The end date for fetching data.</param>
-        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="CryptoPriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
+        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
+        public async Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
         {
             int retryCount = 0;
             while (retryCount < _numberOfAttemps)
@@ -38,7 +38,7 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
                 Log.Warning("Retrying price retrieval for {CurrencyCode} on {Date:yyyy-MM-dd}. Attempt {RetryCount}/{MaxRetries}", symbolPair, startDate, retryCount, _numberOfAttemps);
             }
 
-            return Result.Failure<IEnumerable<CryptoPriceRecord>>($"Failed to get price history for {symbolPair} after {_numberOfAttemps} attemps."); // Indicating failure
+            return Result.Failure<IEnumerable<PriceRecord>>($"Failed to get price history for {symbolPair} after {_numberOfAttemps} attemps."); // Indicating failure
         }
 
         public string DetermineTradingPair(string fromSymbol, string toSymbol)

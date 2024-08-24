@@ -13,7 +13,7 @@ namespace Portfolio.App.HistoricalPrice
     {
         private readonly IPriceHistoryApi _priceHistoryApi;
         private readonly IPriceHistoryStorageService _priceHistoryStorage;
-        private ConcurrentDictionary<string, Lazy<Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>>>> _dataStores = new();
+        private ConcurrentDictionary<string, Lazy<Task<ReadOnlyDictionary<DateTime, PriceRecord>>>> _dataStores = new();
 
         /// <summary>
         /// Gets or sets the default currency symbol used in price calculations.
@@ -83,7 +83,7 @@ namespace Portfolio.App.HistoricalPrice
         /// </summary>
         /// <param name="symbol">The symbol of the cryptocurrency.</param>
         /// <returns>A task representing the asynchronous operation, with a result of the price history dictionary.</returns>
-        private async Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
+        private async Task<ReadOnlyDictionary<DateTime, PriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
         {
             return await _dataStores.GetOrAddAsync(symbol, async s =>
             {
@@ -99,7 +99,7 @@ namespace Portfolio.App.HistoricalPrice
                 else
                 {
                     // Save an empty file to avoid trying to fetch from the API repeatedly.
-                    var emptyDictionary = new Dictionary<DateTime, CryptoPriceRecord>();
+                    var emptyDictionary = new Dictionary<DateTime, PriceRecord>();
                     var saveResult = await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, emptyDictionary.Values)
                         .TapError(Log.ForContext<PriceHistoryService>().Error).ConfigureAwait(false);
                     return emptyDictionary.AsReadOnly();
@@ -114,7 +114,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="date">The date for which data is missing.</param>
         /// <param name="history">The existing price history.</param>
         /// <returns>A <see cref="Result{T}"/> containing the price or an error message.</returns>
-        private Result<decimal> HandleMissingFiatData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
+        private Result<decimal> HandleMissingFiatData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, PriceRecord> history)
         {
             Log.ForContext<PriceHistoryService>().Debug("Missing fiat data for {Symbol} on {Date:yyyy-MM-dd}. Trying previous working days...", symbol, date);
 
@@ -135,7 +135,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="date">The date for which data is missing.</param>
         /// <param name="history">The existing price history.</param>
         /// <returns>The closing price from a previous working day, or -1 if not found.</returns>
-        private decimal GetPreviousWorkingDayPriceData(DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
+        private decimal GetPreviousWorkingDayPriceData(DateTime date, ReadOnlyDictionary<DateTime, PriceRecord> history)
         {
             for (int i = 1; i <= 4; i++)
             {
@@ -153,7 +153,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="date">The date for which data is being fetched.</param>
         /// <param name="history">The existing price history.</param>
         /// <returns>A <see cref="Result{T}"/> containing the closing price or an error message.</returns>
-        private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history)
+        private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, PriceRecord> history)
         {
             var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
             var endDate = AdjustEndDate(date);
@@ -200,7 +200,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="currentHistory">The current price history.</param>
         /// <param name="newRecords">The new records to be saved.</param>
         /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
-        private async Task<Result> SaveNewPriceHistoryAsync(string symbol, ReadOnlyDictionary<DateTime, CryptoPriceRecord> currentHistory, IEnumerable<CryptoPriceRecord> newRecords)
+        private async Task<Result> SaveNewPriceHistoryAsync(string symbol, ReadOnlyDictionary<DateTime, PriceRecord> currentHistory, IEnumerable<PriceRecord> newRecords)
         {
             var existingRecords = currentHistory.Values;
 
@@ -230,7 +230,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="history">The current price history.</param>
         /// <param name="records">The new records to be added.</param>
         /// <returns>A task representing the asynchronous operation, with a result of the updated price history dictionary.</returns>
-        private async Task<ReadOnlyDictionary<DateTime, CryptoPriceRecord>> UpdateHistoryWithFetchedDataAsync(string symbol, ReadOnlyDictionary<DateTime, CryptoPriceRecord> history, IEnumerable<CryptoPriceRecord> records)
+        private async Task<ReadOnlyDictionary<DateTime, PriceRecord>> UpdateHistoryWithFetchedDataAsync(string symbol, ReadOnlyDictionary<DateTime, PriceRecord> history, IEnumerable<PriceRecord> records)
         {
             return await _dataStores.AddOrUpdateAsync(symbol, async _ => await Task.FromResult(history), async (k, v) => 
             {

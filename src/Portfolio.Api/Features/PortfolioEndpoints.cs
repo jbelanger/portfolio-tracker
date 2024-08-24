@@ -77,7 +77,7 @@ namespace Portfolio.Api.Features
                 var portfolio = await dbContext.Portfolios
                     .Include(p => p.Holdings)
                     .Include("Wallets.Transactions")
-                    .Include(p => p.TaxableEvents)                    
+                    .Include(p => p.FinancialEvents)                    
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (portfolio is null)

@@ -5,7 +5,7 @@ namespace Portfolio.Domain;
 
 public static class TransactionValidationUtils
 {
-    public static bool EnsureAboveZeroAmount(CryptoCurrencyRawTransaction tx, bool incoming = true)
+    public static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
     {
         if (incoming && tx.ReceivedAmount.Amount <= 0)
         {
@@ -31,7 +31,7 @@ public static class TransactionValidationUtils
         return true;
     }
 
-    public static void EnsureBalanceNotNegative(CryptoCurrencyRawTransaction tx, string asset, decimal balance)
+    public static void EnsureBalanceNotNegative(FinancialTransaction tx, string asset, decimal balance)
     {
         if (balance < 0)
         {
@@ -44,7 +44,7 @@ public static class TransactionValidationUtils
 
 public static class FeeHandlingUtils
 {
-    public static async Task HandleFeesAsync(CryptoCurrencyRawTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+    public static async Task HandleFeesAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
     {
         if (tx.FeeAmount == Money.Empty) return;
 
@@ -76,7 +76,7 @@ public static class FeeHandlingUtils
         TransactionValidationUtils.EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
     }
 
-    private static bool ShouldDeductFeesFromBalance(CryptoCurrencyRawTransaction tx)
+    private static bool ShouldDeductFeesFromBalance(FinancialTransaction tx)
     {
         // For deposits and trades, fees might not be deducted from the balance if paid in the same currency as the received amount.
         return tx.FeeAmount.CurrencyCode != tx.ReceivedAmount.CurrencyCode || tx.Type == TransactionType.Withdrawal;

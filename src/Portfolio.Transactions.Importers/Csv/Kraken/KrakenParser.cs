@@ -48,10 +48,10 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
             _refidsToIgnore = ignoreRefIds;
         }
 
-        public IEnumerable<CryptoCurrencyRawTransaction> ExtractTransactions()
+        public IEnumerable<FinancialTransaction> ExtractTransactions()
         {
             var rawLedger = _csvLines.Where(x => _refidsToIgnore == null || !_refidsToIgnore.Any() || !_refidsToIgnore.Contains(x.ReferenceId)).OrderBy(x => x.Date).ToList();
-            var transactions = new List<CryptoCurrencyRawTransaction>();
+            var transactions = new List<FinancialTransaction>();
 
             // Trades
             var trades = ProcessTrades(rawLedger);
@@ -82,9 +82,9 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
             return transactions.OrderBy(t => t.DateTime);
         }
 
-        private static IEnumerable<CryptoCurrencyRawTransaction> ProcessWithdrawals(IEnumerable<KrakenCsvEntry> rawLedger)
+        private static IEnumerable<FinancialTransaction> ProcessWithdrawals(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyRawTransaction>();
+            var transactions = new List<FinancialTransaction>();
             var processedRefIds = new HashSet<string>();
             var withdrawals = rawLedger.Where(x => x.Type == "withdrawal");
 
@@ -97,7 +97,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
 
             foreach (var withdraw in withdrawals)
             {
-                var withdrawResult = CryptoCurrencyRawTransaction.CreateWithdraw(
+                var withdrawResult = FinancialTransaction.CreateWithdraw(
                     date: withdraw.Date,
                     sentAmount: withdraw.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
@@ -115,9 +115,9 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
             return transactions;
         }
 
-        private static IEnumerable<CryptoCurrencyRawTransaction> ProcessDeposits(IEnumerable<KrakenCsvEntry> rawLedger)
+        private static IEnumerable<FinancialTransaction> ProcessDeposits(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var transactions = new List<CryptoCurrencyRawTransaction>();
+            var transactions = new List<FinancialTransaction>();
             var deposits = rawLedger.Where(x => x.Type == "deposit");
 
             // Ensure data is valid
@@ -129,7 +129,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
 
             foreach (var deposit in deposits)
             {
-                var depositResult = CryptoCurrencyRawTransaction.CreateDeposit(
+                var depositResult = FinancialTransaction.CreateDeposit(
                     date: deposit.Date,
                     receivedAmount: deposit.Amount.ToAbsoluteAmountMoney().Subtract(deposit.Fee.ToAbsoluteAmountMoney()),
                     feeAmount: deposit.Fee.ToAbsoluteAmountMoney(),
@@ -183,9 +183,9 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
         /// <param name="rawLedger"></param>
         /// <returns></returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static IEnumerable<CryptoCurrencyRawTransaction> ProcessTrades(IEnumerable<KrakenCsvEntry> rawLedger)
+        private static IEnumerable<FinancialTransaction> ProcessTrades(IEnumerable<KrakenCsvEntry> rawLedger)
         {
-            var trades = new List<CryptoCurrencyRawTransaction>();
+            var trades = new List<FinancialTransaction>();
             var processedRefIds = new HashSet<string>();
             var txGroupsByRefid = rawLedger.GroupBy(x => x.ReferenceId).Where(group => group.Count() > 1);
             foreach (var group in txGroupsByRefid)
@@ -197,7 +197,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                     // In those cases, we can see multiple "spend" for one "receive".
                     if (receiveTx.Amount.Amount < 1)
                     {
-                        var depositResult = CryptoCurrencyRawTransaction.CreateDeposit(
+                        var depositResult = FinancialTransaction.CreateDeposit(
                             date: receiveTx.Date,
                             receivedAmount: receiveTx.Amount.ToAbsoluteAmountMoney().Subtract(receiveTx.Fee.ToAbsoluteAmountMoney()),
                             feeAmount: receiveTx.Fee.ToAbsoluteAmountMoney(),
@@ -214,7 +214,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
 
                         foreach (var sTx in group.Where(t => t != receiveTx))
                         {
-                            var withdrawResult = CryptoCurrencyRawTransaction.CreateWithdraw(
+                            var withdrawResult = FinancialTransaction.CreateWithdraw(
                                 date: sTx.Date,
                                 sentAmount: sTx.Amount.ToAbsoluteAmountMoney(),
                                 feeAmount: sTx.Fee.ToAbsoluteAmountMoney(),
@@ -247,7 +247,7 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
                 if (isReceiveFee/* && isSellTransaction*/)
                     receivedAmount -= fee.AbsoluteAmount;
 
-                var tradeResult = CryptoCurrencyRawTransaction.CreateTrade(
+                var tradeResult = FinancialTransaction.CreateTrade(
                     date: receiveTx.Date,
                     receivedAmount: new Money(receivedAmount, receiveTx.Amount.CurrencyCode),
                     sentAmount: spendTx.Amount.ToAbsoluteAmountMoney(),
