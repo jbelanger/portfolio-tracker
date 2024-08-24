@@ -22,7 +22,7 @@ public class PortfolioFullTestSuite
             .Setup(p => p.GetPriceAtCloseTimeAsync(It.IsAny<string>(), It.IsAny<DateTime>()))
             .ReturnsAsync(Result.Failure<decimal>("Price not found"));
 
-        _portfolio = new UserPortfolio();
+        _portfolio = new UserPortfolio();        
     }
 
     [Test]
