@@ -16,7 +16,7 @@ namespace Portfolio.Infrastructure.Data.Configurations
                    .IsRequired()
                    .HasMaxLength(100);
 
-            builder.HasMany<CryptoCurrencyRawTransaction>("Transactions")
+            builder.HasMany<FinancialTransaction>("Transactions")
                    .WithOne()                   
                    .HasForeignKey(t => t.WalletId)
                    .OnDelete(DeleteBehavior.Cascade);

@@ -6,7 +6,7 @@ namespace Portfolio.Domain;
 
 public class DepositTransactionStrategy : ITransactionStrategy
 {
-    public async Task<Result> ProcessTransactionAsync(CryptoCurrencyRawTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+    public async Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
     {
         if (!EnsureAboveZeroAmount(tx)) return Result.Failure(tx.ErrorMessage);
 
@@ -41,7 +41,7 @@ public class DepositTransactionStrategy : ITransactionStrategy
         return Result.Success();
     }
 
-    private static bool EnsureAboveZeroAmount(CryptoCurrencyRawTransaction tx)
+    private static bool EnsureAboveZeroAmount(FinancialTransaction tx)
     {
         if (tx.ReceivedAmount.Amount <= 0)
         {
@@ -50,14 +50,5 @@ public class DepositTransactionStrategy : ITransactionStrategy
             return false;
         }
         return true;
-    }
-
-    private static void EnsureBalanceNotNegative(CryptoCurrencyRawTransaction tx, string asset, decimal balance)
-    {
-        if (balance < 0)
-        {
-            tx.ErrorType = ErrorType.InsufficientFunds;
-            tx.ErrorMessage = $"{asset} balance is under zero: {balance}";
-        }
     }
 }

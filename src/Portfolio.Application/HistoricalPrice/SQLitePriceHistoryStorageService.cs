@@ -45,10 +45,10 @@ namespace Portfolio.App.HistoricalPrice
         /// Loads historical price data for a specified cryptocurrency symbol from the SQLite database.
         /// </summary>
         /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC/USD").</param>
-        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="CryptoPriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<CryptoPriceRecord>>> LoadHistoryAsync(string symbol)
+        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
+        public async Task<Result<IEnumerable<PriceRecord>>> LoadHistoryAsync(string symbol)
         {
-            var priceHistory = new List<CryptoPriceRecord>();
+            var priceHistory = new List<PriceRecord>();
 
             try
             {
@@ -66,7 +66,7 @@ namespace Portfolio.App.HistoricalPrice
                     var closeDate = DateTime.Parse(reader.GetString(1));
                     var closePrice = reader.GetDecimal(2);
 
-                    priceHistory.Add(new CryptoPriceRecord
+                    priceHistory.Add(new PriceRecord
                     {
                         CurrencyPair = currencyPair,
                         CloseDate = closeDate,
@@ -74,12 +74,12 @@ namespace Portfolio.App.HistoricalPrice
                     });
                 }
 
-                return Result.Success<IEnumerable<CryptoPriceRecord>>(priceHistory);
+                return Result.Success<IEnumerable<PriceRecord>>(priceHistory);
             }
             catch (Exception ex)
             {
                 Log.Error($"[{nameof(SQLitePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
-                return Result.Failure<IEnumerable<CryptoPriceRecord>>("Error loading data from SQLite.");
+                return Result.Failure<IEnumerable<PriceRecord>>("Error loading data from SQLite.");
             }
         }
 
@@ -89,7 +89,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC/USD").</param>
         /// <param name="priceHistory">The historical price data to be saved.</param>
         /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
-        public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<CryptoPriceRecord> priceHistory)
+        public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<PriceRecord> priceHistory)
         {
             try
             {

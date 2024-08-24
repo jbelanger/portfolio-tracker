@@ -21,7 +21,7 @@ namespace Portfolio.Domain
         /// <param name="symbol">The trading pair symbol, e.g., "BTC/USD".</param>
         /// <param name="startDate">The start date for fetching data.</param>
         /// <param name="endDate">The end date for fetching data.</param>
-        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="CryptoPriceRecord"/> or an error message.</returns>
-        Task<Result<IEnumerable<CryptoPriceRecord>>> FetchPriceHistoryAsync(string symbol, DateTime startDate, DateTime endDate);
+        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
+        Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbol, DateTime startDate, DateTime endDate);
     }
 }

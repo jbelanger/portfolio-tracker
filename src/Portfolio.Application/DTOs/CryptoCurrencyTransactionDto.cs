@@ -17,7 +17,7 @@ namespace Portfolio.App.DTOs
         public string Account { get; set; } = string.Empty;
         public string Note { get; set; } = string.Empty;
 
-        public static CryptoCurrencyTransactionDto From(CryptoCurrencyRawTransaction transaction)
+        public static CryptoCurrencyTransactionDto From(FinancialTransaction transaction)
         {
             if (transaction is null) throw new ArgumentNullException(nameof(transaction));
 

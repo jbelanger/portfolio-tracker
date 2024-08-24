@@ -21,7 +21,7 @@ namespace Portfolio.Tests
             var transactionIds = new List<string> { "tx123" };
 
             // Act
-            var result = CryptoCurrencyRawTransaction.CreateDeposit(date, receivedAmount, feeAmount, account, transactionIds);
+            var result = FinancialTransaction.CreateDeposit(date, receivedAmount, feeAmount, account, transactionIds);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
@@ -45,7 +45,7 @@ namespace Portfolio.Tests
             var transactionIds = new List<string> { "tx123" };
 
             // Act
-            var result = CryptoCurrencyRawTransaction.CreateDeposit(date, receivedAmount, feeAmount, account, transactionIds);
+            var result = FinancialTransaction.CreateDeposit(date, receivedAmount, feeAmount, account, transactionIds);
 
             // Assert
             result.IsFailure.Should().BeTrue();
@@ -63,7 +63,7 @@ namespace Portfolio.Tests
             var transactionIds = new List<string> { "tx456" };
 
             // Act
-            var result = CryptoCurrencyRawTransaction.CreateWithdraw(date, amount, feeAmount, account, transactionIds);
+            var result = FinancialTransaction.CreateWithdraw(date, amount, feeAmount, account, transactionIds);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
@@ -88,7 +88,7 @@ namespace Portfolio.Tests
             var transactionIds = new List<string> { "tx789" };
 
             // Act
-            var result = CryptoCurrencyRawTransaction.CreateTrade(date, receivedAmount, sentAmount, feeAmount, account, transactionIds);
+            var result = FinancialTransaction.CreateTrade(date, receivedAmount, sentAmount, feeAmount, account, transactionIds);
 
             // Assert
             result.IsSuccess.Should().BeTrue();
@@ -106,7 +106,7 @@ namespace Portfolio.Tests
         public void SetTransactionAmounts_Should_ReturnFailure_When_ReceivedAmount_IsInvalid_ForDeposit()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+            var transaction = FinancialTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
 
             // Act
             var result = transaction.SetTransactionAmounts(new Money(0, "USD"), null, null);
@@ -120,7 +120,7 @@ namespace Portfolio.Tests
         public void SetTransactionAmounts_Should_ReturnFailure_When_SentAmount_IsInvalid_ForWithdrawal()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+            var transaction = FinancialTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
 
             // Act
             var result = transaction.SetTransactionAmounts(null, new Money(0, "USD"), null);
@@ -134,7 +134,7 @@ namespace Portfolio.Tests
         public void SetTransactionAmounts_Should_ReturnFailure_When_ReceivedAmount_IsSet_ForWithdrawal()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+            var transaction = FinancialTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
 
             // Act
             var result = transaction.SetTransactionAmounts(new Money(100, "USD"), null, null);
@@ -148,7 +148,7 @@ namespace Portfolio.Tests
         public void SetTransactionAmounts_Should_ReturnFailure_When_SentAmount_IsSet_ForDeposit()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+            var transaction = FinancialTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
 
             // Act
             var result = transaction.SetTransactionAmounts(new Money(100, "USD"), new Money(100, "USD"), null);
@@ -162,7 +162,7 @@ namespace Portfolio.Tests
         public void SetTransactionAmounts_Should_ReturnSuccess_When_ValidAmounts_AreSet_ForTrade()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateTrade(DateTime.UtcNow, new Money(100, "USD"), new Money(50, "USD"), null, "Account1", null).Value;
+            var transaction = FinancialTransaction.CreateTrade(DateTime.UtcNow, new Money(100, "USD"), new Money(50, "USD"), null, "Account1", null).Value;
 
             // Act
             var result = transaction.SetTransactionAmounts(new Money(100, "USD"), new Money(50, "USD"), new Money(5, "USD"));
@@ -178,7 +178,7 @@ namespace Portfolio.Tests
         public void SetTransactionAmounts_Should_ReturnSuccess_When_ValidAmounts_AreSet_ForDeposit()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+            var transaction = FinancialTransaction.CreateDeposit(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
 
             // Act
             var result = transaction.SetTransactionAmounts(new Money(100, "USD"), null, new Money(1, "USD"));
@@ -194,7 +194,7 @@ namespace Portfolio.Tests
         public void SetTransactionAmounts_Should_ReturnSuccess_When_ValidAmounts_AreSet_ForWithdrawal()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
+            var transaction = FinancialTransaction.CreateWithdraw(DateTime.UtcNow, new Money(100, "USD"), null, "Account1", null).Value;
 
             // Act
             var result = transaction.SetTransactionAmounts(null, new Money(100, "USD"), new Money(1, "USD"));

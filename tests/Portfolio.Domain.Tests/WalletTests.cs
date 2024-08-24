@@ -22,7 +22,7 @@ namespace Portfolio.Tests
         public void Create_ShouldSucceed_WhenNameIsValid()
         {
             // Arrange
-            var transactions = new List<CryptoCurrencyRawTransaction>();
+            var transactions = new List<FinancialTransaction>();
 
             // Act
             var result = Wallet.Create("Test Wallet");
@@ -38,7 +38,7 @@ namespace Portfolio.Tests
         public void AddTransaction_ShouldAddTransaction_WhenTransactionIsValid()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(
+            var transaction = FinancialTransaction.CreateWithdraw(
                 DateTime.Now,
                 new Money(1.0m, "BTC"),
                 new Money(0.1m, "BTC"),
@@ -62,7 +62,7 @@ namespace Portfolio.Tests
         public void AddTransaction_ShouldFail_WhenTransactionAlreadyExists()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(
+            var transaction = FinancialTransaction.CreateWithdraw(
                 DateTime.Now,
                 new Money(1.0m, "BTC"),
                 new Money(0.1m, "BTC"),
@@ -89,7 +89,7 @@ namespace Portfolio.Tests
         public void RemoveTransaction_ShouldRemoveTransaction_WhenTransactionExists()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(
+            var transaction = FinancialTransaction.CreateWithdraw(
                 DateTime.Now,
                 new Money(1.0m, "BTC"),
                 new Money(0.1m, "BTC"),
@@ -115,7 +115,7 @@ namespace Portfolio.Tests
         public void RemoveTransaction_ShouldFail_WhenTransactionDoesNotExist()
         {
             // Arrange
-            var transaction = CryptoCurrencyRawTransaction.CreateWithdraw(
+            var transaction = FinancialTransaction.CreateWithdraw(
                 DateTime.Now,
                 new Money(1.0m, "BTC"),
                 new Money(0.1m, "BTC"),

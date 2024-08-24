@@ -5,7 +5,7 @@ using Portfolio.Domain.ValueObjects;
 namespace Portfolio.Domain;
 public class TradeTransactionStrategy : ITransactionStrategy
 {
-    public async Task<Result> ProcessTransactionAsync(CryptoCurrencyRawTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+    public async Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
     {
         if (!EnsureAboveZeroAmount(tx)) return Result.Failure(tx.ErrorMessage);
         if (!EnsureAboveZeroAmount(tx, false)) return Result.Failure(tx.ErrorMessage);
@@ -31,7 +31,7 @@ public class TradeTransactionStrategy : ITransactionStrategy
 
         UpdateReceiverAverageBoughtPrice(tx, receiver);
         
-        portfolio.AddTaxableEvent(tx, sender, price);
+        portfolio.RecordFinancialEvent(tx, sender, price);               
 
         UpdateBalances(tx, receiver, sender);
         HandleFees(tx, portfolio, priceHistoryService);
@@ -39,7 +39,7 @@ public class TradeTransactionStrategy : ITransactionStrategy
         return Result.Success();
     }
 
-    private static bool EnsureAboveZeroAmount(CryptoCurrencyRawTransaction tx, bool incoming = true)
+    private static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
     {
         if ((incoming && tx.ReceivedAmount.Amount <= 0) || (!incoming && tx.SentAmount.Amount <= 0))
         {
@@ -50,7 +50,7 @@ public class TradeTransactionStrategy : ITransactionStrategy
         return true;
     }
 
-    private decimal CalculateTradedCostInUsd(CryptoCurrencyRawTransaction tx, UserPortfolio portfolio, decimal price)
+    private decimal CalculateTradedCostInUsd(FinancialTransaction tx, UserPortfolio portfolio, decimal price)
     {
         if (tx.ReceivedAmount.CurrencyCode == portfolio.DefaultCurrency)
         {
@@ -66,12 +66,12 @@ public class TradeTransactionStrategy : ITransactionStrategy
         }
     }
 
-    private static void UpdateReceiverAverageBoughtPrice(CryptoCurrencyRawTransaction tx, CryptoCurrencyHolding receiver)
+    private static void UpdateReceiverAverageBoughtPrice(FinancialTransaction tx, AssetHolding receiver)
     {
         receiver.AverageBoughtPrice = (receiver.AverageBoughtPrice * receiver.Balance + tx.ValueInDefaultCurrency.Amount) / (receiver.Balance + tx.ReceivedAmount.Amount);
     }
 
-    private static void UpdateBalances(CryptoCurrencyRawTransaction tx, CryptoCurrencyHolding receiver, CryptoCurrencyHolding sender)
+    private static void UpdateBalances(FinancialTransaction tx, AssetHolding receiver, AssetHolding sender)
     {
         receiver.Balance += tx.ReceivedAmount.Amount;
         sender.Balance -= tx.SentAmount.Amount;
@@ -82,7 +82,7 @@ public class TradeTransactionStrategy : ITransactionStrategy
         EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
     }
 
-    private async void HandleFees(CryptoCurrencyRawTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+    private async void HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
     {
         if (tx.FeeAmount == Money.Empty) return;
 
@@ -114,7 +114,7 @@ public class TradeTransactionStrategy : ITransactionStrategy
         EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
     }
 
-    private static void EnsureBalanceNotNegative(CryptoCurrencyRawTransaction tx, string asset, decimal balance)
+    private static void EnsureBalanceNotNegative(FinancialTransaction tx, string asset, decimal balance)
     {
         if (balance < 0)
         {

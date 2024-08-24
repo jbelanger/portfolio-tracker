@@ -4,12 +4,12 @@ using Portfolio.Domain.Entities;
 
 namespace Portfolio.Infrastructure.Data.Configurations
 {
-       public class CryptoCurrencyRawTransactionConfiguration : IEntityTypeConfiguration<CryptoCurrencyRawTransaction>
+       public class FinancialTransactionConfiguration : IEntityTypeConfiguration<FinancialTransaction>
        {
-              public void Configure(EntityTypeBuilder<CryptoCurrencyRawTransaction> builder)
+              public void Configure(EntityTypeBuilder<FinancialTransaction> builder)
               {
                      // Define the table name (optional, EF Core will use the class name by default)
-                     builder.ToTable("CryptoCurrencyRawTransactions");
+                     builder.ToTable("FinancialTransactions");
 
                      // Define the primary key
                      builder.HasKey(t => t.Id);

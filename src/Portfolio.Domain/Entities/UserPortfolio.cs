@@ -8,25 +8,39 @@ namespace Portfolio.Domain.Entities
     public class UserPortfolio : AggregateRoot
     {
         private readonly TransactionProcessor _transactionProcessor;
-        private List<CryptoCurrencyHolding> _holdings = new();
+        private List<AssetHolding> _holdings = new();
         private List<Wallet> _wallets = new();
-        private List<TaxableEvent> _taxableEvents = new();
-        private ICostBasisCalculationStrategy _costBasisStrategy = new AcbCostBasisCalculationStrategy();
+        private List<FinancialEvent> _financialEvents = new();
+        private ICostBasisCalculationStrategy _costBasisStrategy = null!;
+        private readonly Dictionary<string, ICostBasisCalculationStrategy> _costBasisStrategies = new()
+        {
+            { "AVG", new AcbCostBasisCalculationStrategy() },
+            { "FIFO", new FifoCostBasisCalculationStrategy() },
+            { "LIFO", new LifoCostBasisCalculationStrategy() }
+        };
 
         public string DefaultCurrency { get; private set; } = Strings.CURRENCY_USD;
 
         public IReadOnlyCollection<Wallet> Wallets => _wallets.AsReadOnly();
-        public IReadOnlyCollection<CryptoCurrencyHolding> Holdings => _holdings.AsReadOnly();
-        public IReadOnlyCollection<TaxableEvent> TaxableEvents => _taxableEvents.AsReadOnly();
+        public IReadOnlyCollection<AssetHolding> Holdings => _holdings.AsReadOnly();
+        public IReadOnlyCollection<FinancialEvent> FinancialEvents => _financialEvents.AsReadOnly();
 
         public UserPortfolio()
         {
             _transactionProcessor = new TransactionProcessor();
+            SetCostBasisStrategy("AVG"); // Default to AVG
         }
 
-        public void SetCostBasisStrategy(ICostBasisCalculationStrategy strategy)
-        {            
-            _costBasisStrategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
+        public void SetCostBasisStrategy(string strategy)
+        {
+            if (_costBasisStrategies.ContainsKey(strategy))
+            {
+                _costBasisStrategy = _costBasisStrategies[strategy];
+            }
+            else
+            {
+                throw new ArgumentException($"Cost basis strategy {strategy} not supported.");
+            }
         }
 
         public Result AddWallet(Wallet wallet)
@@ -69,39 +83,70 @@ namespace Portfolio.Domain.Entities
             return Result.Success();
         }
 
-        internal CryptoCurrencyHolding GetOrCreateHolding(string currencyCode)
+        internal AssetHolding GetOrCreateHolding(string currencyCode)
         {
             var holding = _holdings.SingleOrDefault(h => h.Asset == currencyCode);
             if (holding == null)
             {
-                holding = new CryptoCurrencyHolding(currencyCode);
+                holding = new AssetHolding(currencyCode);
                 _holdings.Add(holding);
             }
             return holding;
         }
 
-        internal void AddTaxableEvent(
-            CryptoCurrencyRawTransaction tx,
-            CryptoCurrencyHolding holding,
-            decimal price
-            )
-        {            
-            var costBasis = _costBasisStrategy.CalculateCostBasis([holding], tx);
-            var taxableEventResult = TaxableEvent.Create(tx.DateTime, tx.SentAmount.CurrencyCode, costBasis, price, tx.SentAmount.Amount, DefaultCurrency);
-            if (taxableEventResult.IsSuccess)
+        /// <summary>
+        /// Records a financial transaction event, such as a trade or withdrawal, 
+        /// calculating the capital gain or loss based on the provided transaction data.
+        /// </summary>
+        /// <param name="transaction">The raw transaction data containing details of the trade or withdrawal.</param>
+        /// <param name="holding">The current holding of the disposed asset.</param>
+        /// <param name="marketPricePerUnit">The market price per unit of the disposed asset at the time of the transaction.</param>
+        internal void RecordFinancialEvent(
+            FinancialTransaction transaction,
+            AssetHolding holding,
+            decimal marketPricePerUnit
+        )
+        {
+            // Check if the transaction involves a fiat currency and is a purchase (fiat-to-asset)
+            if (transaction.SentAmount.IsFiatCurrency)
             {
-                _taxableEvents.Add(taxableEventResult.Value);
+                // Fiat-to-asset purchase, not a taxable event, so skip
+                return;
+            }
+
+            // Calculate the cost basis per unit for the disposed asset
+            var costBasisPerUnit = _costBasisStrategy.CalculateCostBasis([holding], transaction) / transaction.SentAmount.Amount;
+
+            // Create the financial event (whether it's a trade or a withdrawal)
+            var financialEventResult = FinancialEvent.Create(
+                transaction.DateTime,
+                transaction.SentAmount.CurrencyCode,
+                costBasisPerUnit,
+                marketPricePerUnit,
+                transaction.SentAmount.Amount,
+                DefaultCurrency
+            );
+
+            // Add the event to the portfolio's list if successful
+            if (financialEventResult.IsSuccess)
+            {
+                _financialEvents.Add(financialEventResult.Value);
             }
             else
             {
-                tx.ErrorMessage = "Could not create taxable event for this transaction.";
-                tx.ErrorType = ErrorType.TaxEventNotCreated;
+                // Handle the error if the event creation failed
+                transaction.ErrorMessage = "Could not create financial event for this transaction.";
+                transaction.ErrorType = ErrorType.EventCreationFailed;
             }
         }
 
-        private IEnumerable<CryptoCurrencyRawTransaction> GetTransactionsFromAllWallets()
+        /// <summary>
+        /// Retrieves all transactions from all wallets in the portfolio.
+        /// </summary>
+        /// <returns>A collection of transactions ordered by date.</returns>
+        private IEnumerable<FinancialTransaction> GetTransactionsFromAllWallets()
         {
-            return Wallets.SelectMany(w => w.Transactions).OrderBy(t => t.DateTime).ToList();
+            return _wallets.SelectMany(w => w.Transactions).OrderBy(t => t.DateTime).ToList();
         }
     }
 }

@@ -27,11 +27,11 @@ namespace Portfolio.Api.Services
             if (!Enum.TryParse(transactionDto.Type, true, out TransactionType transactionType))
                 return Result.Failure<long>($"Invalid transaction type {transactionDto.Type}");
 
-            Result<CryptoCurrencyRawTransaction> addTransactionResult = new Result<CryptoCurrencyRawTransaction>();
+            Result<FinancialTransaction> addTransactionResult = new Result<FinancialTransaction>();
             switch (transactionType)
             {
                 case TransactionType.Deposit:
-                    addTransactionResult = CryptoCurrencyRawTransaction.CreateDeposit(
+                    addTransactionResult = FinancialTransaction.CreateDeposit(
                         transactionDto.DateTime,
                         new Money(transactionDto.ReceivedAmount ?? 0m, transactionDto.ReceivedCurrency),
                         transactionDto.FeeAmount.HasValue ? new Money(transactionDto.FeeAmount ?? 0m, transactionDto.FeeCurrency) : null,
@@ -41,7 +41,7 @@ namespace Portfolio.Api.Services
                     );
                     break;
                 case TransactionType.Withdrawal:
-                    addTransactionResult = CryptoCurrencyRawTransaction.CreateWithdraw(
+                    addTransactionResult = FinancialTransaction.CreateWithdraw(
                         transactionDto.DateTime,
                         new Money(transactionDto.SentAmount.GetValueOrDefault(), transactionDto.SentCurrency),
                         transactionDto.FeeAmount.HasValue ? new Money(transactionDto.FeeAmount.Value, transactionDto.FeeCurrency) : null,
@@ -51,7 +51,7 @@ namespace Portfolio.Api.Services
                     );
                     break;
                 case TransactionType.Trade:
-                    addTransactionResult = CryptoCurrencyRawTransaction.CreateTrade(
+                    addTransactionResult = FinancialTransaction.CreateTrade(
                         transactionDto.DateTime,
                         new Money(transactionDto.ReceivedAmount.GetValueOrDefault(), transactionDto.ReceivedCurrency),
                         new Money(transactionDto.SentAmount.GetValueOrDefault(), transactionDto.SentCurrency),
@@ -210,7 +210,7 @@ namespace Portfolio.Api.Services
             if (wallet == null)
                 return Result.Failure($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
 
-            IEnumerable<CryptoCurrencyRawTransaction>? transactions = null;
+            IEnumerable<FinancialTransaction>? transactions = null;
 
             try
             {
@@ -253,7 +253,7 @@ namespace Portfolio.Api.Services
             return Result.Success();
         }
 
-        private async Task<Result> EnsureTransactionNotAlreadyExistsAsync(long walletId, CryptoCurrencyRawTransaction n)
+        private async Task<Result> EnsureTransactionNotAlreadyExistsAsync(long walletId, FinancialTransaction n)
         {
             decimal received = n.ReceivedAmount.Amount;// ?? null;
             decimal sent = n.SentAmount.Amount;// ?? null;

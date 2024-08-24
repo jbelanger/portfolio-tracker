@@ -26,8 +26,8 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
         /// <param name="symbolPair">The trading pair symbol, e.g., "bitcoin/usd".</param>
         /// <param name="startDate">The start date for fetching data.</param>
         /// <param name="endDate">The end date for fetching data.</param>
-        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="CryptoPriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<CryptoPriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
+        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
+        public async Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
         {
             try
             {
@@ -36,10 +36,10 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
                 var coinId = GetCoinGeckoId(symbolPair.Split('/')[0]);
                 if (string.IsNullOrEmpty(coinId))
                 {
-                    return Result.Failure<IEnumerable<CryptoPriceRecord>>($"CoinGecko ID not found for symbol: {symbolPair}");
+                    return Result.Failure<IEnumerable<PriceRecord>>($"CoinGecko ID not found for symbol: {symbolPair}");
                 }
 
-                var priceData = new List<CryptoPriceRecord>();
+                var priceData = new List<PriceRecord>();
 
                 for (var date = startDate.Date; date <= endDate.Date; date = date.AddDays(1))
                 {
@@ -57,7 +57,7 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
 
                     if (price.HasValue)
                     {
-                        priceData.Add(new CryptoPriceRecord
+                        priceData.Add(new PriceRecord
                         {
                             CurrencyPair = symbolPair,
                             CloseDate = date,
@@ -73,17 +73,17 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
                 if (priceData.Any())
                 {
                     Log.Information("Successfully retrieved price data from CoinGecko for {SymbolPair}.", symbolPair);
-                    return Result.Success<IEnumerable<CryptoPriceRecord>>(priceData);
+                    return Result.Success<IEnumerable<PriceRecord>>(priceData);
                 }
                 else
                 {
-                    return Result.Failure<IEnumerable<CryptoPriceRecord>>("No price data retrieved from CoinGecko.");
+                    return Result.Failure<IEnumerable<PriceRecord>>("No price data retrieved from CoinGecko.");
                 }
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error occurred while fetching data from CoinGecko for {SymbolPair}.", symbolPair);
-                return Result.Failure<IEnumerable<CryptoPriceRecord>>("An error occurred while fetching data from CoinGecko.");
+                return Result.Failure<IEnumerable<PriceRecord>>("An error occurred while fetching data from CoinGecko.");
             }
         }
 

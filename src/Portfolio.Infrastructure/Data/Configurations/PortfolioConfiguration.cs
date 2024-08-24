@@ -28,7 +28,7 @@ namespace Portfolio.Infrastructure.Data.Configurations
                    .OnDelete(DeleteBehavior.Cascade);
 
             // Configure the relationship with ProcessedTransactions
-            builder.HasMany(p => p.TaxableEvents)
+            builder.HasMany(p => p.FinancialEvents)
                    .WithOne()
                    .OnDelete(DeleteBehavior.Cascade);
         }

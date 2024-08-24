@@ -11,8 +11,8 @@ namespace Portfolio.Domain
         /// Loads historical price data for a specified symbol from storage.
         /// </summary>
         /// <param name="symbol">The symbol of the currency or coin.</param>
-        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="CryptoPriceRecord"/> or an error message.</returns>
-        Task<Result<IEnumerable<CryptoPriceRecord>>> LoadHistoryAsync(string symbol);
+        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
+        Task<Result<IEnumerable<PriceRecord>>> LoadHistoryAsync(string symbol);
 
         /// <summary>
         /// Saves historical price data for a specified symbol to storage.
@@ -20,6 +20,6 @@ namespace Portfolio.Domain
         /// <param name="symbol">The symbol of the currency or coin.</param>
         /// <param name="priceHistory">The historical price data to be saved.</param>
         /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
-        Task<Result> SaveHistoryAsync(string symbol, IEnumerable<CryptoPriceRecord> priceHistory);
+        Task<Result> SaveHistoryAsync(string symbol, IEnumerable<PriceRecord> priceHistory);
     }
 }

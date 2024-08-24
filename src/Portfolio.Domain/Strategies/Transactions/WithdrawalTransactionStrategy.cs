@@ -6,7 +6,7 @@ namespace Portfolio.Domain;
 
 public class WithdrawalTransactionStrategy : ITransactionStrategy
 {
-    public async Task<Result> ProcessTransactionAsync(CryptoCurrencyRawTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+    public async Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
     {
         if (!EnsureAboveZeroAmount(tx, false)) return Result.Failure(tx.ErrorMessage);
 
@@ -17,7 +17,7 @@ public class WithdrawalTransactionStrategy : ITransactionStrategy
             decimal price = priceResult.Value;
             tx.ValueInDefaultCurrency = new Money(tx.SentAmount.Amount * price, portfolio.DefaultCurrency);
 
-            portfolio.AddTaxableEvent(tx, sender, price);
+            portfolio.RecordFinancialEvent(tx, sender, price);
         }
         else
         {
@@ -62,7 +62,7 @@ public class WithdrawalTransactionStrategy : ITransactionStrategy
         return Result.Success();
     }
 
-    private static bool EnsureAboveZeroAmount(CryptoCurrencyRawTransaction tx, bool incoming = true)
+    private static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
     {
         if (tx.SentAmount.Amount <= 0)
         {
@@ -73,7 +73,7 @@ public class WithdrawalTransactionStrategy : ITransactionStrategy
         return true;
     }
 
-    private static void EnsureBalanceNotNegative(CryptoCurrencyRawTransaction tx, string asset, decimal balance)
+    private static void EnsureBalanceNotNegative(FinancialTransaction tx, string asset, decimal balance)
     {
         if (balance < 0)
         {
