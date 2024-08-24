@@ -1,8 +1,10 @@
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Entities;
-using Portfolio.Domain.ValueObjects;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.Strategies.Transactions;
 
-namespace Portfolio.Domain
+namespace Portfolio.Domain.Services
 {
     /// <summary>
     /// Processes financial transactions by applying the appropriate transaction strategy 

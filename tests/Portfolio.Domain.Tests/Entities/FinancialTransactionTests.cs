@@ -1,11 +1,12 @@
 using FluentAssertions;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Tests
 {
     [TestFixture]
-    public class CryptoCurrencyRawTransactionTests
+    public class FinancialTransactionTests
     {
         private static Money CreateMoney(decimal amount, string currencyCode) =>
             new Money(amount, currencyCode);
@@ -141,7 +142,7 @@ namespace Portfolio.Tests
 
             // Assert
             result.IsFailure.Should().BeTrue();
-            result.Error.Should().Be("Received amount can not be set on a 'withdrawal' transaction.");
+            result.Error.Should().Be("Received amount cannot be set on a 'withdrawal' transaction.");
         }
 
         [Test]
@@ -155,7 +156,7 @@ namespace Portfolio.Tests
 
             // Assert
             result.IsFailure.Should().BeTrue();
-            result.Error.Should().Be("Sent amount can not be set on a 'deposit' transaction.");
+            result.Error.Should().Be("Sent amount cannot be set on a 'deposit' transaction.");
         }
 
         [Test]

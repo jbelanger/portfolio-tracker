@@ -1,6 +1,11 @@
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Common;
 using Portfolio.Domain.Constants;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Events;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.Services;
+using Portfolio.Domain.Strategies.CostBasis;
 using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Domain.Entities
@@ -106,7 +111,7 @@ namespace Portfolio.Domain.Entities
             AssetHolding holding,
             decimal marketPricePerUnit
         )
-        {
+        {           
             // Check if the transaction involves a fiat currency and is a purchase (fiat-to-asset)
             if (transaction.SentAmount.IsFiatCurrency)
             {
@@ -114,30 +119,41 @@ namespace Portfolio.Domain.Entities
                 return;
             }
 
+            Result result = Result.Success();
+
             // Calculate the cost basis per unit for the disposed asset
-            var costBasisPerUnit = _costBasisStrategy.CalculateCostBasis([holding], transaction) / transaction.SentAmount.Amount;
-
-            // Create the financial event (whether it's a trade or a withdrawal)
-            var financialEventResult = FinancialEvent.Create(
-                transaction.DateTime,
-                transaction.SentAmount.CurrencyCode,
-                costBasisPerUnit,
-                marketPricePerUnit,
-                transaction.SentAmount.Amount,
-                DefaultCurrency
-            );
-
-            // Add the event to the portfolio's list if successful
-            if (financialEventResult.IsSuccess)
-            {
-                _financialEvents.Add(financialEventResult.Value);
-            }
+            var costBasisPerUnitResult = _costBasisStrategy.CalculateCostBasis(holding, transaction);
+            if (costBasisPerUnitResult.IsFailure)
+                result = Result.Failure(costBasisPerUnitResult.Error);
             else
             {
-                // Handle the error if the event creation failed
-                transaction.ErrorMessage = "Could not create financial event for this transaction.";
-                transaction.ErrorType = ErrorType.EventCreationFailed;
+                var costBasisPerUnit = costBasisPerUnitResult.Value / transaction.SentAmount.Amount;
+
+                // Create the financial event (whether it's a trade or a withdrawal)
+                var financialEventResult = FinancialEvent.Create(
+                    transaction.DateTime,
+                    transaction.SentAmount.CurrencyCode,
+                    costBasisPerUnit,
+                    marketPricePerUnit,
+                    transaction.SentAmount.Amount,
+                    DefaultCurrency
+                );
+
+                // Add the event to the portfolio's list if successful
+                if (financialEventResult.IsSuccess)
+                {
+                    _financialEvents.Add(financialEventResult.Value);
+                }
+                else
+                {
+                    // Handle the error if the event creation failed
+                    transaction.ErrorMessage = "Could not create financial event for this transaction.";
+                    transaction.ErrorType = ErrorType.EventCreationFailed;
+                    result = financialEventResult;
+                }
             }
+
+            AddDomainEvent(new FinancialEventAdded(transaction, holding, marketPricePerUnit, result.IsFailure ? result.Error: string.Empty));                    
         }
 
         /// <summary>

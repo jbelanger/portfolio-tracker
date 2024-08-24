@@ -1,84 +1,100 @@
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.ValueObjects;
 
-namespace Portfolio.Domain;
-
-public class WithdrawalTransactionStrategy : ITransactionStrategy
+namespace Portfolio.Domain.Strategies.Transactions
 {
-    public async Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+    public class WithdrawalTransactionStrategy : ITransactionStrategy
     {
-        if (!EnsureAboveZeroAmount(tx, false)) return Result.Failure(tx.ErrorMessage);
-
-        var sender = portfolio.GetOrCreateHolding(tx.SentAmount.CurrencyCode);
-        var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
-        if (priceResult.IsSuccess)
+        public async Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
         {
-            decimal price = priceResult.Value;
-            tx.ValueInDefaultCurrency = new Money(tx.SentAmount.Amount * price, portfolio.DefaultCurrency);
+            if (!EnsureAboveZeroAmount(tx, false)) return Result.Failure(tx.ErrorMessage);
 
-            portfolio.RecordFinancialEvent(tx, sender, price);
-        }
-        else
-        {
-            tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-            tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
-        }
+            var sender = portfolio.GetOrCreateHolding(tx.SentAmount.CurrencyCode);
+            var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
 
-        sender.Balance -= tx.SentAmount.Amount;
-        if (sender.Balance == 0)
-            sender.AverageBoughtPrice = 0m;
-
-        EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
-
-        // Handle Fees
-        if (tx.FeeAmount != Money.Empty)
-        {
-            var fees = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
-            fees.Balance -= tx.FeeAmount.Amount;
-
-            if (tx.FeeAmount.CurrencyCode == portfolio.DefaultCurrency)
+            decimal price;
+            if (priceResult.IsSuccess)
             {
-                tx.FeeValueInDefaultCurrency = tx.FeeAmount;
+                price = priceResult.Value;
             }
             else
             {
-                var feePriceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.FeeAmount.CurrencyCode, tx.DateTime);
-                if (feePriceResult.IsSuccess)
+                tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+                tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
+                price = sender.AverageBoughtPrice;// Fallback to average bought price                
+            }
+
+            tx.ValueInDefaultCurrency = new Money(tx.SentAmount.Amount * price, portfolio.DefaultCurrency);
+
+            portfolio.RecordFinancialEvent(tx, sender, price);            
+
+            UpdateBalance(tx, sender);
+            HandleFees(tx, portfolio, priceHistoryService);
+
+            return Result.Success();
+        }
+
+        private async void HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
+            // Handle Fees
+            if (tx.FeeAmount != Money.Empty)
+            {
+                var fees = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
+                fees.Balance -= tx.FeeAmount.Amount;
+
+                if (tx.FeeAmount.CurrencyCode == portfolio.DefaultCurrency)
                 {
-                    decimal feePrice = feePriceResult.Value;
-                    tx.FeeValueInDefaultCurrency = new Money(tx.FeeAmount.Amount * feePrice, portfolio.DefaultCurrency);
+                    tx.FeeValueInDefaultCurrency = tx.FeeAmount;
                 }
                 else
                 {
-                    tx.ErrorType = ErrorType.PriceHistoryUnavailable;
-                    tx.ErrorMessage = $"Could not get price history for {fees.Asset} fees. Fees calculations will be incorrect.";
+                    var feePriceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.FeeAmount.CurrencyCode, tx.DateTime);
+                    if (feePriceResult.IsSuccess)
+                    {
+                        decimal feePrice = feePriceResult.Value;
+                        tx.FeeValueInDefaultCurrency = new Money(tx.FeeAmount.Amount * feePrice, portfolio.DefaultCurrency);
+                    }
+                    else
+                    {
+                        tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+                        tx.ErrorMessage = $"Could not get price history for {fees.Asset} fees. Fees calculations will be incorrect.";
+                    }
                 }
+
+                EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
             }
-
-            EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
         }
 
-        return Result.Success();
-    }
-
-    private static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
-    {
-        if (tx.SentAmount.Amount <= 0)
+        private static void UpdateBalance(FinancialTransaction tx, AssetHolding sender)
         {
-            tx.ErrorMessage = $"Sent amount is zero or negative in withdrawal transaction: {tx.TransactionIds}";
-            tx.ErrorType = ErrorType.InvalidCurrency;
-            return false;
+            sender.Balance -= tx.SentAmount.Amount;
+            if (sender.Balance == 0)
+                sender.AverageBoughtPrice = 0m;
+
+            EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
         }
-        return true;
-    }
 
-    private static void EnsureBalanceNotNegative(FinancialTransaction tx, string asset, decimal balance)
-    {
-        if (balance < 0)
+        private static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
         {
-            tx.ErrorType = ErrorType.InsufficientFunds;
-            tx.ErrorMessage = $"{asset} balance is under zero: {balance}";
+            if (tx.SentAmount.Amount <= 0)
+            {
+                tx.ErrorMessage = $"Sent amount is zero or negative in withdrawal transaction: {tx.TransactionIds}";
+                tx.ErrorType = ErrorType.InvalidCurrency;
+                return false;
+            }
+            return true;
+        }
+
+        private static void EnsureBalanceNotNegative(FinancialTransaction tx, string asset, decimal balance)
+        {
+            if (balance < 0)
+            {
+                tx.ErrorType = ErrorType.InsufficientFunds;
+                tx.ErrorMessage = $"{asset} balance is under zero: {balance}";
+            }
         }
     }
 }

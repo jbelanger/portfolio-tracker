@@ -1,6 +1,7 @@
-﻿namespace Portfolio.Domain.Constants;
-
-public abstract class Roles
+﻿namespace Portfolio.Domain.Constants
 {
-    public const string Administrator = nameof(Administrator);
+    public abstract class Roles
+    {
+        public const string Administrator = nameof(Administrator);
+    }
 }

@@ -1,5 +1,8 @@
 find . -type f -name "*.cs" -exec cat {} + > output.txt
 
+without comments
+find . -type f -name "*.cs" -exec cat {} + | grep -v '^\s*//' > output.txt
+
 
 dotnet ef migrations add "InitialMigration" --project src/Portfolio.Infrastructure --startup-project src/Portfolio.Api --output-dir Data\Migrations
 

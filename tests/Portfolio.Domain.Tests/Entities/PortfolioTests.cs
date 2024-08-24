@@ -1,8 +1,9 @@
 using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Moq;
-using Portfolio.Domain;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Domain.Tests.Entities

@@ -1,6 +1,7 @@
-﻿namespace Portfolio.Domain;
-
-public interface IUser
+﻿namespace Portfolio.Domain.Interfaces
 {
-    string? Id { get; }
+    public interface IUser
+    {
+        string? Id { get; }
+    }
 }

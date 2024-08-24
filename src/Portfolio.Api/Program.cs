@@ -4,7 +4,7 @@ using Portfolio.App;
 using Portfolio.App.HistoricalPrice;
 using Portfolio.App.HistoricalPrice.YahooFinance;
 using Portfolio.App.Services;
-using Portfolio.Domain;
+using Portfolio.Domain.Interfaces;
 using Portfolio.Infrastructure;
 
 

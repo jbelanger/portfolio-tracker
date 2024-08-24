@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Portfolio.Domain;
+using Portfolio.Domain.Interfaces;
 
 namespace Portfolio.Api;
 

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Portfolio.App.DTOs;
-using Portfolio.Domain;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Interfaces;
 using Portfolio.Infrastructure;
 
 namespace Portfolio.Api.Features

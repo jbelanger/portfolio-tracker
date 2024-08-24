@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Portfolio.App.Common.Interfaces;
-using Portfolio.Domain;
+using Portfolio.Domain.Interfaces;
 
 namespace Portfolio.App.Common.Behaviours;
 

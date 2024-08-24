@@ -2,7 +2,7 @@
 using Portfolio.App.Common.Exceptions;
 using Portfolio.App.Common.Interfaces;
 using Portfolio.App.Common.Security;
-using Portfolio.Domain;
+using Portfolio.Domain.Interfaces;
 
 namespace Portfolio.App.Common.Behaviours;
 
