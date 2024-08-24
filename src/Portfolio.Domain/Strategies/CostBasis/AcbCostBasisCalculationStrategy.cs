@@ -1,30 +1,27 @@
-namespace Portfolio.Domain.Entities
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+
+namespace Portfolio.Domain.Strategies.CostBasis
 {
     /// <summary>
-    /// Implements the Average Cost Basis (ACB) calculation strategy for determining the cost basis
-    /// of an asset, which is used to calculate capital gains or losses for tax purposes.
-    /// This strategy is accurate according to the guidelines provided by the Canada Revenue Agency (CRA)
-    /// for calculating the average cost of identical properties.
+    /// Implements the Average Cost Basis (ACB) calculation strategy.
+    /// This strategy calculates the cost basis by determining the average purchase price
+    /// per unit of an asset and multiplying it by the quantity being disposed of.
+    /// The ACB method is commonly used in tax reporting to calculate capital gains or losses.
     /// </summary>
-    /// <remarks>
-    /// The calculation is based on the ACB method, where the cost basis of the disposed asset 
-    /// is calculated by multiplying the average purchase price per unit by the quantity being disposed of.
-    /// See the following CRA guide for more details:
-    /// https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/personal-income/line-12700-capital-gains/shares-funds-other-units/identical-properties/examples-calculating-average-cost-property.html
-    /// </remarks>
     public class AcbCostBasisCalculationStrategy : ICostBasisCalculationStrategy
     {
         /// <summary>
         /// Calculates the cost basis of an asset using the Average Cost Basis (ACB) method.
         /// </summary>
-        /// <param name="holdings">The list of asset holdings, typically containing one holding per asset type.</param>
+        /// <param name="holding">The asset holding containing the purchase records for the asset.</param>
         /// <param name="tx">The financial transaction that disposes of the asset.</param>
         /// <returns>
-        /// The calculated cost basis for the disposed amount, based on the average purchase price per unit.
+        /// The calculated cost basis for the disposed amount, based on the ACB strategy.
         /// </returns>
-        public decimal CalculateCostBasis(IEnumerable<AssetHolding> holdings, FinancialTransaction tx)
+        public Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx)
         {
-            var holding = holdings.First(); // Assuming one holding per asset type in the portfolio
+            // Calculate the cost basis using the average purchase price per unit
             return holding.AverageBoughtPrice * tx.SentAmount.Amount;
         }
     }

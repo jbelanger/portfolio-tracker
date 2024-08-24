@@ -1,5 +1,6 @@
 using CSharpFunctionalExtensions;
 using Portfolio.Domain.Common;
+using Portfolio.Domain.Enums;
 using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Domain.Entities
@@ -86,7 +87,7 @@ namespace Portfolio.Domain.Entities
         /// <summary>
         /// Protected constructor to enforce the use of factory methods for creating transactions.
         /// </summary>
-        protected FinancialTransaction() { }
+        internal FinancialTransaction() { }
 
         /// <summary>
         /// Factory method to create a deposit transaction.

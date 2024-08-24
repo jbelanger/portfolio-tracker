@@ -1,4 +1,5 @@
-using Portfolio.Domain;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.App.HistoricalPrice.YahooFinance
 {

@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Portfolio.Domain
+namespace Portfolio.Domain.Interfaces
 {
     /// <summary>
     /// Interface for a service that provides historical price data for currencies or coins.

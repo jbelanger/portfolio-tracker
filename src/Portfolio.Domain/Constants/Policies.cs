@@ -1,6 +1,7 @@
-﻿namespace Portfolio.Domain.Constants;
-
-public abstract class Policies
+﻿namespace Portfolio.Domain.Constants
 {
-    public const string CanPurge = nameof(CanPurge);
+    public abstract class Policies
+    {
+        public const string CanPurge = nameof(CanPurge);
+    }
 }

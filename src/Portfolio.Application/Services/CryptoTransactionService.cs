@@ -1,6 +1,7 @@
 using Portfolio.App;
 using Portfolio.App.DTOs;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
 using Portfolio.Domain.ValueObjects;
 using Portfolio.Infrastructure;
 using Portfolio.Transactions.Importers.Csv.Kraken;

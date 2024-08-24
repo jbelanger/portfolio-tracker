@@ -1,8 +1,8 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Portfolio.Domain;
 using Portfolio.Domain.Entities;
+using Portfolio.Domain.Interfaces;
 using Serilog;
 
 namespace Portfolio.Transactions.Importers.Csv.LedgerLive

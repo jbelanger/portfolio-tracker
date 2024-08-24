@@ -1,6 +1,6 @@
 using Portfolio.Domain.ValueObjects;
 
-namespace Portfolio.Domain
+namespace Portfolio.Domain.Interfaces
 {
     public interface ICryptoCurrencyTransaction
     {
@@ -37,6 +37,6 @@ namespace Portfolio.Domain
         public object State { get; set; }
 
         //public CryptoCurrencyTransaction ToGenericTransaction();
-    
+
     }
 }

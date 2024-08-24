@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Portfolio.Domain;
 using Portfolio.Domain.Common;
+using Portfolio.Domain.Interfaces;
 
 namespace Portfolio.Infrastructure.Data.Interceptors
 {

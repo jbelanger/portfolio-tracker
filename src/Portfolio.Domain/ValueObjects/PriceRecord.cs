@@ -1,6 +1,6 @@
 using CSharpFunctionalExtensions;
 
-namespace Portfolio.Domain
+namespace Portfolio.Domain.ValueObjects
 {
     /// <summary>
     /// Represents a record of a cryptocurrency's price at a specific date.

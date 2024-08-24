@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
+using Portfolio.Domain.ValueObjects;
 
-namespace Portfolio.Domain
+namespace Portfolio.Domain.Interfaces
 {
     /// <summary>
     /// Interface for a service that handles storage and retrieval of historical price data.

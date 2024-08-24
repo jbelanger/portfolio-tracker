@@ -1,8 +1,9 @@
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Portfolio.Domain;
 using Portfolio.Domain.Constants;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.App.HistoricalPrice
 {

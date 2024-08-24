@@ -1,3 +1,5 @@
+using CSharpFunctionalExtensions;
+
 namespace Portfolio.Domain.Entities
 {
     /// <summary>
@@ -10,11 +12,11 @@ namespace Portfolio.Domain.Entities
         /// <summary>
         /// Calculates the cost basis of an asset using a specific calculation strategy.
         /// </summary>
-        /// <param name="holdings">The list of asset holdings, typically containing one holding per asset type.</param>
+        /// <param name="holding">The asset holding containing the purchase records for the asset.</param>
         /// <param name="tx">The financial transaction that disposes of the asset.</param>
         /// <returns>
         /// The calculated cost basis for the disposed amount, which will be used to determine capital gains or losses.
         /// </returns>
-        decimal CalculateCostBasis(IEnumerable<AssetHolding> holdings, FinancialTransaction tx);
+        Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx);
     }
 }

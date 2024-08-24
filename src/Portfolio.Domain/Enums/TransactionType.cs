@@ -1,4 +1,4 @@
-namespace Portfolio.Domain.ValueObjects
+namespace Portfolio.Domain.Enums
 {
     /// <summary>
     /// Specifies the type of financial transaction, including trades, deposits, withdrawals, and fees.

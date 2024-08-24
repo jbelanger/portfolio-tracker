@@ -1,8 +1,10 @@
 using CSharpFunctionalExtensions;
-using Portfolio.Domain;
 using Portfolio.Domain.Entities;
 
-public interface ITransactionStrategy
+namespace Portfolio.Domain.Interfaces
 {
-    Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService);
+    public interface ITransactionStrategy
+    {
+        Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService);
+    }
 }
