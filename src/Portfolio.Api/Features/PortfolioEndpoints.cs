@@ -88,7 +88,7 @@ namespace Portfolio.Api.Features
                 await portfolio.CalculateTradesAsync(priceHistoryService);
                 await dbContext.SaveChangesAsync();
 
-                return Results.Ok(portfolio);
+                return Results.Ok(PortfolioDto.From(portfolio));
             });
         }
     }

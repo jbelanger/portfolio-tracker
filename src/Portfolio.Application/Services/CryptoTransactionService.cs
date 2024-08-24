@@ -17,7 +17,7 @@ namespace Portfolio.Api.Services
             _dbContext = dbContext;
         }
 
-        public async Task<Result<long>> AddTransactionAsync(long portfolioId, long walletId, CryptoCurrencyTransactionDto transactionDto)
+        public async Task<Result<long>> AddTransactionAsync(long portfolioId, long walletId, TransactionDto transactionDto)
         {
             var wallet = await _dbContext.Wallets                
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
@@ -71,16 +71,16 @@ namespace Portfolio.Api.Services
                 .Map(t => t.Id);
         }
 
-        public async Task<Result> UpdateTransactionAsync(long portfolioId, long walletId, long transactionId, CryptoCurrencyTransactionDto transactionDto)
+        public async Task<Result> UpdateTransactionAsync(long portfolioId, long walletId, long transactionId, TransactionDto transactionDto)
         {
             var isUserWallet = await _dbContext.Wallets
                 .AsNoTracking()
                 .AnyAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (!isUserWallet)
-                return Result.Failure<CryptoCurrencyTransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
+                return Result.Failure<TransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
 
-            var transaction = _dbContext.RawTransactions.AsNoTracking().FirstOrDefault(t => t.Id == transactionId);
+            var transaction = _dbContext.Transactions.AsNoTracking().FirstOrDefault(t => t.Id == transactionId);
             if (transaction == null)
                 return Result.Failure($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
 
@@ -94,18 +94,18 @@ namespace Portfolio.Api.Services
                 .Tap(async () => await _dbContext.SaveChangesAsync());
         }
 
-        public async Task<Result> BulkUpdateTransactionsAsync(long portfolioId, long walletId, List<CryptoCurrencyTransactionDto> transactionsToUpdate)
+        public async Task<Result> BulkUpdateTransactionsAsync(long portfolioId, long walletId, List<TransactionDto> transactionsToUpdate)
         {
             var wallet = await _dbContext.Wallets
                 .Include(w => w.Transactions)
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (wallet == null)
-                return Result.Failure<IEnumerable<CryptoCurrencyTransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
+                return Result.Failure<IEnumerable<TransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
 
 
             var transactionIds = transactionsToUpdate.Select(t => t.Id).ToArray();
-            var transactions = await _dbContext.RawTransactions
+            var transactions = await _dbContext.Transactions
                                              .Where(t => transactionIds.Contains(t.Id))
                                              .ToListAsync();
 
@@ -135,16 +135,16 @@ namespace Portfolio.Api.Services
                 .AnyAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (!isUserWallet)
-                return Result.Failure<CryptoCurrencyTransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
+                return Result.Failure<TransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
 
-            var transaction = _dbContext.RawTransactions.AsNoTracking().FirstOrDefault(t => t.Id == transactionId);
+            var transaction = _dbContext.Transactions.AsNoTracking().FirstOrDefault(t => t.Id == transactionId);
             if (transaction == null)
             {
                 return Result.Failure($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
             }
 
             //_dbContext.Entry(transaction).State = EntityState.Deleted;
-            _dbContext.RawTransactions.Remove(transaction);
+            _dbContext.Transactions.Remove(transaction);
 
             await _dbContext.SaveChangesAsync();
 
@@ -157,37 +157,37 @@ namespace Portfolio.Api.Services
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (wallet == null)
-                return Result.Failure<IEnumerable<CryptoCurrencyTransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
+                return Result.Failure<IEnumerable<TransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
 
-            var transactions = await _dbContext.RawTransactions
+            var transactions = await _dbContext.Transactions
                                              .Where(t => transactionIds.Contains(t.Id))
                                              .ToListAsync();
 
             if (transactions.Count != transactionIds.Length)
                 return Result.Failure("Some transactions could not be found.");
                         
-            _dbContext.RawTransactions.RemoveRange(transactions);
+            _dbContext.Transactions.RemoveRange(transactions);
             await _dbContext.SaveChangesAsync();
 
             return Result.Success();
         }
 
 
-        public async Task<Result<IEnumerable<CryptoCurrencyTransactionDto>>> GetTransactionsAsync(long portfolioId, long walletId)
+        public async Task<Result<IEnumerable<TransactionDto>>> GetTransactionsAsync(long portfolioId, long walletId)
         {
             var wallet = await _dbContext.Wallets
                 .Include(w => w.Transactions)
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (wallet == null)
-                return Result.Failure<IEnumerable<CryptoCurrencyTransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
+                return Result.Failure<IEnumerable<TransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
 
-            var transactionsDto = wallet.Transactions.Select(t => CryptoCurrencyTransactionDto.From(t));
+            var transactionsDto = wallet.Transactions.Select(t => TransactionDto.From(t));
 
             return Result.Success(transactionsDto);
         }
 
-        public async Task<Result<CryptoCurrencyTransactionDto>> GetTransactionAsync(long portfolioId, long walletId, long transactionId)
+        public async Task<Result<TransactionDto>> GetTransactionAsync(long portfolioId, long walletId, long transactionId)
         {
             var isUserWallet = await _dbContext
                 .Wallets
@@ -195,11 +195,11 @@ namespace Portfolio.Api.Services
                 .AnyAsync(w => w.Id == walletId && w.PortfolioId == portfolioId && w.Transactions.Any(t => t.Id == transactionId));
 
             if (!isUserWallet)
-                return Result.Failure<CryptoCurrencyTransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
+                return Result.Failure<TransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
 
-            var transaction = await _dbContext.RawTransactions.AsNoTracking().FirstAsync(t => t.Id == transactionId);
+            var transaction = await _dbContext.Transactions.AsNoTracking().FirstAsync(t => t.Id == transactionId);
 
-            return Result.Success(CryptoCurrencyTransactionDto.From(transaction));
+            return Result.Success(TransactionDto.From(transaction));
         }
 
         public async Task<Result> ImportTransactionsFromCsvAsync(long portfolioId, long walletId, CsvFileImportType csvType, StreamReader streamReader)
@@ -263,7 +263,7 @@ namespace Portfolio.Api.Services
             string sentCurrency = n.SentAmount.CurrencyCode;// ?? null;
             string feeCurrency = n.FeeAmount.CurrencyCode;// ?? null;
 
-            var exists = await _dbContext.RawTransactions.AsNoTracking().AnyAsync(other =>
+            var exists = await _dbContext.Transactions.AsNoTracking().AnyAsync(other =>
                 walletId == other.WalletId &&
                 n.DateTime == other.DateTime &&
                 n.Type == other.Type &&

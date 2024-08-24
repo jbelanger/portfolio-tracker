@@ -3,7 +3,7 @@ using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.App.DTOs
 {
-    public class CryptoCurrencyTransactionDto
+    public class TransactionDto
     {
         public long Id { get; set; }
         public DateTime DateTime { get; set; }
@@ -16,12 +16,15 @@ namespace Portfolio.App.DTOs
         public string FeeCurrency { get; set; } = string.Empty;
         public string Account { get; set; } = string.Empty;
         public string Note { get; set; } = string.Empty;
+        public string ErrorMessage { get; private set; } = string.Empty;
+        public decimal ValueInDefaultCurrency { get; private set; }
+        public decimal FeeValueInDefaultCurrency { get; private set; }
 
-        public static CryptoCurrencyTransactionDto From(FinancialTransaction transaction)
+        public static TransactionDto From(FinancialTransaction transaction)
         {
             if (transaction is null) throw new ArgumentNullException(nameof(transaction));
 
-            return new CryptoCurrencyTransactionDto
+            return new TransactionDto
             {
                 Id = transaction.Id,
                 DateTime = transaction.DateTime,
@@ -33,7 +36,10 @@ namespace Portfolio.App.DTOs
                 FeeAmount = (transaction.FeeAmount == Money.Empty) ? null : transaction.FeeAmount.Amount,
                 FeeCurrency = transaction.FeeAmount?.CurrencyCode ?? string.Empty,
                 Account = transaction.Account,
-                Note = transaction.Note
+                Note = transaction.Note,
+                ErrorMessage = transaction.ErrorMessage,
+                ValueInDefaultCurrency = transaction.ValueInDefaultCurrency.Amount,
+                FeeValueInDefaultCurrency = transaction.FeeValueInDefaultCurrency.Amount,
             };
         }
     }

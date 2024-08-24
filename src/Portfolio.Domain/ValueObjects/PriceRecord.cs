@@ -7,6 +7,8 @@ namespace Portfolio.Domain.ValueObjects
     /// </summary>
     public class PriceRecord : ValueObject
     {
+public long Id { get; set; }
+
         /// <summary>
         /// Gets or sets the currency pair (e.g., "BTC/USD") associated with this price record.
         /// </summary>

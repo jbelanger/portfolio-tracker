@@ -11,6 +11,8 @@ namespace Portfolio.Domain.Strategies.CostBasis
     /// </summary>
     public class FifoCostBasisCalculationStrategy : ICostBasisCalculationStrategy
     {
+                public string Name => "FIFO";
+
         /// <summary>
         /// Calculates the cost basis of an asset using the FIFO (First In, First Out) method.
         /// </summary>

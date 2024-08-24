@@ -75,6 +75,7 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
                 "RNDR" => $"RENDER-{toSymbol}",
                 "UNI" => $"UNI7083-{toSymbol}",
                 "BEAM" => $"BEAM28298-{toSymbol}",
+                "STX" => $"STX4847-{toSymbol}",
                 _ => $"{fromSymbol}-{toSymbol}"
             };
         }
