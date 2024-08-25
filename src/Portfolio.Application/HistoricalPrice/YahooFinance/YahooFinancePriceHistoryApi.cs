@@ -106,5 +106,10 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
                 ClosePrice = candle.Close
             };
         }
+
+        Task<Result<IEnumerable<PriceRecord>>> IPriceHistoryApi.FetchCurrentPriceAsync(IEnumerable<string> symbols, string currency)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

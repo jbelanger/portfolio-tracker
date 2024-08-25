@@ -6,7 +6,7 @@ namespace Portfolio.App.DTOs
     {
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public List<TransactionDto> Transactions { get; set; } = new();
+        public List<FinancialTransactionDto> Transactions { get; set; } = new();
 
         public static WalletDto From(Wallet wallet)
         {
@@ -14,7 +14,7 @@ namespace Portfolio.App.DTOs
             {
                 Id = wallet.Id,
                 Name = wallet.Name,
-                Transactions = wallet.Transactions.Select(TransactionDto.From).ToList()
+                Transactions = wallet.Transactions.Select(FinancialTransactionDto.From).ToList()
             };
         }
     }

@@ -32,12 +32,12 @@ namespace Portfolio.Domain.Strategies.Transactions
             portfolio.RecordFinancialEvent(tx, sender, price);            
 
             UpdateBalance(tx, sender);
-            HandleFees(tx, portfolio, priceHistoryService);
+            await HandleFees(tx, portfolio, priceHistoryService);
 
             return Result.Success();
         }
 
-        private async void HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        private async Task HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
         {
             // Handle Fees
             if (tx.FeeAmount != Money.Empty)

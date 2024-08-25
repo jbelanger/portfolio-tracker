@@ -23,3 +23,12 @@ export enum CsvFileImportType {
   Coinbase = 'Coinbase',
   Binance = 'Binance',
 }
+
+export interface Holding {
+  id: number;
+  asset: string;
+  balance: number;
+  averageBoughtPrice: number;
+  currentPrice: number;
+  errorMessage?: string;
+}

@@ -1,11 +1,15 @@
+using Microsoft.Extensions.Caching.Memory;
 using Portfolio.Api.Features;
 using Portfolio.Api.Services;
 using Portfolio.App;
 using Portfolio.App.HistoricalPrice;
-using Portfolio.App.HistoricalPrice.YahooFinance;
+using Portfolio.App.HistoricalPrice.CoinGecko;
 using Portfolio.App.Services;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Infrastructure;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Json;
 
 
 namespace Portfolio.Api
@@ -14,6 +18,20 @@ namespace Portfolio.Api
     {
         public static async Task Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext() // Allows you to add properties to the log context dynamically
+                                        //.Enrich.WithCallerInfo() // Automatically includes method and class names
+                                        // add console as logging target
+                .WriteTo.Console()
+                // add a logging target for warnings and higher severity  logs
+                // structured in JSON format
+                .WriteTo.File(new JsonFormatter(), "important.json", restrictedToMinimumLevel: LogEventLevel.Warning)
+                // add a rolling file for all logs
+                .WriteTo.File("all-.logs", rollingInterval: RollingInterval.Day)
+                // set default minimum level
+                .MinimumLevel.Debug()
+                .CreateLogger();
+
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddApplicationServices();
@@ -40,9 +58,12 @@ namespace Portfolio.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddHttpClient();
+            builder.Services.AddSingleton(new MemoryCache(new MemoryCacheOptions()));
             builder.Services.AddScoped<IWalletService, WalletService>();
             builder.Services.AddScoped<ICryptoTransactionService, CryptoTransactionService>();
-            builder.Services.AddScoped<IPriceHistoryApi>(p => new PriceHistoryApiWithRetry(new YahooFinancePriceHistoryApi(), 3));
+            builder.Services.AddScoped<IHoldingService, HoldingService>();
+            builder.Services.AddScoped<IPriceHistoryApi, CoinGeckoPriceHistoryApi>();//(p => new PriceHistoryApiWithRetry(new YahooFinancePriceHistoryApi(), 3));
             builder.Services.AddScoped<IPriceHistoryService, PriceHistoryService>();
             builder.Services.AddScoped<IPriceHistoryStorageService, DbContextPriceHistoryStorageService>();
 
@@ -51,7 +72,7 @@ namespace Portfolio.Api
 
             // Use CORS
             app.UseCors("AllowSpecificOrigin");
-            
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -63,28 +84,9 @@ namespace Portfolio.Api
 
             app.UseAuthorization();
 
-            var summaries = new[]
-            {
-                "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-            };
-
-            app.MapGet("/weatherforecast", (HttpContext httpContext) =>
-            {
-                var forecast = Enumerable.Range(1, 5).Select(index =>
-                    new WeatherForecast
-                    {
-                        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = summaries[Random.Shared.Next(summaries.Length)]
-                    })
-                    .ToArray();
-                return forecast;
-            })
-            .WithName("GetWeatherForecast")
-            .WithOpenApi();
-
             app.MapWalletEndpoints();
             app.MapPortfolioEndpoints();
+            app.MapHoldingEndpoints();
             app.MapTransactionEndpoints();
 
 

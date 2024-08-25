@@ -3,7 +3,7 @@ using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.App.DTOs
 {
-    public class TransactionDto
+    public class FinancialTransactionDto
     {
         public long Id { get; set; }
         public DateTime DateTime { get; set; }
@@ -20,11 +20,11 @@ namespace Portfolio.App.DTOs
         public decimal ValueInDefaultCurrency { get; private set; }
         public decimal FeeValueInDefaultCurrency { get; private set; }
 
-        public static TransactionDto From(FinancialTransaction transaction)
+        public static FinancialTransactionDto From(FinancialTransaction transaction)
         {
             if (transaction is null) throw new ArgumentNullException(nameof(transaction));
 
-            return new TransactionDto
+            return new FinancialTransactionDto
             {
                 Id = transaction.Id,
                 DateTime = transaction.DateTime,

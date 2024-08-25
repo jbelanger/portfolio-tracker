@@ -42,12 +42,12 @@ const Layout: React.FC<LayoutProps> = ({ darkMode, onToggleDarkMode }) => {
 
   return (
     <Router>
-      <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <Box sx={{ display: 'flex', height: '100vh' }}>
         <CssBaseline />        
         <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
           <Toolbar>
             <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-              Portfolio Manager
+              Watch My Coins <small>Portfolio Tracker</small>
             </Typography>
             <IconButton edge="end" color="inherit">
               <AccountCircle />

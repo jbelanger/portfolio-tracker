@@ -30,20 +30,6 @@ namespace Portfolio.Infrastructure.Data.Configurations
             // Configure the AverageBoughtPrice property
             builder.Property(h => h.AverageBoughtPrice)
                    .HasColumnType("decimal(18,8)"); // Nullable, with precision and scale for high precision calculations
-
-            builder.OwnsOne(t => t.CurrentPrice, money =>
-{
-    money.Property(m => m.Amount)
-                                .HasColumnName("SentAmount")
-                                .HasColumnType("decimal(18,8)");
-    //.HasConversion(new EmptyMoneyAmountConverter());
-
-    money.Property(m => m.CurrencyCode)
-                                .HasColumnName("SentCurrency")
-                                .HasMaxLength(3);
-});
-
-            // Additional configurations (indexes, constraints, etc.) can be added here if needed
         }
     }
 }

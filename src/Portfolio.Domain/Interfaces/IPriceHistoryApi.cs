@@ -24,5 +24,7 @@ namespace Portfolio.Domain.Interfaces
         /// <param name="endDate">The end date for fetching data.</param>
         /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
         Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbol, DateTime startDate, DateTime endDate);
+
+        Task<Result<IEnumerable<PriceRecord>>> FetchCurrentPriceAsync(IEnumerable<string> symbols, string currency);
     }
 }

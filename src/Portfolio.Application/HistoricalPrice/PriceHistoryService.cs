@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.Caching.Memory;
 using Portfolio.Domain.Constants;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.ValueObjects;
@@ -14,6 +15,8 @@ namespace Portfolio.App.HistoricalPrice
         private readonly IPriceHistoryApi _priceHistoryApi;
         private readonly IPriceHistoryStorageService _priceHistoryStorage;
         private ConcurrentDictionary<string, Lazy<Task<ReadOnlyDictionary<DateTime, PriceRecord>>>> _dataStores = new();
+        private readonly MemoryCache _cache;
+
 
         /// <summary>
         /// Gets or sets the default currency symbol used in price calculations.
@@ -29,10 +32,13 @@ namespace Portfolio.App.HistoricalPrice
         public PriceHistoryService(
             IPriceHistoryApi priceHistoryApi,
             IPriceHistoryStorageService priceHistoryStorage,
+            MemoryCache cache,
             string defaultCurrencySymbol = Strings.CURRENCY_USD)
         {
             _priceHistoryApi = priceHistoryApi ?? throw new ArgumentNullException(nameof(priceHistoryApi));
             _priceHistoryStorage = priceHistoryStorage ?? throw new ArgumentNullException(nameof(priceHistoryStorage));
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));  // Assign the cache
+
 
             DefaultCurrency = defaultCurrencySymbol ?? throw new ArgumentNullException(nameof(defaultCurrencySymbol));
         }
@@ -50,17 +56,45 @@ namespace Portfolio.App.HistoricalPrice
             if (symbol == DefaultCurrency)
                 return HandleDefaultCurrencyError(symbol);
 
+            // Check if today's data is cached
+            if (dateOnly == DateTime.Today)
+            {
+                var cacheKey = GetCacheKey(symbol, dateOnly);
+                if (_cache.Get(cacheKey) is decimal cachedPrice)
+                {
+                    return Result.Success(cachedPrice);
+                }
+            }
+
             var history = await LoadPriceHistoryFromStorageAsync(symbol).ConfigureAwait(false);
             if (history.Any())
             {
                 if (history.ContainsKey(dateOnly))
-                    return history[dateOnly].ClosePrice;
+                {
+                    var closePrice = history[dateOnly].ClosePrice;
+
+                    if (dateOnly == DateTime.Today)
+                    {
+                        CacheTodayPrice(symbol, dateOnly, closePrice);
+                    }
+
+                    return closePrice;
+                }
 
                 if (FiatCurrency.All.Any(f => f == symbol))
                 {
                     var handleMissingFiatResult = HandleMissingFiatData(symbol, dateOnly, history);
                     if (handleMissingFiatResult.IsSuccess)
-                        return handleMissingFiatResult.Value;
+                    {
+                        var fiatPrice = handleMissingFiatResult.Value;
+
+                        if (dateOnly == DateTime.Today)
+                        {
+                            CacheTodayPrice(symbol, dateOnly, fiatPrice);
+                        }
+
+                        return fiatPrice;
+                    }
                 }
             }
 
@@ -232,7 +266,7 @@ namespace Portfolio.App.HistoricalPrice
         /// <returns>A task representing the asynchronous operation, with a result of the updated price history dictionary.</returns>
         private async Task<ReadOnlyDictionary<DateTime, PriceRecord>> UpdateHistoryWithFetchedDataAsync(string symbol, ReadOnlyDictionary<DateTime, PriceRecord> history, IEnumerable<PriceRecord> records)
         {
-            return await _dataStores.AddOrUpdateAsync(symbol, async _ => await Task.FromResult(history), async (k, v) => 
+            return await _dataStores.AddOrUpdateAsync(symbol, async _ => await Task.FromResult(history), async (k, v) =>
             {
                 var dict = v.ToDictionary();
                 foreach (var record in records)
@@ -243,6 +277,51 @@ namespace Portfolio.App.HistoricalPrice
                 }
                 return dict.AsReadOnly();
             }).ConfigureAwait(false);
+        }
+
+        private void CacheTodayPrice(string symbol, DateTime date, decimal price)
+        {
+            var cacheKey = GetCacheKey(symbol, date);
+            _cache.Set(cacheKey, price, DateTimeOffset.Now.AddMinutes(1));  // Use the Set method with absolute expiration
+        }
+
+        private string GetCacheKey(string symbol, DateTime date)
+        {
+            return $"{symbol}_{date:yyyyMMdd}";
+        }
+
+        public async Task<Result<Dictionary<string, decimal>>> GetCurrentPricesAsync(IEnumerable<string> symbols)
+        {
+            // Check if the current price is already cached
+            Dictionary<string, decimal> found = new();
+            List<string> missingSymbols = new();
+
+            foreach (var s in symbols)
+            {
+                var cacheKey = GetCacheKey(s, DateTime.Today);
+                if (_cache.Get(cacheKey) is decimal cachedPrice)
+                {
+                    found.Add(s, cachedPrice);
+                }
+                missingSymbols.Add(s);
+            }            
+
+            // Fetch the current price from the API            
+            var result = await _priceHistoryApi.FetchCurrentPriceAsync(missingSymbols, DefaultCurrency).ConfigureAwait(false);
+
+            if (result.IsSuccess)
+            {
+                foreach(var s in missingSymbols)
+                {
+                    var priceRecord = result.Value.FirstOrDefault(p => p.CurrencyPair.Split("-")[0] == s);
+                    if(priceRecord != null)
+                        found.Add(s, priceRecord.ClosePrice);
+                }
+
+                return Result.Success(found);
+            }
+
+            return Result.Failure<Dictionary<string, decimal>>(result.Error);
         }
     }
 }
