@@ -11,7 +11,7 @@ namespace Portfolio.Api.Features
         {
             var group = routes.MapGroup("/portfolios/{portfolioId:long}/wallets/{walletId:long}/transactions");
 
-            group.MapPost("/", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, TransactionDto transactionDto) =>
+            group.MapPost("/", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, FinancialTransactionDto transactionDto) =>
             {
                 var result = await transactionService.AddTransactionAsync(portfolioId, walletId, transactionDto);
 
@@ -22,7 +22,7 @@ namespace Portfolio.Api.Features
                 return Results.BadRequest(result.Error);
             });
 
-            group.MapPut("/{transactionId:long}", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, long transactionId, TransactionDto transactionDto) =>
+            group.MapPut("/{transactionId:long}", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, long transactionId, FinancialTransactionDto transactionDto) =>
             {
                 var result = await transactionService.UpdateTransactionAsync(portfolioId, walletId, transactionId, transactionDto);
 
@@ -33,7 +33,7 @@ namespace Portfolio.Api.Features
                 return Results.BadRequest(result.Error);
             });
 
-            group.MapPut("/bulk-edit", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, [FromBody] List<TransactionDto> transactionsToUpdate) =>
+            group.MapPut("/bulk-edit", async (ICryptoTransactionService transactionService, long portfolioId, long walletId, [FromBody] List<FinancialTransactionDto> transactionsToUpdate) =>
             {
                 var result = await transactionService.BulkUpdateTransactionsAsync(portfolioId, walletId, transactionsToUpdate);
 

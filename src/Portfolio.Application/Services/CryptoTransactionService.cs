@@ -17,7 +17,7 @@ namespace Portfolio.Api.Services
             _dbContext = dbContext;
         }
 
-        public async Task<Result<long>> AddTransactionAsync(long portfolioId, long walletId, TransactionDto transactionDto)
+        public async Task<Result<long>> AddTransactionAsync(long portfolioId, long walletId, FinancialTransactionDto transactionDto)
         {
             var wallet = await _dbContext.Wallets                
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
@@ -71,14 +71,14 @@ namespace Portfolio.Api.Services
                 .Map(t => t.Id);
         }
 
-        public async Task<Result> UpdateTransactionAsync(long portfolioId, long walletId, long transactionId, TransactionDto transactionDto)
+        public async Task<Result> UpdateTransactionAsync(long portfolioId, long walletId, long transactionId, FinancialTransactionDto transactionDto)
         {
             var isUserWallet = await _dbContext.Wallets
                 .AsNoTracking()
                 .AnyAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (!isUserWallet)
-                return Result.Failure<TransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
+                return Result.Failure<FinancialTransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
 
             var transaction = _dbContext.Transactions.AsNoTracking().FirstOrDefault(t => t.Id == transactionId);
             if (transaction == null)
@@ -94,14 +94,14 @@ namespace Portfolio.Api.Services
                 .Tap(async () => await _dbContext.SaveChangesAsync());
         }
 
-        public async Task<Result> BulkUpdateTransactionsAsync(long portfolioId, long walletId, List<TransactionDto> transactionsToUpdate)
+        public async Task<Result> BulkUpdateTransactionsAsync(long portfolioId, long walletId, List<FinancialTransactionDto> transactionsToUpdate)
         {
             var wallet = await _dbContext.Wallets
                 .Include(w => w.Transactions)
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (wallet == null)
-                return Result.Failure<IEnumerable<TransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
+                return Result.Failure<IEnumerable<FinancialTransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
 
 
             var transactionIds = transactionsToUpdate.Select(t => t.Id).ToArray();
@@ -135,7 +135,7 @@ namespace Portfolio.Api.Services
                 .AnyAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (!isUserWallet)
-                return Result.Failure<TransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
+                return Result.Failure<FinancialTransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
 
             var transaction = _dbContext.Transactions.AsNoTracking().FirstOrDefault(t => t.Id == transactionId);
             if (transaction == null)
@@ -157,7 +157,7 @@ namespace Portfolio.Api.Services
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (wallet == null)
-                return Result.Failure<IEnumerable<TransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
+                return Result.Failure<IEnumerable<FinancialTransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
 
             var transactions = await _dbContext.Transactions
                                              .Where(t => transactionIds.Contains(t.Id))
@@ -173,21 +173,21 @@ namespace Portfolio.Api.Services
         }
 
 
-        public async Task<Result<IEnumerable<TransactionDto>>> GetTransactionsAsync(long portfolioId, long walletId)
+        public async Task<Result<IEnumerable<FinancialTransactionDto>>> GetTransactionsAsync(long portfolioId, long walletId)
         {
             var wallet = await _dbContext.Wallets
                 .Include(w => w.Transactions)
                 .FirstOrDefaultAsync(w => w.Id == walletId && w.PortfolioId == portfolioId);
 
             if (wallet == null)
-                return Result.Failure<IEnumerable<TransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
+                return Result.Failure<IEnumerable<FinancialTransactionDto>>($"Wallet with ID {walletId} not found in Portfolio {portfolioId}.");
 
-            var transactionsDto = wallet.Transactions.Select(t => TransactionDto.From(t));
+            var transactionsDto = wallet.Transactions.Select(t => FinancialTransactionDto.From(t));
 
             return Result.Success(transactionsDto);
         }
 
-        public async Task<Result<TransactionDto>> GetTransactionAsync(long portfolioId, long walletId, long transactionId)
+        public async Task<Result<FinancialTransactionDto>> GetTransactionAsync(long portfolioId, long walletId, long transactionId)
         {
             var isUserWallet = await _dbContext
                 .Wallets
@@ -195,11 +195,11 @@ namespace Portfolio.Api.Services
                 .AnyAsync(w => w.Id == walletId && w.PortfolioId == portfolioId && w.Transactions.Any(t => t.Id == transactionId));
 
             if (!isUserWallet)
-                return Result.Failure<TransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
+                return Result.Failure<FinancialTransactionDto>($"Transaction with ID {transactionId} not found in Wallet {walletId}.");
 
             var transaction = await _dbContext.Transactions.AsNoTracking().FirstAsync(t => t.Id == transactionId);
 
-            return Result.Success(TransactionDto.From(transaction));
+            return Result.Success(FinancialTransactionDto.From(transaction));
         }
 
         public async Task<Result> ImportTransactionsFromCsvAsync(long portfolioId, long walletId, CsvFileImportType csvType, StreamReader streamReader)

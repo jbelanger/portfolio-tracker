@@ -25,6 +25,7 @@ namespace Portfolio.Infrastructure.Data.Configurations
             // Configure the relationship with Holdings
             builder.HasMany(p => p.Holdings)
                    .WithOne()
+                   .HasForeignKey(h => h.UserPortfolioId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             // Configure the relationship with ProcessedTransactions

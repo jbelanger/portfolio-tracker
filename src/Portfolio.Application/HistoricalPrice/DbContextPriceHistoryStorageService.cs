@@ -22,7 +22,7 @@ namespace Portfolio.App.HistoricalPrice
         public async Task<Result<IEnumerable<PriceRecord>>> LoadHistoryAsync(string symbol)
         {
             var priceHistory = new List<PriceRecord>();
-            var historyRecords = await _dbContext.PriceHistoryRecords.Where(P => P.CurrencyPair == symbol).ToListAsync();
+            var historyRecords = await _dbContext.PriceHistoryRecords.Where(P => P.CurrencyPair == symbol).AsNoTracking().ToListAsync();
             return Result.Success<IEnumerable<PriceRecord>>(priceHistory);
         }
 
@@ -33,11 +33,26 @@ namespace Portfolio.App.HistoricalPrice
         /// <param name="priceHistory">The historical price data to be saved.</param>
         /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
         public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<PriceRecord> priceHistory)
-        {            
-            await _dbContext.PriceHistoryRecords.AddRangeAsync(priceHistory);
-            await _dbContext.SaveChangesAsync();
-            
-            return Result.Success();
+        {
+            try
+            {
+                priceHistory = priceHistory.OrderBy(p => p.CloseDate);
+                var firstRecord = priceHistory.FirstOrDefault();
+                var lastRecord = priceHistory.LastOrDefault();
+                
+                if(firstRecord == null || lastRecord == null)
+                    return Result.Success();
+
+                await _dbContext.PriceHistoryRecords.Where(p => p.CloseDate >= firstRecord.CloseDate && p.CloseDate <= lastRecord.CloseDate).ExecuteDeleteAsync();            
+                await _dbContext.PriceHistoryRecords.AddRangeAsync(priceHistory);                
+                await _dbContext.SaveChangesAsync();
+
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure($"Failed to save price history: {ex.GetBaseException().Message}");
+            }
         }
     }
 }

@@ -18,8 +18,7 @@ namespace Portfolio.App.DTOs
                 Id = holding.Id,
                 Asset = holding.Asset,
                 Balance = holding.Balance,
-                AverageBoughtPrice = holding.AverageBoughtPrice,
-                CurrentPrice = holding.CurrentPrice.Amount,
+                AverageBoughtPrice = holding.AverageBoughtPrice,                
                 ErrorMessage = holding.ErrorMessage
             };
         }

@@ -11,6 +11,8 @@ namespace Portfolio.Infrastructure.Data.Configurations
             builder.ToTable("PriceHistoryRecords");
          
             builder.HasKey(h => h.Id);
+
+            builder.HasIndex(h => new { h.CurrencyPair, h.CloseDate}).IsUnique();            
             
             builder.Property(h => h.CurrencyPair)
                    .IsRequired()

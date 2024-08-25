@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Portfolio.Infrastructure;
 
@@ -10,9 +11,11 @@ using Portfolio.Infrastructure;
 namespace Portfolio.Infrastructure.DataMigrations
 {
     [DbContext(typeof(PortfolioDbContext))]
-    partial class PortfolioDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240825003535_InitialMigration56")]
+    partial class InitialMigration56
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -418,8 +421,7 @@ namespace Portfolio.Infrastructure.DataMigrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CurrencyPair", "CloseDate")
-                        .IsUnique();
+                    b.HasIndex("CurrencyPair", "CloseDate");
 
                     b.ToTable("PriceHistoryRecords", (string)null);
                 });
@@ -545,6 +547,32 @@ namespace Portfolio.Infrastructure.DataMigrations
                         .WithMany("Holdings")
                         .HasForeignKey("UserPortfolioId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("Portfolio.Domain.ValueObjects.Money", "CurrentPrice", b1 =>
+                        {
+                            b1.Property<long>("AssetHoldingId")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<decimal>("Amount")
+                                .HasColumnType("decimal(18,8)")
+                                .HasColumnName("SentAmount");
+
+                            b1.Property<string>("CurrencyCode")
+                                .IsRequired()
+                                .HasMaxLength(3)
+                                .HasColumnType("TEXT")
+                                .HasColumnName("SentCurrency");
+
+                            b1.HasKey("AssetHoldingId");
+
+                            b1.ToTable("AssetHoldings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AssetHoldingId");
+                        });
+
+                    b.Navigation("CurrentPrice")
                         .IsRequired();
                 });
 

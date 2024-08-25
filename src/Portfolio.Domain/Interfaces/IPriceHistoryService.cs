@@ -19,5 +19,7 @@ namespace Portfolio.Domain.Interfaces
         /// <param name="date">The date and time at which to retrieve the closing price.</param>
         /// <returns>A <see cref="Result{T}"/> containing the closing price or an error message.</returns>
         Task<Result<decimal>> GetPriceAtCloseTimeAsync(string symbol, DateTime date);
+
+        Task<Result<Dictionary<string, decimal>>> GetCurrentPricesAsync(IEnumerable<string> symbols);
     }
 }

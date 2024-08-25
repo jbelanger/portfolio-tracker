@@ -46,5 +46,23 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
         {
             return _internalApi.DetermineTradingPair(fromSymbol, toSymbol);
         }
+
+        public async Task<Result<IEnumerable<PriceRecord>>> FetchCurrentPriceAsync(IEnumerable<string> symbols, string currency)
+        {
+            int retryCount = 0;
+            while (retryCount < _numberOfAttemps)
+            {
+                var priceResult = await _internalApi.FetchCurrentPriceAsync(symbols, currency).ConfigureAwait(false);
+                if (priceResult.IsSuccess)
+                {
+                    return priceResult;
+                }
+
+                retryCount++;
+                Log.Warning("Retrying price retrieval for current price of {CurrencyCode}. Attempt {RetryCount}/{MaxRetries}", symbols, retryCount, _numberOfAttemps);
+            }
+
+            return Result.Failure<IEnumerable<PriceRecord>>($"Failed to get price history for {symbols} after {_numberOfAttemps} attemps."); // Indicating failure
+        }
     }
 }

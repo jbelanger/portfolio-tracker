@@ -1,0 +1,1146 @@
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: 'http://localhost:5262', // Replace with your API base URL
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export default apiClient;
+import React, { useState } from 'react';
+import {
+  Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Typography, RadioGroup, FormControl, FormControlLabel, Radio, InputLabel, Select, MenuItem
+} from '@mui/material';
+import { CsvFileImportType, CryptoCurrencyTransactionDto } from '../types/Wallet';
+import apiClient from '../api/axios';
+import TransactionForm from './TransactionForm';
+
+interface TransactionDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onTransactionAdded: () => void;
+  selectedWalletId: number;
+  showSnackbar: (message: string, severity: 'success' | 'error') => void;
+}
+
+const AddTransactionDialog: React.FC<TransactionDialogProps> = ({ open, onClose, onTransactionAdded, selectedWalletId, showSnackbar }) => {
+  const [importType, setImportType] = useState<CsvFileImportType>(CsvFileImportType.Kraken);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [transactionMode, setTransactionMode] = useState<'manual' | 'csv'>('csv');
+  const [currentTransaction, setCurrentTransaction] = useState<CryptoCurrencyTransactionDto | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleImportTransactions = async (): Promise<void> => {
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      await apiClient.post(`/portfolios/1/wallets/${selectedWalletId}/transactions/upload-csv?csvImportType=${importType}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      showSnackbar('Transactions imported successfully.', 'success');
+      onTransactionAdded();
+      onClose();
+    } catch (error) {
+      console.error('Error importing transactions:', error);
+      showSnackbar('Error importing transactions. Please try again.', 'error');
+    }
+  };
+
+  const handleSaveManualTransaction = async (): Promise<void> => {
+    if (!currentTransaction) return;
+
+    try {
+      await apiClient.post(`/portfolios/1/wallets/${selectedWalletId}/transactions`, currentTransaction);
+      showSnackbar('Transaction added successfully.', 'success');
+      onTransactionAdded();
+      onClose();
+    } catch (error: any) {
+      console.error('Error saving transaction:', error);
+      const errorMessage = error.response?.data || 'An unexpected error occurred. Please try again.';
+      showSnackbar(errorMessage, 'error');
+    }
+  };
+
+  const renderCsvImportSection = () => (
+    <>
+      <Typography variant="h6">CSV Import</Typography>
+      <FormControl fullWidth margin="dense">
+        <InputLabel>Import Type</InputLabel>
+        <Select
+          value={importType}
+          onChange={(e) => setImportType(e.target.value as CsvFileImportType)}
+          label="Import Type"
+        >
+          <MenuItem value={CsvFileImportType.Kraken}>Kraken</MenuItem>
+          <MenuItem value={CsvFileImportType.Coinbase}>Coinbase</MenuItem>
+          <MenuItem value={CsvFileImportType.Binance}>Binance</MenuItem>
+        </Select>
+      </FormControl>
+      <input
+        accept=".csv"
+        style={{ display: 'none' }}
+        id="csv-file-input"
+        type="file"
+        onChange={handleFileChange}
+      />
+      <label htmlFor="csv-file-input">
+        <Button
+          variant="contained"
+          color="primary"
+          component="span"
+          style={{ marginTop: '15px' }}
+        >
+          Choose CSV File
+        </Button>
+      </label>
+      {selectedFile && (
+        <Typography variant="body2" style={{ marginTop: '10px' }}>
+          Selected File: {selectedFile.name}
+        </Typography>
+      )}
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={handleImportTransactions}
+        disabled={!selectedFile}
+        style={{ marginTop: '15px' }}
+      >
+        Import Transactions
+      </Button>
+    </>
+  );
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Add or Import Transactions</DialogTitle>
+      <DialogContent>
+        <Box marginBottom={2}>
+          <Typography variant="subtitle1">Choose Transaction Mode</Typography>
+          <RadioGroup
+            row
+            value={transactionMode}
+            onChange={(e) => setTransactionMode(e.target.value as 'manual' | 'csv')}
+          >
+            <FormControlLabel value="csv" control={<Radio />} label="CSV Import" />
+            <FormControlLabel value="manual" control={<Radio />} label="Manual Entry" />
+          </RadioGroup>
+        </Box>
+        {transactionMode === 'csv' ? (
+          renderCsvImportSection()
+        ) : (
+          <TransactionForm
+            transaction={currentTransaction}
+            onChange={setCurrentTransaction}
+            onSave={handleSaveManualTransaction}
+            isEditing={false}
+          />
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary">Cancel</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default AddTransactionDialog;
+import React from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+
+interface BulkEditDialogProps {
+  open: boolean;
+  onClose: () => void;
+  selectedTransactions: number[];
+}
+
+const BulkEditDialog: React.FC<BulkEditDialogProps> = ({ open, onClose, selectedTransactions }) => (
+  <Dialog open={open} onClose={onClose}>
+    <DialogTitle>Bulk Edit Transactions</DialogTitle>
+    <DialogContent>
+      <p>{`You have selected ${selectedTransactions.length} transactions for bulk editing.`}</p>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={onClose} color="primary">Cancel</Button>
+      <Button onClick={onClose} color="primary">Apply Changes</Button>
+    </DialogActions>
+  </Dialog>
+);
+
+export default BulkEditDialog;
+import React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import { Box } from '@mui/material';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Settings from '@mui/icons-material/Settings';
+import CodeIcon from '@mui/icons-material/Code'; // Placeholder for logo
+
+const CustomAppBar: React.FC = () => {
+  return (
+    <AppBar position="static" sx={{ background: 'linear-gradient(90deg, #007ACC, #1E1E1E)', padding: '0 16px', boxShadow: 'none' }}>
+      <Toolbar disableGutters>
+        {/* Logo and App Name */}
+        <Box display="flex" alignItems="center" sx={{ flexGrow: 1 }}>
+          <CodeIcon sx={{ fontSize: 36, mr: 2, color: '#23D18B' }} /> {/* Use your custom logo here */}
+          <Typography variant="h6" sx={{ fontFamily: '"Fira Code", monospace', color: '#D4D4D4', fontWeight: 'bold' }}>
+            CodeFlow
+          </Typography>
+        </Box>
+
+        {/* Right-aligned Icons */}
+        <Box display="flex">
+          <IconButton size="large" edge="end" color="inherit" aria-label="settings" sx={{ color: '#D4D4D4' }}>
+            <Settings />
+          </IconButton>
+          <IconButton size="large" edge="end" color="inherit" aria-label="account" sx={{ color: '#D4D4D4' }}>
+            <AccountCircle />
+          </IconButton>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+export default CustomAppBar;
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IconButton } from '@mui/material';
+import { Delete } from '@mui/icons-material';
+import apiClient from '../api/axios';
+import { Wallet } from '../types/Wallet';
+
+interface DeleteWalletButtonProps {
+  wallet: Wallet;
+  onDelete: () => void;
+  showSnackbar: (message: string, severity: 'success' | 'error') => void;
+}
+
+const DeleteWalletButton: React.FC<DeleteWalletButtonProps> = ({ wallet, onDelete, showSnackbar }) => {
+  const navigate = useNavigate();
+
+  const handleDeleteWallet = async () => {
+    try {
+      await apiClient.delete(`/portfolios/1/wallets/${wallet.id}`);
+      onDelete();
+      showSnackbar('Wallet deleted successfully.', 'success');
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting wallet:', error);
+      showSnackbar('Error deleting wallet. Please try again.', 'error');
+    }
+  };
+
+  return (
+    <IconButton onClick={handleDeleteWallet}>
+      <Delete />
+    </IconButton>
+  );
+};
+
+export default DeleteWalletButton;
+import React, { useState, useEffect } from 'react';
+import { Box, CssBaseline, Toolbar, AppBar, Typography, IconButton } from '@mui/material';
+import { AccountCircle } from '@mui/icons-material';
+import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
+import WalletList from './WalletList';
+import LeftMenu from './LeftMenu';
+import { Wallet } from '../types/Wallet';
+import MainPage from './MainPage';
+
+interface LayoutProps {
+  darkMode: boolean;
+  onToggleDarkMode: () => void;
+}
+
+const Layout: React.FC<LayoutProps> = ({ darkMode, onToggleDarkMode }) => {
+  const [selectedWallet, setSelectedWallet] = useState<Wallet | null>(null);
+  const [menuCollapsed, setMenuCollapsed] = useState(false);
+
+  const handleSelectWallet = (wallet: Wallet | null) => {
+    setSelectedWallet(wallet);
+  };
+
+  const showSnackbar = (message: string, severity: 'success' | 'error') => {
+    console.log(message, severity);
+  };
+
+  const handleWalletDeleted = () => {
+    showSnackbar('Wallet deleted successfully.', 'success');
+  };
+
+  useEffect(() => {
+    const resizeGrid = () => {
+      window.dispatchEvent(new Event('resize'));
+    };
+    resizeGrid();
+    window.addEventListener('resize', resizeGrid);
+
+    return () => {
+      window.removeEventListener('resize', resizeGrid);
+    };
+  }, [menuCollapsed]);
+
+  return (
+    <Router>
+      <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+        <CssBaseline />        
+        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          <Toolbar>
+            <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
+              Portfolio Manager
+            </Typography>
+            <IconButton edge="end" color="inherit">
+              <AccountCircle />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <LeftMenu onWalletDeleted={handleWalletDeleted} onSelectWallet={handleSelectWallet} showSnackbar={showSnackbar} />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            bgcolor: 'background.default',
+            p: 3,
+            transition: 'margin-left 0.3s',
+          }}
+        >
+          <Toolbar />
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/" element={<WalletList allWallets />} />
+            {selectedWallet && (
+              <Route path={`/wallets/${selectedWallet.id}`} element={<WalletList wallet={selectedWallet} />} />
+            )}
+            <Route path="/another-page" element={<Typography variant="h4">Another Page</Typography>} />
+          </Routes>
+        </Box>
+      </Box>
+    </Router>
+  );
+};
+
+export default Layout;
+import React, { useState, useEffect } from 'react';
+import { Box, Toolbar, List, ListItem, ListItemText, Button, Divider, IconButton, ListItemIcon, Tooltip } from '@mui/material';
+import { Add, ChevronLeft, ChevronRight, Wallet, AccountBalanceWallet } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import apiClient from '../api/axios';
+import { Wallet as WalletType } from '../types/Wallet';
+import NewWalletDialog from './NewWalletDialog';
+import DeleteWalletButton from './DeleteWalletButton';
+
+interface LeftMenuProps {
+  onSelectWallet: (wallet: WalletType | null) => void;
+  showSnackbar: (message: string, severity: 'success' | 'error') => void;
+  onWalletDeleted: () => void;
+}
+
+const LeftMenu: React.FC<LeftMenuProps> = ({ onSelectWallet, showSnackbar, onWalletDeleted }) => {
+  const [wallets, setWallets] = useState<WalletType[]>([]);
+  const [newWalletDialogOpen, setNewWalletDialogOpen] = useState(false);
+  const [menuCollapsed, setMenuCollapsed] = useState(false);
+
+  useEffect(() => {
+    fetchWallets();
+  }, []);
+
+  const fetchWallets = async () => {
+    try {
+      const response = await apiClient.get<WalletType[]>('/portfolios/1/wallets');
+      setWallets(response.data);
+    } catch (error) {
+      console.error('Error fetching wallets:', error);
+    }
+  };
+
+  const handleWalletCreated = () => {
+    setNewWalletDialogOpen(false);
+    fetchWallets();
+  };
+
+  const handleAddWallet = () => {
+    setNewWalletDialogOpen(true);
+  };
+
+  const toggleMenuCollapse = () => {
+    setMenuCollapsed(!menuCollapsed);
+  };
+
+  return (
+    <Box
+      sx={{
+        width: menuCollapsed ? 60 : 240,
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+        transition: 'width 0.3s',
+        [`& .MuiDrawer-paper`]: {
+          width: menuCollapsed ? 60 : 240,
+          boxSizing: 'border-box',
+          transition: 'width 0.3s',
+        },
+      }}
+    >
+      <Toolbar />
+      <Box sx={{ overflow: 'auto' }}>
+        <List component="nav">
+          <ListItem button onClick={toggleMenuCollapse}>
+            <ListItemIcon>
+              {menuCollapsed ? <ChevronRight /> : <ChevronLeft />}
+            </ListItemIcon>
+            {!menuCollapsed && <ListItemText primary="Collapse Menu" />}
+          </ListItem>
+          <Divider />
+          <ListItem button component={Link} to="/" onClick={() => onSelectWallet(null)}>
+            <Tooltip title="All Wallets" placement="right">
+              <ListItemIcon>
+                <AccountBalanceWallet />
+              </ListItemIcon>
+            </Tooltip>
+            {!menuCollapsed && <ListItemText primary="All Wallets" />}
+          </ListItem>
+          <Divider />
+          {wallets.map((wallet) => (
+            <ListItem
+              button
+              key={wallet.id}
+              component={Link}
+              to={`/wallets/${wallet.id}`}
+              onClick={() => onSelectWallet(wallet)}
+              sx={{ display: 'flex', justifyContent: 'space-between' }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Tooltip title={wallet.name} placement="right">
+                  <ListItemIcon>
+                    <Wallet />
+                  </ListItemIcon>
+                </Tooltip>
+                {!menuCollapsed && <ListItemText primary={wallet.name} />}
+              </Box>
+              {!menuCollapsed && (
+                <DeleteWalletButton
+                  wallet={wallet}
+                  onDelete={() => {
+                    fetchWallets();
+                    onWalletDeleted();
+                  }}
+                  showSnackbar={showSnackbar}
+                />
+              )}
+            </ListItem>
+          ))}
+          <Divider />
+          <ListItem>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<Add />}
+              onClick={handleAddWallet}
+              fullWidth={!menuCollapsed}
+              sx={{ justifyContent: menuCollapsed ? 'center' : 'flex-start' }}
+            >
+              {!menuCollapsed && "Add Wallet"}
+            </Button>
+          </ListItem>
+        </List>
+      </Box>
+      <NewWalletDialog
+        open={newWalletDialogOpen}
+        onClose={() => setNewWalletDialogOpen(false)}
+        onWalletCreated={handleWalletCreated}
+        showSnackbar={showSnackbar}
+      />
+    </Box>
+  );
+};
+
+export default LeftMenu;
+import React from 'react';
+import { Box, Typography } from '@mui/material';
+
+const MainPage: React.FC = () => (
+    <Box sx={{ padding: '20px' }}>
+        <Typography variant="h4" gutterBottom>
+            Welcome to Your Portfolio
+        </Typography>
+        <Typography variant="body1">
+            Please select a wallet from the left menu to view its transactions, or create a new wallet to start tracking your cryptocurrency assets.
+        </Typography>
+    </Box>
+);
+
+export default MainPage;
+import React, { useState } from 'react';
+import { AppBar, Toolbar, IconButton, Menu, MenuItem, Typography, Switch } from '@mui/material';
+import { AccountCircle } from '@mui/icons-material';
+
+interface NavbarProps {
+  darkMode: boolean;
+  onToggleDarkMode: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ darkMode, onToggleDarkMode }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <AppBar position="static">
+      <Toolbar variant="regular" disableGutters>
+        <Typography variant="h6" style={{ flexGrow: 1 }}>
+          Portfolio
+        </Typography>
+        <div>
+          <IconButton edge="end" color="inherit" onClick={handleMenu}>
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem>
+              <Typography variant="body1">Dark Mode</Typography>
+              <Switch checked={darkMode} onChange={onToggleDarkMode} />
+            </MenuItem>
+            <MenuItem onClick={handleClose}>Logout</MenuItem>
+          </Menu>
+        </div>
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+export default Navbar;
+import React, { useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
+import apiClient from '../api/axios';
+
+interface NewWalletDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onWalletCreated: () => void;
+  showSnackbar: (message: string, severity: 'success' | 'error') => void;
+}
+
+const NewWalletDialog: React.FC<NewWalletDialogProps> = ({ open, onClose, onWalletCreated, showSnackbar }) => {
+  const [walletName, setWalletName] = useState('');
+
+  const handleCreateWallet = async () => {
+    if (!walletName.trim()) {
+      showSnackbar('Wallet name cannot be empty.', 'error');
+      return;
+    }
+
+    try {
+      await apiClient.post('/portfolios/1/wallets', { name: walletName });
+      showSnackbar('Wallet created successfully.', 'success');
+      onWalletCreated();
+      onClose();
+    } catch (error) {
+      console.error('Error creating wallet:', error);
+      showSnackbar('Error creating wallet. Please try again.', 'error');
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Create New Wallet</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          fullWidth
+          margin="dense"
+          label="Wallet Name"
+          value={walletName}
+          onChange={(e) => setWalletName(e.target.value)}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary">Cancel</Button>
+        <Button onClick={handleCreateWallet} color="primary">Create</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default NewWalletDialog;
+import React from 'react';
+import { TextField, MenuItem, Select, InputLabel, FormControl, Button, Grid } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import { CryptoCurrencyTransactionDto } from '../types/Wallet';
+
+interface TransactionFormProps {
+  transaction: CryptoCurrencyTransactionDto | null;
+  onChange: (transaction: CryptoCurrencyTransactionDto) => void;
+  onSave: () => void;
+  isEditing: boolean;
+}
+
+const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange, onSave, isEditing }) => (
+  <>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Transaction Type</InputLabel>
+          <Select
+            fullWidth
+            value={transaction?.type || ''}
+            disabled={isEditing}
+            onChange={(e) =>
+              onChange({
+                ...transaction!,
+                type: e.target.value,
+              })
+            }
+            label="Transaction Type"
+          >
+            <MenuItem value="Deposit">Deposit</MenuItem>
+            <MenuItem value="Withdrawal">Withdrawal</MenuItem>
+            <MenuItem value="Trade">Trade</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            label="Transaction Date"
+            value={dayjs(transaction?.dateTime || new Date())}
+            onChange={(date) => {
+              onChange({
+                ...transaction!,
+                dateTime: date?.toDate() || new Date(),
+              });
+            }}
+            slotProps={{ textField: { margin: "dense", fullWidth: true } }}
+          />
+        </LocalizationProvider>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Received Amount"
+          type="number"
+          value={transaction?.receivedAmount || ''}
+          onChange={(e) => onChange({ ...transaction!, receivedAmount: parseFloat(e.target.value) })}
+          InputProps={{ style: { fontSize: '0.875rem' } }}
+          disabled={transaction?.type === "Withdrawal"}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Received Currency"
+          value={transaction?.receivedCurrency || ''}
+          onChange={(e) => onChange({ ...transaction!, receivedCurrency: e.target.value })}
+          InputProps={{ style: { fontSize: '0.875rem' } }}
+          disabled={transaction?.type === "Withdrawal"}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Sent Amount"
+          type="number"
+          value={transaction?.sentAmount || ''}
+          onChange={(e) => onChange({ ...transaction!, sentAmount: parseFloat(e.target.value) })}
+          InputProps={{ style: { fontSize: '0.875rem' } }}
+          disabled={transaction?.type === "Deposit"}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Sent Currency"
+          value={transaction?.sentCurrency || ''}
+          onChange={(e) => onChange({ ...transaction!, sentCurrency: e.target.value })}
+          InputProps={{ style: { fontSize: '0.875rem' } }}
+          disabled={transaction?.type === "Deposit"}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Fee Amount"
+          type="number"
+          value={transaction?.feeAmount || ''}
+          onChange={(e) => onChange({ ...transaction!, feeAmount: parseFloat(e.target.value) })}
+          InputProps={{ style: { fontSize: '0.875rem' } }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Fee Currency"
+          value={transaction?.feeCurrency || ''}
+          onChange={(e) => onChange({ ...transaction!, feeCurrency: e.target.value })}
+          InputProps={{ style: { fontSize: '0.875rem' } }}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Account"
+          value={transaction?.account || ''}
+          onChange={(e) => onChange({ ...transaction!, account: e.target.value })}
+          InputProps={{ style: { fontSize: '0.875rem' } }}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          multiline
+          rows={5}
+          fullWidth
+          margin="dense"
+          label="Note"
+          value={transaction?.note || ''}
+          onChange={(e) => onChange({ ...transaction!, note: e.target.value })}
+          InputProps={{ style: { fontSize: '0.875rem' } }}
+        />
+      </Grid>
+    </Grid>
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={onSave}
+      style={{ marginTop: '15px' }}
+    >
+      {isEditing ? 'Save Changes' : 'Add Transaction'}
+    </Button>
+  </>
+);
+
+export default TransactionForm;
+import React, { useState, useEffect } from 'react';
+import {
+    IconButton, Typography, Snackbar, Alert,
+    Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, MenuItem, Select, InputLabel, FormControl
+} from '@mui/material';
+import { Delete, Edit, Add, Download } from '@mui/icons-material';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import apiClient from '../api/axios';
+import { Wallet, CryptoCurrencyTransactionDto } from '../types/Wallet';
+import dayjs from 'dayjs';
+import TransactionForm from './TransactionForm';
+import AddTransactionDialog from './AddTransactionDialog';
+import BulkEditDialog from './BulkEditDialog';
+
+interface WalletListProps {
+    allWallets?: boolean;
+    wallet?: Wallet | null;
+}
+
+const WalletList: React.FC<WalletListProps> = ({ allWallets = false, wallet = null }) => {
+    const [transactions, setTransactions] = useState<CryptoCurrencyTransactionDto[]>([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentTransaction, setCurrentTransaction] = useState<CryptoCurrencyTransactionDto | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [exportFormat, setExportFormat] = useState('xlsx');
+    const [transactionDialogOpen, setTransactionDialogOpen] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+    const [deleting, setDeleting] = useState<number | null>(null);
+    const [selectedTransactions, setSelectedTransactions] = useState<number[]>([]);
+    const [bulkEditDialogOpen, setBulkEditDialogOpen] = useState(false);
+    const [bulkAction, setBulkAction] = useState<string | null>(null);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+
+    useEffect(() => {
+        if (allWallets) {
+            fetchTransactions(null);
+        } else if (wallet) {
+            fetchTransactions(wallet?.id);
+        }
+    }, [allWallets, wallet]);
+
+    const fetchTransactions = async (walletId: number | null) => {
+        try {
+            if (walletId === null) {
+                const response = await apiClient.get<CryptoCurrencyTransactionDto[]>('/portfolios/1/transactions');
+                setTransactions(response.data);
+            } else {
+                const response = await apiClient.get<CryptoCurrencyTransactionDto[]>(`/portfolios/1/wallets/${walletId}/transactions`);
+                setTransactions(response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            showSnackbar('Error fetching transactions from wallet(s).', 'error');
+        }
+    };
+
+    const handleDeleteTransaction = async (transactionId: number) => {
+        try {
+            const updatedTransactions = transactions.filter(transaction => transaction.id !== transactionId);
+            setTransactions(updatedTransactions);
+            setDeleting(transactionId);
+
+            if (wallet) {
+                await apiClient.delete(`/portfolios/1/wallets/${wallet.id}/transactions/${transactionId}`);
+                showSnackbar('Transaction deleted successfully.', 'success');
+            }
+        } catch (error) {
+            setTransactions(transactions);
+            console.error('Error deleting transaction:', error);
+            showSnackbar('Error deleting transaction. Please try again.', 'error');
+        } finally {
+            setDeleting(null);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        try {
+            await apiClient.delete(`/portfolios/1/wallets/${wallet?.id}/transactions/bulk-delete`, {
+                data: selectedTransactions,
+            });
+            setTransactions(transactions.filter(transaction => !selectedTransactions.includes(transaction.id)));
+            setSelectedTransactions([]);
+            showSnackbar('Selected transactions deleted successfully.', 'success');
+        } catch (error) {
+            console.error('Error deleting transactions:', error);
+            showSnackbar('Error deleting transactions. Please try again.', 'error');
+        }
+    };
+
+    const handleEditTransaction = (transaction: CryptoCurrencyTransactionDto) => {
+        setCurrentTransaction(transaction);
+        setIsEditing(true);
+        setDialogOpen(true);
+    };
+
+    const handleBulkEdit = async (updatedFields: Partial<CryptoCurrencyTransactionDto>) => {
+        try {
+            const transactionsToUpdate = selectedTransactions.map(id => ({
+                ...transactions.find(t => t.id === id),
+                ...updatedFields,
+            }));
+
+            await apiClient.put(`/portfolios/1/wallets/${wallet?.id}/transactions/bulk-edit`, transactionsToUpdate);
+
+            await fetchTransactions(wallet?.id!);
+
+            setBulkEditDialogOpen(false);
+            setSelectedTransactions([]);
+            showSnackbar('Selected transactions updated successfully.', 'success');
+        } catch (error) {
+            console.error('Error updating transactions:', error);
+            showSnackbar('Error updating transactions. Please try again.', 'error');
+        }
+    };
+
+    const handleDialogClose = () => {
+        setDialogOpen(false);
+        setCurrentTransaction(null);
+    };
+
+    const handleSaveTransaction = async () => {
+        if (!currentTransaction || !wallet) return;
+        try {
+            if (isEditing) {
+                await apiClient.put(`/portfolios/1/wallets/${wallet.id}/transactions/${currentTransaction.id}`, currentTransaction);
+            } else {
+                await apiClient.post(`/portfolios/1/wallets/${wallet.id}/transactions`, currentTransaction);
+            }
+
+            await fetchTransactions(wallet.id);
+            handleDialogClose();
+        } catch (error: any) {
+            console.error('Error saving transaction:', error);
+            const errorMessage = error.response?.data || 'An unexpected error occurred. Please try again.';
+            showSnackbar(errorMessage, 'error');
+        }
+    };
+
+    const handleAddTransaction = () => {
+        setTransactionDialogOpen(true);
+    };
+
+    const handleTransactionDialogClose = () => {
+        setTransactionDialogOpen(false);
+        fetchTransactions(wallet?.id || 0);
+    };
+
+    const handleBulkAction = (action: string | null) => {
+        if (action === 'bulkEdit') {
+            setBulkEditDialogOpen(true);
+        } else if (action === 'bulkDelete') {
+            setConfirmDeleteOpen(true);
+        }
+        setBulkAction("");
+    };
+
+    const handleExport = async () => {
+        if (!wallet) return;
+        try {
+            const response = await apiClient.get(`/portfolios/1/wallets/${wallet.id}/export?format=${exportFormat}`, {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `transactions.${exportFormat}`);
+            document.body.appendChild(link);
+            link.click();
+        } catch (error) {
+            console.error('Error exporting transactions:', error);
+        }
+    };
+
+    const showSnackbar = (message: string, severity: 'success' | 'error' = 'success') => {
+        setSnackbarMessage(message);
+        setSnackbarSeverity(severity);
+        setSnackbarOpen(true);
+    };
+
+    const columns: GridColDef[] = [
+        {
+            field: 'dateTime',
+            headerName: 'Date',
+            flex: 2,
+            valueGetter: (params: any, tx: CryptoCurrencyTransactionDto) => {
+                return dayjs(tx.dateTime).format('YYYY-MM-DD HH:mm:ss UTC');
+            },
+        },
+        { field: 'type', headerName: 'Type', flex: 1 },
+        {
+            field: 'receivedAmount',
+            headerName: 'Received Amount',
+            flex: 1,
+            valueGetter: (params: any, tx: CryptoCurrencyTransactionDto) =>
+                `${tx.receivedAmount ?? ''} ${tx.receivedCurrency ?? ''}`,
+        },
+        {
+            field: 'sentAmount',
+            headerName: 'Sent Amount',
+            flex: 1,
+            valueGetter: (params: any, tx: CryptoCurrencyTransactionDto) =>
+                `${tx.sentAmount ?? ''} ${tx.sentCurrency ?? ''}`,
+        },
+        {
+            field: 'feeAmount',
+            headerName: 'Fee',
+            flex: 1,
+            valueGetter: (params: any, tx: CryptoCurrencyTransactionDto) =>
+                `${tx.feeAmount ?? ''} ${tx.feeCurrency ?? ''}`,
+        },
+        { field: 'account', headerName: 'Account', flex: 1 },
+        { field: 'note', headerName: 'Note', flex: 2 },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            flex: 0,
+            sortable: false,
+            renderCell: (params: GridRenderCellParams) => (
+                <>
+                    <IconButton
+                        onClick={() => handleEditTransaction(params.row as CryptoCurrencyTransactionDto)}
+                        disabled={deleting !== null}
+                    >
+                        <Edit />
+                    </IconButton>
+                    <IconButton
+                        onClick={() => handleDeleteTransaction((params.row as CryptoCurrencyTransactionDto).id)}
+                        disabled={deleting === (params.row as CryptoCurrencyTransactionDto).id}
+                    >
+                        <Delete />
+                    </IconButton>
+                </>
+            ),
+        },
+    ];
+
+    return (
+        <div style={{ padding: '20px' }}>
+            <Typography variant="h1" gutterBottom>{wallet?.name}</Typography>
+
+            {wallet && (
+                <div style={{ marginTop: '20px' }}>
+                    <Box display="flex" justifyContent="space-between" mb={2}>
+                        <Box display="flex" alignItems="left">
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<Add />}
+                                onClick={handleAddTransaction}
+                                sx={{ mr: 2 }}
+                            >
+                                Add Transactions
+                            </Button>
+                            <FormControl variant="outlined" size="small" sx={{ minWidth: 150, mr: 2 }}>
+                                <Select
+                                    value={bulkAction}
+                                    color='secondary'
+                                    onChange={(e) => {
+                                        setBulkAction(e.target.value);
+                                        handleBulkAction(e.target.value);
+                                    }}
+                                    displayEmpty
+                                >
+                                    <MenuItem value="" disabled>Bulk Action</MenuItem>
+                                    <MenuItem value="bulkEdit">Bulk Edit</MenuItem>
+                                    <MenuItem value="bulkDelete">Bulk Delete</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                        <Box display="flex" alignItems="center">
+                            <FormControl variant="outlined" size="small" sx={{ minWidth: 120, mr: 2 }}>
+                                <InputLabel>Export Format</InputLabel>
+                                <Select
+                                    value={exportFormat}
+                                    onChange={(e) => setExportFormat(e.target.value)}
+                                    label="Export Format"
+                                >
+                                    <MenuItem value="xlsx">Excel (.xlsx)</MenuItem>
+                                    <MenuItem value="csv">CSV (.csv)</MenuItem>
+                                </Select>
+                            </FormControl>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                startIcon={<Download />}
+                                onClick={handleExport}
+                            >
+                                Export
+                            </Button>
+                        </Box>
+                    </Box>                    
+                    <div style={{ display: 'flex', height: '100%' }}>
+                        <div style={{ flexGrow: 1 }}>
+                            <DataGrid
+                                rows={transactions}
+                                columns={columns}
+                                initialState={{
+                                    pagination: {
+                                        paginationModel: {
+                                            pageSize: 25,
+                                        },
+                                    },
+                                }}
+                                pageSizeOptions={[10, 25, 100]}
+                                autoHeight
+                                disableRowSelectionOnClick
+                                checkboxSelection
+                                onRowSelectionModelChange={(newSelection) => setSelectedTransactions(newSelection as number[])}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <Dialog open={dialogOpen} onClose={handleDialogClose}>
+                <DialogTitle>{isEditing ? 'Edit Transaction' : 'Add Transaction'}</DialogTitle>
+                <DialogContent>
+                    <TransactionForm
+                        transaction={currentTransaction}
+                        onChange={setCurrentTransaction}
+                        onSave={handleSaveTransaction}
+                        isEditing={isEditing}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDialogClose} color="primary">Cancel</Button>
+                </DialogActions>
+            </Dialog>
+
+            <AddTransactionDialog
+                open={transactionDialogOpen}
+                onClose={handleTransactionDialogClose}
+                onTransactionAdded={handleTransactionDialogClose}
+                selectedWalletId={wallet?.id || 0}
+                showSnackbar={showSnackbar}
+            />
+            <BulkEditDialog
+                open={bulkEditDialogOpen}
+                onClose={() => setBulkEditDialogOpen(false)}
+                selectedTransactions={selectedTransactions}
+            />
+            <Dialog open={confirmDeleteOpen} onClose={() => setConfirmDeleteOpen(false)}>
+                <DialogTitle>Confirm Bulk Delete</DialogTitle>
+                <DialogContent>
+                    <Typography>Are you sure you want to delete the selected transactions?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmDeleteOpen(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setConfirmDeleteOpen(false);
+                            handleBulkDelete();
+                        }}
+                        color="secondary"
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
+        </div>
+    );
+};
+
+export default WalletList;
+export interface CryptoCurrencyTransactionDto {
+  id: number;
+  dateTime: Date;
+  type: string;
+  receivedAmount?: number;
+  receivedCurrency: string;
+  sentAmount?: number;
+  sentCurrency: string;
+  feeAmount?: number;
+  feeCurrency: string;
+  account: string;
+  note: string;
+}
+
+export interface Wallet {
+  id: number;
+  name: string;
+  transactions: CryptoCurrencyTransactionDto[];
+}
+
+export enum CsvFileImportType {
+  Kraken = 'Kraken',
+  Coinbase = 'Coinbase',
+  Binance = 'Binance',
+}

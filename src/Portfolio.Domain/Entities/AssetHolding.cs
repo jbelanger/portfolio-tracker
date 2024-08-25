@@ -10,6 +10,8 @@ namespace Portfolio.Domain.Entities
     /// </summary>
     public class AssetHolding : BaseAuditableEntity
     {
+        public long UserPortfolioId { get; private set; }
+
         /// <summary>
         /// Gets the symbol or identifier of the asset (e.g., BTC, AAPL).
         /// </summary>
@@ -25,11 +27,6 @@ namespace Portfolio.Domain.Entities
         /// This is useful for calculating the cost basis for tax purposes.
         /// </summary>
         public decimal AverageBoughtPrice { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current market price of the asset.
-        /// </summary>
-        public Money CurrentPrice { get; set; } = Money.Empty;
 
         /// <summary>
         /// Gets or sets the type of error associated with the holding, if any.

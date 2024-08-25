@@ -38,7 +38,7 @@ namespace Portfolio.Domain.Strategies.Transactions
             portfolio.RecordFinancialEvent(tx, sender, price);
 
             UpdateBalances(tx, receiver, sender);
-            HandleFees(tx, portfolio, priceHistoryService);
+            await HandleFees(tx, portfolio, priceHistoryService);
 
             return Result.Success();
         }
@@ -86,7 +86,7 @@ namespace Portfolio.Domain.Strategies.Transactions
             EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
         }
 
-        private async void HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        private async Task HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
         {
             if (tx.FeeAmount == Money.Empty) return;
 

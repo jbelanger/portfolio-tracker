@@ -23,7 +23,7 @@ namespace Portfolio.Infrastructure
 
         public DbSet<UserPortfolio> Portfolios { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
-        public DbSet<AssetHolding> Holdings { get; set; }
+        public DbSet<AssetHolding> AssetHoldings { get; set; }
         public DbSet<FinancialTransaction> Transactions { get; set; }
         public DbSet<PriceRecord> PriceHistoryRecords { get; set; }
 
