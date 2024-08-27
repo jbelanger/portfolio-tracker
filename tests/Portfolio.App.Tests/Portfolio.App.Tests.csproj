@@ -19,6 +19,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="FluentAssertions" Version="4.13.1" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.42.5" />
+    <PackageReference Include="RichardSzalay.MockHttp" Version="7.0.0" />
 
   </ItemGroup>
 
