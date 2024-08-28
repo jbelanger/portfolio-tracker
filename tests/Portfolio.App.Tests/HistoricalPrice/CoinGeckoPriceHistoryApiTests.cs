@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Portfolio.Domain.Constants;
 
 namespace Portfolio.App.Tests;
 
@@ -23,7 +24,10 @@ public class CoinGeckoPriceHistoryApiTests
     {
         _mockHttp = new MockHttpMessageHandler();
         _httpClient = new HttpClient(_mockHttp);
-        _coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClient);
+        _coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClient)
+        {
+            RequestsPerMinute = 9999
+        };
 
         // Mock response for GetAllSupportedCoinIdsAsync
         var jsonResponse = @"
@@ -62,8 +66,8 @@ public class CoinGeckoPriceHistoryApiTests
                 [1641081600000, 46495.22]
             ]
         }";
-
-        _mockHttp.When($"https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency={currency.ToLower()}&from=...")
+        // var uri = $"https://api.coingecko.com/api/v3/coins/{coinId}/market_chart/range?vs_currency={currency}&from={new DateTimeOffset(startDate).ToUnixTimeSeconds()}&to={new DateTimeOffset(endDate).ToUnixTimeSeconds()}";
+        _mockHttp.When($"https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency={currency.ToLower()}")
                  .Respond("application/json", jsonResponse);
 
         // Act
@@ -102,7 +106,7 @@ public class CoinGeckoPriceHistoryApiTests
         var startDate = DateTime.UtcNow.AddDays(-5);
         var endDate = DateTime.UtcNow;
 
-        _mockHttp.When($"https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency={currency.ToLower()}&from=...")
+        _mockHttp.When($"https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency={currency.ToLower()}")
                  .Respond(HttpStatusCode.BadRequest);
 
         // Act
@@ -110,7 +114,7 @@ public class CoinGeckoPriceHistoryApiTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Contain("Failed to fetch data");
+        result.Error.Should().Contain(Errors.ERR_COINGECKO_API_FETCH_FAILURE);
     }
 
     [Test]
@@ -179,7 +183,7 @@ public class CoinGeckoPriceHistoryApiTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Contain("Failed to fetch data");
+        result.Error.Should().Contain(Errors.ERR_COINGECKO_API_FETCH_FAILURE);
     }
 
     [Test]
@@ -228,13 +232,18 @@ public class CoinGeckoPriceHistoryApiTests
             ]
         }";
 
-        _mockHttp.When($"https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency={currency.ToLower()}&from=...")
+        var coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClient)
+        {
+            RequestsPerMinute = 30
+        };
+
+        _mockHttp.When($"https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency={currency.ToLower()}")
                  .Respond("application/json", jsonResponse);
 
         // Act
-        var firstCall = await _coinGeckoApi.FetchPriceHistoryAsync(symbol, currency, startDate, endDate);
+        var firstCall = await coinGeckoApi.FetchPriceHistoryAsync(symbol, currency, startDate, endDate);
         var secondCallStart = DateTime.UtcNow;
-        var secondCall = await _coinGeckoApi.FetchPriceHistoryAsync(symbol, currency, startDate, endDate);
+        var secondCall = await coinGeckoApi.FetchPriceHistoryAsync(symbol, currency, startDate, endDate);
         var secondCallEnd = DateTime.UtcNow;
 
         // Assert
@@ -243,7 +252,7 @@ public class CoinGeckoPriceHistoryApiTests
 
         // Ensure that the delay was applied between the two calls
         var timeBetweenCalls = secondCallEnd - secondCallStart;
-        timeBetweenCalls.Should().BeGreaterOrEqualTo(TimeSpan.FromMinutes(1.0 / 15)); // 15 requests per minute
+        timeBetweenCalls.TotalSeconds.Should().BeApproximately(TimeSpan.FromMinutes(1.0 / coinGeckoApi.RequestsPerMinute).TotalSeconds, 0.01); // 15 requests per minute
     }
 
     [Test]
@@ -259,13 +268,19 @@ public class CoinGeckoPriceHistoryApiTests
             'ethereum': {'usd': 3504.88}
         }";
 
+        var coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClient)
+        {
+            RequestsPerMinute = 30
+        };
+
+
         _mockHttp.When("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd")
                  .Respond("application/json", jsonResponse);
 
         // Act
-        var firstCall = await _coinGeckoApi.FetchCurrentPriceAsync(symbols, currency);
+        var firstCall = await coinGeckoApi.FetchCurrentPriceAsync(symbols, currency);
         var secondCallStart = DateTime.UtcNow;
-        var secondCall = await _coinGeckoApi.FetchCurrentPriceAsync(symbols, currency);
+        var secondCall = await coinGeckoApi.FetchCurrentPriceAsync(symbols, currency);
         var secondCallEnd = DateTime.UtcNow;
 
         // Assert
@@ -274,6 +289,6 @@ public class CoinGeckoPriceHistoryApiTests
 
         // Ensure that the delay was applied between the two calls
         var timeBetweenCalls = secondCallEnd - secondCallStart;
-        timeBetweenCalls.Should().BeGreaterOrEqualTo(TimeSpan.FromMinutes(1.0 / 15)); // 15 requests per minute
+        timeBetweenCalls.TotalSeconds.Should().BeApproximately(TimeSpan.FromMinutes(1.0 / coinGeckoApi.RequestsPerMinute).TotalSeconds, 0.01); // 15 requests per minute
     }
 }

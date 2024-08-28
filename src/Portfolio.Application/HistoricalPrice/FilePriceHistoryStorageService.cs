@@ -1,7 +1,8 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Portfolio.Domain.Constants;
+using Microsoft.Extensions.Caching.Memory;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.ValueObjects;
 
@@ -21,22 +22,89 @@ namespace Portfolio.App.HistoricalPrice
     /// </summary>
     public class FilePriceHistoryStorageService : IPriceHistoryStorageService
     {
-        /// <summary>
-        /// Gets or sets the location where the CSV files containing historical price data are stored.
-        /// </summary>
-        public string StorageLocation { get; set; } = "historical_price_data";
+        private readonly MemoryCache _cache;
+        private readonly string StorageLocation = "historical_price_data";
+        private readonly ConcurrentDictionary<string, Lazy<Task<IEnumerable<PriceRecord>>>> _loadedFilesCache = new();
 
-        /// <summary>
-        /// Loads historical price data for a specified cryptocurrency symbol from a CSV file.
-        /// </summary>
-        /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC/USD").</param>
-        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<PriceRecord>>> LoadHistoryAsync(string symbol)
+        public FilePriceHistoryStorageService(MemoryCache cache)
+        {
+            _cache = cache;
+        }
+
+        public async Task<Result<PriceRecord>> GetPriceAsync(string symbol, DateTime date)
+        {
+            var cacheKey = $"{symbol}_history";
+            var dateKey = $"{symbol}_{date:yyyyMMdd}";
+
+            if (_cache.TryGetValue(dateKey, out PriceRecord? cachedPriceRecord))
+            {
+                return Result.Success(cachedPriceRecord!);
+            }
+
+            var records = await _loadedFilesCache.GetOrAdd(symbol, new Lazy<Task<IEnumerable<PriceRecord>>>(() => LoadFileIntoMemoryAsync(symbol))).Value.ConfigureAwait(false);
+
+            var matchingRecord = records.FirstOrDefault(r => r.CloseDate.Date == date.Date);
+            if (matchingRecord == null)
+            {
+                return Result.Failure<PriceRecord>($"No record found for {symbol} on {date:yyyy-MM-dd}");
+            }
+
+            // Cache the found record
+            _cache.Set(dateKey, matchingRecord, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            });
+
+            return Result.Success(matchingRecord);
+        }
+
+        public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<PriceRecord> priceHistory)
         {
             var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
+            var cacheKey = $"{symbol}_history";
 
+            if (!Directory.Exists(StorageLocation))
+                Directory.CreateDirectory(StorageLocation);
+
+            try
+            {
+                var existingRecords = await LoadFileIntoMemoryAsync(symbol).ConfigureAwait(false);
+                var updatedRecords = existingRecords.ToDictionary(r => r.CloseDate.Date);
+
+                // Update or add new records
+                foreach (var newRecord in priceHistory)
+                {
+                    updatedRecords[newRecord.CloseDate.Date] = newRecord;
+                }
+
+                // Write updated records back to the file
+                using (var writer = new StreamWriter(csvFileName))
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
+                    csv.WriteRecords(updatedRecords.Values.OrderBy(r => r.CloseDate));
+                }
+
+                // Invalidate the cache for this symbol
+                _cache.Remove(cacheKey);
+                _loadedFilesCache.TryRemove(symbol, out _);
+
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(SaveHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
+                return Result.Failure($"Error saving data to CSV.");
+            }
+        }
+
+        private async Task<IEnumerable<PriceRecord>> LoadFileIntoMemoryAsync(string symbol)
+        {
+            var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
             if (!File.Exists(csvFileName))
-                return Result.Failure<IEnumerable<PriceRecord>>($"File not found: {csvFileName}");
+            {
+                return Enumerable.Empty<PriceRecord>();
+            }
 
             try
             {
@@ -50,52 +118,22 @@ namespace Portfolio.App.HistoricalPrice
                     records.Add(record);
                 }
 
-                return Result.Success<IEnumerable<PriceRecord>>(records);
-            }
-            catch (Exception ex)
-            {
-                Log.ForContext<FilePriceHistoryStorageService>().Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
-
-                // File might be corrupt. Delete it.
-                File.Delete(csvFileName);
-
-                return Result.Failure<IEnumerable<PriceRecord>>($"Error loading data from CSV.");
-            }
-        }
-
-        /// <summary>
-        /// Saves historical price data for a specified cryptocurrency symbol to a CSV file.
-        /// </summary>
-        /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC/USD").</param>
-        /// <param name="priceHistory">The historical price data to be saved.</param>
-        /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
-        public async Task<Result> SaveHistoryAsync(string symbol, IEnumerable<PriceRecord> priceHistory)
-        {
-            var csvFileName = $"{StorageLocation}/{symbol}_history.csv";
-
-            if (!Directory.Exists(StorageLocation))
-                Directory.CreateDirectory(StorageLocation);
-
-            try
-            {
-                using (var writer = new StreamWriter(csvFileName))
-                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                // Cache the entire file contents
+                var cacheKey = $"{symbol}_history";
+                _cache.Set(cacheKey, records, new MemoryCacheEntryOptions
                 {
-                    csv.Context.RegisterClassMap<CryptoPriceRecordMap>();
-                    csv.WriteRecords(priceHistory.Select(data => new
-                    {
-                        CloseDate = data.CloseDate.ToString(Strings.DATE_FORMAT),
-                        data.ClosePrice
-                    }));
-                }
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+                });
 
-                return await Task.FromResult(Result.Success()).ConfigureAwait(false);
+                return records;
             }
             catch (Exception ex)
             {
-                Log.Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(SaveHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
-                return Result.Failure($"Error saving data to CSV.");
+                Log.ForContext<FilePriceHistoryStorageService>().Error($"[{nameof(FilePriceHistoryStorageService)}.{nameof(LoadFileIntoMemoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
+                return Enumerable.Empty<PriceRecord>();
             }
         }
     }
+
+
 }

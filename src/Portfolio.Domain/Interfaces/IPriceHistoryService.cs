@@ -8,11 +8,6 @@ namespace Portfolio.Domain.Interfaces
     public interface IPriceHistoryService
     {
         /// <summary>
-        /// Gets or sets the default currency symbol used in price calculations.
-        /// </summary>
-        string DefaultCurrency { get; set; }
-
-        /// <summary>
         /// Retrieves the price of a specific symbol at a specified close time.
         /// </summary>
         /// <param name="symbol">The symbol of the currency or coin.</param>

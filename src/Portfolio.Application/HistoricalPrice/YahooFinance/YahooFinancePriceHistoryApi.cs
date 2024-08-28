@@ -14,12 +14,14 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
         /// <summary>
         /// Fetches historical price data for a given cryptocurrency symbol and date range from the Yahoo Finance API.
         /// </summary>
-        /// <param name="symbolPair">The trading pair symbol, e.g., "BTC/USD".</param>
+        /// <param name="symbol">The trading pair symbol, e.g., "BTC/USD".</param>
         /// <param name="startDate">The start date for fetching data.</param>
         /// <param name="endDate">The end date for fetching data.</param>
         /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
+        public async Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbol, string currency, DateTime startDate, DateTime endDate)
         {
+            var symbolPair = DetermineTradingPair(symbol, currency);
+
             try
             {
                 // Log the beginning of the data fetch operation

@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
 using Microsoft.Extensions.Caching.Memory;
 using Portfolio.Domain.Constants;
 using Portfolio.Domain.Interfaces;
@@ -14,9 +12,8 @@ namespace Portfolio.App.HistoricalPrice
     {
         private readonly IPriceHistoryApi _priceHistoryApi;
         private readonly IPriceHistoryStorageService _priceHistoryStorage;
-        private ConcurrentDictionary<string, Lazy<Task<ReadOnlyDictionary<DateTime, PriceRecord>>>> _dataStores = new();
         private readonly MemoryCache _cache;
-
+        private readonly object _lock = new();
 
         /// <summary>
         /// Gets or sets the default currency symbol used in price calculations.
@@ -28,6 +25,7 @@ namespace Portfolio.App.HistoricalPrice
         /// </summary>
         /// <param name="priceHistoryApi">The API used to fetch historical price data.</param>
         /// <param name="priceHistoryStorage">The storage service used to save and load historical price data.</param>
+        /// <param name="cache">The memory cache instance used for caching results.</param>
         /// <param name="defaultCurrencySymbol">The default currency symbol (e.g., "USD").</param>
         public PriceHistoryService(
             IPriceHistoryApi priceHistoryApi,
@@ -36,73 +34,48 @@ namespace Portfolio.App.HistoricalPrice
             string defaultCurrencySymbol = Strings.CURRENCY_USD)
         {
             _priceHistoryApi = priceHistoryApi ?? throw new ArgumentNullException(nameof(priceHistoryApi));
-            _priceHistoryStorage = priceHistoryStorage ?? throw new ArgumentNullException(nameof(priceHistoryStorage));
-            _cache = cache ?? throw new ArgumentNullException(nameof(cache));  // Assign the cache
-
+            _priceHistoryStorage = priceHistoryStorage ?? throw new ArgumentNullException(nameof(priceHistoryStorage));          
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
 
             DefaultCurrency = defaultCurrencySymbol ?? throw new ArgumentNullException(nameof(defaultCurrencySymbol));
         }
 
         /// <summary>
         /// Retrieves the closing price of a specific cryptocurrency symbol at a specified date.
+        /// If the requested symbol matches the default currency, an error is returned.
+        /// If no price is found for the specified date, the service attempts to fetch it from the API,
+        /// or recursively checks up to four previous days for fiat currencies.
         /// </summary>
         /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC").</param>
         /// <param name="date">The date and time for which to retrieve the closing price.</param>
         /// <returns>A <see cref="Result{T}"/> containing the closing price or an error message.</returns>
         public async Task<Result<decimal>> GetPriceAtCloseTimeAsync(string symbol, DateTime date)
         {
-            var dateOnly = date.Date;
-
             if (symbol == DefaultCurrency)
                 return HandleDefaultCurrencyError(symbol);
 
-            // Check if today's data is cached
-            if (dateOnly == DateTime.Today)
+            var priceResult = await _priceHistoryStorage.GetPriceAsync(symbol, date).ConfigureAwait(false);
+
+            if (priceResult.IsSuccess)
             {
-                var cacheKey = GetCacheKey(symbol, dateOnly);
-                if (_cache.Get(cacheKey) is decimal cachedPrice)
+                return priceResult.Value.ClosePrice;
+            }
+
+            if (FiatCurrency.All.Any(f => f == symbol))
+            {
+                var handleMissingFiatResult = await HandleMissingFiatDataAsync(symbol, date, 4).ConfigureAwait(false);
+                if (handleMissingFiatResult.IsSuccess)
                 {
-                    return Result.Success(cachedPrice);
+                    return handleMissingFiatResult.Value;
                 }
             }
 
-            var history = await LoadPriceHistoryFromStorageAsync(symbol).ConfigureAwait(false);
-            if (history.Any())
-            {
-                if (history.ContainsKey(dateOnly))
-                {
-                    var closePrice = history[dateOnly].ClosePrice;
-
-                    if (dateOnly == DateTime.Today)
-                    {
-                        CacheTodayPrice(symbol, dateOnly, closePrice);
-                    }
-
-                    return closePrice;
-                }
-
-                if (FiatCurrency.All.Any(f => f == symbol))
-                {
-                    var handleMissingFiatResult = HandleMissingFiatData(symbol, dateOnly, history);
-                    if (handleMissingFiatResult.IsSuccess)
-                    {
-                        var fiatPrice = handleMissingFiatResult.Value;
-
-                        if (dateOnly == DateTime.Today)
-                        {
-                            CacheTodayPrice(symbol, dateOnly, fiatPrice);
-                        }
-
-                        return fiatPrice;
-                    }
-                }
-            }
-
-            return await FetchAndSavePriceData(symbol, dateOnly, history).ConfigureAwait(false);
+            return await FetchAndSavePriceData(symbol, date).ConfigureAwait(false);
         }
 
         /// <summary>
         /// Handles the case where the requested symbol matches the default currency.
+        /// Returns an error to indicate that fetching the price for the same symbol as the default currency is not allowed.
         /// </summary>
         /// <param name="symbol">The currency symbol.</param>
         /// <returns>A <see cref="Result{T}"/> indicating a failure due to the same symbol as the default currency.</returns>
@@ -113,107 +86,68 @@ namespace Portfolio.App.HistoricalPrice
         }
 
         /// <summary>
-        /// Loads the price history from storage for a specific cryptocurrency symbol.
-        /// </summary>
-        /// <param name="symbol">The symbol of the cryptocurrency.</param>
-        /// <returns>A task representing the asynchronous operation, with a result of the price history dictionary.</returns>
-        private async Task<ReadOnlyDictionary<DateTime, PriceRecord>> LoadPriceHistoryFromStorageAsync(string symbol)
-        {
-            return await _dataStores.GetOrAddAsync(symbol, async s =>
-            {
-                var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
-                var result = await _priceHistoryStorage.LoadHistoryAsync(symbolTradingPair).ConfigureAwait(false);
-                if (result.IsSuccess)
-                {
-                    return result.Value.Where(r => r.ClosePrice > 0).ToDictionary(
-                        record => record.CloseDate.Date,
-                        record => record
-                    ).AsReadOnly();
-                }
-                else
-                {
-                    // Save an empty file to avoid trying to fetch from the API repeatedly.
-                    var emptyDictionary = new Dictionary<DateTime, PriceRecord>();
-                    var saveResult = await _priceHistoryStorage.SaveHistoryAsync(symbolTradingPair, emptyDictionary.Values)
-                        .TapError(Log.ForContext<PriceHistoryService>().Error).ConfigureAwait(false);
-                    return emptyDictionary.AsReadOnly();
-                }
-            }).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Handles the case where fiat currency data is missing by attempting to retrieve the price from previous working days.
+        /// Recursively checks for the availability of fiat currency data for the given symbol and date.
+        /// If no data is found for the specified date, it will check up to four previous days.
         /// </summary>
         /// <param name="symbol">The currency symbol.</param>
-        /// <param name="date">The date for which data is missing.</param>
-        /// <param name="history">The existing price history.</param>
-        /// <returns>A <see cref="Result{T}"/> containing the price or an error message.</returns>
-        private Result<decimal> HandleMissingFiatData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, PriceRecord> history)
+        /// <param name="date">The date for which to check for price data.</param>
+        /// <param name="daysToCheck">The number of previous days to check if data is missing.</param>
+        /// <returns>A <see cref="Result{T}"/> containing the closing price or an error message.</returns>
+        private async Task<Result<decimal>> HandleMissingFiatDataAsync(string symbol, DateTime date, int daysToCheck = 4)
         {
-            Log.ForContext<PriceHistoryService>().Debug("Missing fiat data for {Symbol} on {Date:yyyy-MM-dd}. Trying previous working days...", symbol, date);
-
-            var previousPriceData = GetPreviousWorkingDayPriceData(date, history);
-            if (previousPriceData > -1)
+            if (daysToCheck <= 0)
             {
-                Log.ForContext<PriceHistoryService>().Debug("Fiat data found for {Symbol} on {Date:yyyy-MM-dd}.", symbol, date);
-                return previousPriceData;
+                Log.ForContext<PriceHistoryService>().Debug("No available fiat data for {Symbol} on {Date:yyyy-MM-dd} or previous days.", symbol);
+                return Result.Failure<decimal>($"No price data available for {symbol} on {date:yyyy-MM-dd} or previous days.");
             }
 
-            Log.ForContext<PriceHistoryService>().Debug("No available fiat data for {Symbol} on previous working days.", symbol);
-            return Result.Failure<decimal>($"No price data available for {symbol} on {date:yyyy-MM-dd}");
+            Log.ForContext<PriceHistoryService>().Debug("Missing fiat data for {Symbol} on {Date:yyyy-MM-dd}. Checking previous day...", symbol, date);
+
+            var previousDate = date.AddDays(-1);
+            var priceResult = await _priceHistoryStorage.GetPriceAsync(symbol, previousDate).ConfigureAwait(false);
+
+            if (priceResult.IsSuccess)
+            {
+                Log.ForContext<PriceHistoryService>().Debug("Fiat data found for {Symbol} on {PreviousDate:yyyy-MM-dd}.", symbol, previousDate);
+                return Result.Success(priceResult.Value.ClosePrice);
+            }
+
+            // Recurse to check the previous day
+            return await HandleMissingFiatDataAsync(symbol, previousDate, daysToCheck - 1).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Retrieves the price data from previous working days in the event of missing fiat currency data.
-        /// </summary>
-        /// <param name="date">The date for which data is missing.</param>
-        /// <param name="history">The existing price history.</param>
-        /// <returns>The closing price from a previous working day, or -1 if not found.</returns>
-        private decimal GetPreviousWorkingDayPriceData(DateTime date, ReadOnlyDictionary<DateTime, PriceRecord> history)
-        {
-            for (int i = 1; i <= 4; i++)
-            {
-                var previousDate = date.AddDays(-i);
-                if (history.TryGetValue(previousDate, out var priceData))
-                    return priceData.ClosePrice;
-            }
-            return -1;
-        }
-
-        /// <summary>
-        /// Fetches new price data from the API and saves it to storage.
+        /// Fetches new price data from the API for the specified symbol and date range, and saves it to storage.
+        /// If data is successfully fetched and saved, it returns the price for the requested date.
+        /// If the price is still not found, it attempts to handle missing fiat data.
         /// </summary>
         /// <param name="symbol">The symbol of the cryptocurrency.</param>
         /// <param name="date">The date for which data is being fetched.</param>
-        /// <param name="history">The existing price history.</param>
         /// <returns>A <see cref="Result{T}"/> containing the closing price or an error message.</returns>
-        private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date, ReadOnlyDictionary<DateTime, PriceRecord> history)
-        {
-            var symbolTradingPair = _priceHistoryApi.DetermineTradingPair(symbol, DefaultCurrency);
+        private async Task<Result<decimal>> FetchAndSavePriceData(string symbol, DateTime date)
+        {            
             var endDate = AdjustEndDate(date);
-            var result = await _priceHistoryApi.FetchPriceHistoryAsync(symbolTradingPair, date.Date, endDate).ConfigureAwait(false);
+            var result = await _priceHistoryApi.FetchPriceHistoryAsync(symbol, DefaultCurrency, date.Date, endDate).ConfigureAwait(false);
 
             if (result.IsSuccess)
             {
-                // Save the newly fetched data.
-                var saveResult = await SaveNewPriceHistoryAsync(symbolTradingPair, history, result.Value)
-                    .TapError(Log.ForContext<PriceHistoryService>().Error).ConfigureAwait(false);
+                await _priceHistoryStorage.SaveHistoryAsync(symbol, result.Value).ConfigureAwait(false);
 
-                history = await UpdateHistoryWithFetchedDataAsync(symbol, history, result.Value).ConfigureAwait(false);
-
-                if (history.ContainsKey(date.Date))
-                    return history[date.Date].ClosePrice;
-                else if (FiatCurrency.All.Any(f => f == symbol))
+                var matchingRecord = result.Value.FirstOrDefault(r => r.CloseDate.Date == date.Date);
+                if (matchingRecord != null)
                 {
-                    var handleMissingFiatResult = HandleMissingFiatData(symbol, date, history);
+                    return matchingRecord.ClosePrice;
+                }
+
+                if (FiatCurrency.All.Any(f => f == symbol))
+                {
+                    var handleMissingFiatResult = await HandleMissingFiatDataAsync(symbol, date);
                     if (handleMissingFiatResult.IsSuccess)
                         return handleMissingFiatResult.Value;
                 }
-
-                return Result.Failure<decimal>("Unexpected error has occurred.");
             }
 
-            return Result.Failure<decimal>(result.Error);
+            return Result.Failure<decimal>("Error retrieving or saving price data.");
         }
 
         /// <summary>
@@ -228,94 +162,44 @@ namespace Portfolio.App.HistoricalPrice
         }
 
         /// <summary>
-        /// Saves new price records to storage, avoiding duplicates with existing records.
+        /// Retrieves the current prices for the specified cryptocurrency symbols.
+        /// Fetches the prices from the API and caches the results for one minute to prevent exceeding API rate limits.
+        /// If cached data is available, it returns the cached data.
         /// </summary>
-        /// <param name="symbol">The symbol of the cryptocurrency.</param>
-        /// <param name="currentHistory">The current price history.</param>
-        /// <param name="newRecords">The new records to be saved.</param>
-        /// <returns>A <see cref="Result"/> indicating success or failure.</returns>
-        private async Task<Result> SaveNewPriceHistoryAsync(string symbol, ReadOnlyDictionary<DateTime, PriceRecord> currentHistory, IEnumerable<PriceRecord> newRecords)
-        {
-            var existingRecords = currentHistory.Values;
-
-            // Filter out records that already exist.
-            var recordsToSave = newRecords
-                .Where(newRecord => !existingRecords.Any(existingRecord =>
-                    existingRecord.CurrencyPair == newRecord.CurrencyPair &&
-                    existingRecord.CloseDate == newRecord.CloseDate))
-                .ToList();
-
-            if (recordsToSave.Any())
-            {
-                // Save only the new records.
-                return await _priceHistoryStorage.SaveHistoryAsync(symbol, recordsToSave).ConfigureAwait(false);
-            }
-            else
-            {
-                Log.Information("No new records to save for {Symbol}.", symbol);
-                return Result.Success();
-            }
-        }
-
-        /// <summary>
-        /// Updates the in-memory price history with the newly fetched data.
-        /// </summary>
-        /// <param name="symbol">The symbol of the cryptocurrency.</param>
-        /// <param name="history">The current price history.</param>
-        /// <param name="records">The new records to be added.</param>
-        /// <returns>A task representing the asynchronous operation, with a result of the updated price history dictionary.</returns>
-        private async Task<ReadOnlyDictionary<DateTime, PriceRecord>> UpdateHistoryWithFetchedDataAsync(string symbol, ReadOnlyDictionary<DateTime, PriceRecord> history, IEnumerable<PriceRecord> records)
-        {
-            return await _dataStores.AddOrUpdateAsync(symbol, async _ => await Task.FromResult(history), async (k, v) =>
-            {
-                var dict = v.ToDictionary();
-                foreach (var record in records)
-                {
-                    var closeDate = record.CloseDate.Date;
-                    if (!dict.ContainsKey(closeDate) && record.ClosePrice > 0)
-                        dict[closeDate] = record;
-                }
-                return dict.AsReadOnly();
-            }).ConfigureAwait(false);
-        }
-
-        private void CacheTodayPrice(string symbol, DateTime date, decimal price)
-        {
-            var cacheKey = GetCacheKey(symbol, date);
-            _cache.Set(cacheKey, price, DateTimeOffset.Now.AddMinutes(1));  // Use the Set method with absolute expiration
-        }
-
-        private string GetCacheKey(string symbol, DateTime date)
-        {
-            return $"{symbol}_{date:yyyyMMdd}";
-        }
-
+        /// <param name="symbols">A collection of cryptocurrency symbols to retrieve prices for.</param>
+        /// <returns>A <see cref="Result{T}"/> containing a dictionary of symbols and their corresponding prices, or an error message.</returns>
         public async Task<Result<Dictionary<string, decimal>>> GetCurrentPricesAsync(IEnumerable<string> symbols)
         {
-            // Check if the current price is already cached
-            Dictionary<string, decimal> found = new();
-            List<string> missingSymbols = new();
-
-            foreach (var s in symbols)
+            var cacheKey = $"CurrentPrices_{string.Join("_", symbols.OrderBy(s => s))}";
+            
+            if (_cache.TryGetValue(cacheKey, out Dictionary<string, decimal>? cachedPrices))
             {
-                var cacheKey = GetCacheKey(s, DateTime.Today);
-                if (_cache.Get(cacheKey) is decimal cachedPrice)
+                return Result.Success(cachedPrices!);
+            }
+
+            Dictionary<string, decimal> found = new();
+            
+            lock (_lock)
+            {
+                if (_cache.TryGetValue(cacheKey, out cachedPrices!))
                 {
-                    found.Add(s, cachedPrice);
+                    return Result.Success(cachedPrices);
                 }
-                missingSymbols.Add(s);
-            }            
+            }
 
-            // Fetch the current price from the API            
-            var result = await _priceHistoryApi.FetchCurrentPriceAsync(missingSymbols, DefaultCurrency).ConfigureAwait(false);
-
+            var result = await _priceHistoryApi.FetchCurrentPriceAsync(symbols, DefaultCurrency).ConfigureAwait(false);
             if (result.IsSuccess)
             {
-                foreach(var s in missingSymbols)
+                foreach (var s in symbols)
                 {
                     var priceRecord = result.Value.FirstOrDefault(p => p.CurrencyPair.Split("-")[0] == s);
-                    if(priceRecord != null)
+                    if (priceRecord != null)
                         found.Add(s, priceRecord.ClosePrice);
+                }
+
+                lock (_lock)
+                {
+                    _cache.Set(cacheKey, found, TimeSpan.FromMinutes(1));
                 }
 
                 return Result.Success(found);

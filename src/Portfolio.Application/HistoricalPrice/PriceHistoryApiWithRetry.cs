@@ -20,31 +20,26 @@ namespace Portfolio.App.HistoricalPrice.YahooFinance
         /// <summary>
         /// Fetches historical price data for a given cryptocurrency symbol and date range from the Yahoo Finance API.
         /// </summary>
-        /// <param name="symbolPair">The trading pair symbol, e.g., "BTC/USD".</param>
+        /// <param name="symbol">The trading pair symbol, e.g., "BTC/USD".</param>
         /// <param name="startDate">The start date for fetching data.</param>
         /// <param name="endDate">The end date for fetching data.</param>
         /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbolPair, DateTime startDate, DateTime endDate)
+        public async Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbol, string currency, DateTime startDate, DateTime endDate)
         {
             int retryCount = 0;
             while (retryCount < _numberOfAttemps)
             {
-                var priceResult = await _internalApi.FetchPriceHistoryAsync(symbolPair, startDate, endDate).ConfigureAwait(false);
+                var priceResult = await _internalApi.FetchPriceHistoryAsync(symbol, currency, startDate, endDate).ConfigureAwait(false);
                 if (priceResult.IsSuccess)
                 {
                     return priceResult;
                 }
 
                 retryCount++;
-                Log.Warning("Retrying price retrieval for {CurrencyCode} on {Date:yyyy-MM-dd}. Attempt {RetryCount}/{MaxRetries}", symbolPair, startDate, retryCount, _numberOfAttemps);
+                Log.Warning("Retrying price retrieval for {CurrencyCode} on {Date:yyyy-MM-dd}. Attempt {RetryCount}/{MaxRetries}", symbol, startDate, retryCount, _numberOfAttemps);
             }
 
-            return Result.Failure<IEnumerable<PriceRecord>>($"Failed to get price history for {symbolPair} after {_numberOfAttemps} attemps."); // Indicating failure
-        }
-
-        public string DetermineTradingPair(string fromSymbol, string toSymbol)
-        {
-            return _internalApi.DetermineTradingPair(fromSymbol, toSymbol);
+            return Result.Failure<IEnumerable<PriceRecord>>($"Failed to get price history for {symbol} after {_numberOfAttemps} attemps."); // Indicating failure
         }
 
         public async Task<Result<IEnumerable<PriceRecord>>> FetchCurrentPriceAsync(IEnumerable<string> symbols, string currency)

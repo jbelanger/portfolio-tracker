@@ -1,6 +1,5 @@
 using Portfolio.Domain.Common;
 using Portfolio.Domain.Enums;
-using Portfolio.Domain.ValueObjects;
 
 namespace Portfolio.Domain.Entities
 {

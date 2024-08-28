@@ -1,10 +1,8 @@
 using FluentAssertions;
-using NUnit.Framework;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.Enums;
 using Portfolio.Domain.Strategies.CostBasis;
 using Portfolio.Domain.ValueObjects;
-using System;
 
 namespace Portfolio.Tests
 {

@@ -22,8 +22,8 @@ namespace Portfolio.App.HistoricalPrice
         }
 
         /// <summary>
-        // Initializes the SQLite database by creating the required table if it does not already exist.
-        // </summary>
+        /// Initializes the SQLite database by creating the required table if it does not already exist.
+        /// </summary>
         private void InitializeDatabase()
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -43,49 +43,52 @@ namespace Portfolio.App.HistoricalPrice
         }
 
         /// <summary>
-        /// Loads historical price data for a specified cryptocurrency symbol from the SQLite database.
+        /// Retrieves the price record for a specific cryptocurrency symbol on a given date from the SQLite database.
         /// </summary>
         /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC/USD").</param>
-        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
-        public async Task<Result<IEnumerable<PriceRecord>>> LoadHistoryAsync(string symbol)
+        /// <param name="date">The date of the price record.</param>
+        /// <returns>A <see cref="Result{T}"/> containing the <see cref="PriceRecord"/> or an error message.</returns>
+        public async Task<Result<PriceRecord>> GetPriceAsync(string symbol, DateTime date)
         {
-            var priceHistory = new List<PriceRecord>();
-
             try
             {
                 using var connection = new SqliteConnection(_connectionString);
                 await connection.OpenAsync().ConfigureAwait(false);
 
-                string query = "SELECT CurrencyPair, CloseDate, ClosePrice FROM CryptoPriceRecords WHERE CurrencyPair = @CurrencyPair ORDER BY CloseDate;";
+                string query = @"
+                    SELECT CurrencyPair, CloseDate, ClosePrice 
+                    FROM CryptoPriceRecords 
+                    WHERE CurrencyPair = @CurrencyPair AND CloseDate = @CloseDate;";
+
                 using var command = new SqliteCommand(query, connection);
                 command.Parameters.AddWithValue("@CurrencyPair", symbol);
+                command.Parameters.AddWithValue("@CloseDate", date.ToString("yyyy-MM-dd"));
 
                 using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
-                while (await reader.ReadAsync().ConfigureAwait(false))
+                if (await reader.ReadAsync().ConfigureAwait(false))
                 {
-                    var currencyPair = reader.GetString(0);
-                    var closeDate = DateTime.Parse(reader.GetString(1));
-                    var closePrice = reader.GetDecimal(2);
-
-                    priceHistory.Add(new PriceRecord
+                    var priceRecord = new PriceRecord
                     {
-                        CurrencyPair = currencyPair,
-                        CloseDate = closeDate,
-                        ClosePrice = closePrice
-                    });
+                        CurrencyPair = reader.GetString(0),
+                        CloseDate = DateTime.Parse(reader.GetString(1)),
+                        ClosePrice = reader.GetDecimal(2)
+                    };
+
+                    return Result.Success(priceRecord);
                 }
 
-                return Result.Success<IEnumerable<PriceRecord>>(priceHistory);
+                return Result.Failure<PriceRecord>($"No record found for {symbol} on {date:yyyy-MM-dd}");
             }
             catch (Exception ex)
             {
-                Log.Error($"[{nameof(SQLitePriceHistoryStorageService)}.{nameof(LoadHistoryAsync)}] An error occurred: {ex.GetBaseException().Message}");
-                return Result.Failure<IEnumerable<PriceRecord>>("Error loading data from SQLite.");
+                Log.Error($"[{nameof(SQLitePriceHistoryStorageService)}.{nameof(GetPriceAsync)}] An error occurred: {ex.GetBaseException().Message}");
+                return Result.Failure<PriceRecord>($"Error retrieving data from SQLite.");
             }
         }
 
         /// <summary>
-        /// Saves historical price data for a specified cryptocurrency symbol to the SQLite database.
+        /// Saves or updates historical price data for a specified cryptocurrency symbol to the SQLite database.
+        /// Existing records for the same date will be updated.
         /// </summary>
         /// <param name="symbol">The symbol of the cryptocurrency (e.g., "BTC/USD").</param>
         /// <param name="priceHistory">The historical price data to be saved.</param>
@@ -108,7 +111,7 @@ namespace Portfolio.App.HistoricalPrice
                 foreach (var record in priceHistory)
                 {
                     command.Parameters.Clear();
-                    command.Parameters.AddWithValue("@CurrencyPair", record.CurrencyPair);
+                    command.Parameters.AddWithValue("@CurrencyPair", symbol);
                     command.Parameters.AddWithValue("@CloseDate", record.CloseDate.ToString("yyyy-MM-dd"));
                     command.Parameters.AddWithValue("@ClosePrice", record.ClosePrice);
 

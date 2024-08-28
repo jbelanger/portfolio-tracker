@@ -1,5 +1,4 @@
 using FluentAssertions;
-using NUnit.Framework.Internal.Execution;
 using Portfolio.Domain.Entities;
 
 public class PortfolioTestUtils
