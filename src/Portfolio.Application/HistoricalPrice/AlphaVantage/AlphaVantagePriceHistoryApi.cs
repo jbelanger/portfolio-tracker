@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Net.Http;
-using System.Threading;
 using Newtonsoft.Json.Linq;
 using Portfolio.Domain.Constants;
 using Portfolio.Domain.Interfaces;
@@ -150,6 +148,11 @@ namespace Portfolio.App.HistoricalPrice.AlphaVantage
         }
 
         Task<Result<IEnumerable<PriceRecord>>> IPriceHistoryApi.FetchCurrentPriceAsync(IEnumerable<string> symbols, string currency)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbolPair, string currency, DateTime startDate, DateTime endDate)
         {
             throw new NotImplementedException();
         }

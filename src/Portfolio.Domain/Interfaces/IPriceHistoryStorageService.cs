@@ -8,12 +8,7 @@ namespace Portfolio.Domain.Interfaces
     /// </summary>
     public interface IPriceHistoryStorageService
     {
-        /// <summary>
-        /// Loads historical price data for a specified symbol from storage.
-        /// </summary>
-        /// <param name="symbol">The symbol of the currency or coin.</param>
-        /// <returns>A <see cref="Result{T}"/> containing a list of <see cref="PriceRecord"/> or an error message.</returns>
-        Task<Result<IEnumerable<PriceRecord>>> LoadHistoryAsync(string symbol);
+        Task<Result<PriceRecord>> GetPriceAsync(string symbol, DateTime date);
 
         /// <summary>
         /// Saves historical price data for a specified symbol to storage.

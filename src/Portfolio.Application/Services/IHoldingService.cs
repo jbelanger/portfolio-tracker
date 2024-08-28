@@ -1,6 +1,4 @@
 using Portfolio.App.DTOs;
-using Portfolio.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Portfolio.App.Services
 {

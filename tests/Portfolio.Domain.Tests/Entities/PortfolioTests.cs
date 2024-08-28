@@ -3,7 +3,6 @@ using FluentAssertions;
 using Moq;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.Enums;
-using Portfolio.Domain.Events;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.ValueObjects;
 
