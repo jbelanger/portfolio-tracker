@@ -192,7 +192,7 @@ namespace Portfolio.App.HistoricalPrice
             {
                 foreach (var s in symbols)
                 {
-                    var priceRecord = result.Value.FirstOrDefault(p => p.CurrencyPair.Split("-")[0] == s);
+                    var priceRecord = result.Value.FirstOrDefault(p => p.CurrencyPair.Split("/")[0] == s);
                     if (priceRecord != null)
                         found.Add(s, priceRecord.ClosePrice);
                 }
