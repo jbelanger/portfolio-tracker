@@ -16,10 +16,20 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
         private static Dictionary<string, string>? _cachedCoinIds;
         private static readonly object _cacheLock = new();
 
+        private int _requestsPerMinute = 15;
         private static readonly SemaphoreSlim _rateLimitSemaphore = new SemaphoreSlim(1, 1);
         private static DateTime _lastRequestTime = DateTime.MinValue;
-        
-        public int RequestsPerMinute {get; set;}
+
+        public int RequestsPerMinute
+        {
+            get => _requestsPerMinute; 
+            set
+            {
+                if (value > 0)
+                    _requestsPerMinute = value; 
+                throw new InvalidOperationException("RequestsPerMinute must be greater than 0.");
+            }
+        }
 
         public CoinGeckoPriceHistoryApi(HttpClient httpClient)
         {
