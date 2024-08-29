@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Microsoft.Extensions.Caching.Memory;
 using Portfolio.Api.Features;
 using Portfolio.Api.Services;
@@ -20,8 +21,8 @@ namespace Portfolio.Api
         {
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext() // Allows you to add properties to the log context dynamically
-                                        //.Enrich.WithCallerInfo() // Automatically includes method and class names
-                                        // add console as logging target
+                                         //.Enrich.WithCallerInfo() // Automatically includes method and class names
+                                         // add console as logging target
                 .WriteTo.Console()
                 // add a logging target for warnings and higher severity  logs
                 // structured in JSON format
@@ -58,7 +59,13 @@ namespace Portfolio.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddHttpClient();
+            builder.Services.AddHttpClient("CoinGeckoClient", client =>
+            {
+                client.BaseAddress = new Uri("https://api.coingecko.com");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.Timeout = TimeSpan.FromSeconds(30); // Set the timeout
+            });
             builder.Services.AddSingleton(new MemoryCache(new MemoryCacheOptions()));
             builder.Services.AddScoped<IWalletService, WalletService>();
             builder.Services.AddScoped<ICryptoTransactionService, CryptoTransactionService>();
