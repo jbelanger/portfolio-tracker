@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Portfolio.App.Common.Interfaces;
 using Portfolio.Infrastructure.Data.Interceptors;
 
 namespace Portfolio.Infrastructure
@@ -26,7 +27,7 @@ namespace Portfolio.Infrastructure
     //            options.UseSqlServer(connectionString);
             });
 
-            // services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+            services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<PortfolioDbContext>());
 
             // services.AddScoped<ApplicationDbContextInitialiser>();
 

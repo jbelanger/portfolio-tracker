@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Portfolio.Domain.Entities;
 
-namespace Portfolio.Infrastructure.Persistence.Configurations
+namespace Portfolio.Infrastructure.Data.Configurations
 {
     public class FinancialEventConfiguration : IEntityTypeConfiguration<FinancialEvent>
     {
@@ -33,7 +33,7 @@ namespace Portfolio.Infrastructure.Persistence.Configurations
             builder.Property(te => te.BaseCurrency)
                 .HasMaxLength(10)
                 .IsRequired();
-            
+
             builder.Property(te => te.AssetSymbol)
                 .HasMaxLength(10)
                 .IsRequired();
