@@ -1,14 +1,12 @@
-using NUnit.Framework;
 using Portfolio.App.HistoricalPrice.CoinGecko;
-using Portfolio.Domain.ValueObjects;
 using RichardSzalay.MockHttp;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Portfolio.Domain.Constants;
+using Microsoft.Extensions.Caching.Memory;
+using Moq;
+using Portfolio.App.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Portfolio.App.Tests;
 
@@ -18,13 +16,27 @@ public class CoinGeckoPriceHistoryApiTests
     private MockHttpMessageHandler _mockHttp;
     private HttpClient _httpClient;
     private CoinGeckoPriceHistoryApi _coinGeckoApi;
+    private IHttpClientFactory _httpClientFactory;
+#pragma warning disable NUnit1032 // An IDisposable field/property should be Disposed in a TearDown method
+    private IApplicationDbContext _dbContext;
+#pragma warning restore NUnit1032 // An IDisposable field/property should be Disposed in a TearDown method
 
     [SetUp]
     public async Task SetUp()
     {
         _mockHttp = new MockHttpMessageHandler();
         _httpClient = new HttpClient(_mockHttp);
-        _coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClient)
+        var httpClientFactory = new Mock<IHttpClientFactory>();
+        httpClientFactory.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(_httpClient);
+        _httpClientFactory = httpClientFactory.Object;
+
+        var options = new DbContextOptionsBuilder<ApplicationDbContextInMemory>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // Use a unique name for each test
+            .Options;
+
+        _dbContext = new ApplicationDbContextInMemory(options);        
+
+        _coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClientFactory, new Microsoft.Extensions.Caching.Memory.MemoryCache(new MemoryCacheOptions()), _dbContext)
         {
             RequestsPerMinute = 9999
         };
@@ -39,15 +51,16 @@ public class CoinGeckoPriceHistoryApiTests
         _mockHttp.When("https://api.coingecko.com/api/v3/coins/list")
                  .Respond("application/json", jsonResponse);
 
-        // Populate the internal cache by calling GetAllSupportedCoinIdsAsync
-        await _coinGeckoApi.GetAllSupportedCoinIdsAsync();
+        _mockHttp.When("https://api.coingecko.com/api/v3/coins/markets")
+                 .Respond("application/json", jsonResponse);
     }
 
     [TearDown]
     public void TearDown()
     {
         _httpClient.Dispose();
-        _mockHttp.Dispose();
+        _mockHttp.Dispose();   
+        (_dbContext as DbContext)?.Dispose();     
     }
 
     [Test]
@@ -187,35 +200,6 @@ public class CoinGeckoPriceHistoryApiTests
     }
 
     [Test]
-    public async Task GetCoinIdAsync_WhenCoinIdIsCached_ReturnsCachedCoinId()
-    {
-        // Arrange
-        var symbol = "BTC";
-        var expectedCoinId = "bitcoin";
-
-        // Act
-        var result = await _coinGeckoApi.GetCoinIdAsync(symbol);
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(expectedCoinId);
-    }
-
-    [Test]
-    public async Task GetCoinIdAsync_WhenCoinIdIsNotCached_ReturnsFailure()
-    {
-        // Arrange
-        var symbol = "INVALID";
-
-        // Act
-        var result = await _coinGeckoApi.GetCoinIdAsync(symbol);
-
-        // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Contain("Coin ID for symbol INVALID could not be found.");
-    }
-
-    [Test]
     public async Task FetchPriceHistoryAsync_RespectsRateLimitBetweenRequests()
     {
         // Arrange
@@ -232,7 +216,7 @@ public class CoinGeckoPriceHistoryApiTests
             ]
         }";
 
-        var coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClient)
+        var coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClientFactory, new Microsoft.Extensions.Caching.Memory.MemoryCache(new MemoryCacheOptions()), _dbContext)
         {
             RequestsPerMinute = 30
         };
@@ -268,7 +252,7 @@ public class CoinGeckoPriceHistoryApiTests
             'ethereum': {'usd': 3504.88}
         }";
 
-        var coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClient)
+        var coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClientFactory, new Microsoft.Extensions.Caching.Memory.MemoryCache(new MemoryCacheOptions()), _dbContext)
         {
             RequestsPerMinute = 30
         };

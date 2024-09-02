@@ -12,5 +12,7 @@ namespace Portfolio.Domain.Constants
         public const string ERR_YAHOO_API_FETCH_FAILURE = "An error occurred while fetching from Yahoo Finance API.";
         public const string ERR_ALPHAVANTAGE_API_FETCH_FAILURE = "An error occurred while fetching from AlphaVantage API.";
         public const string ERR_COINGECKO_API_FETCH_FAILURE = "An error occurred while fetching from the CoinGecko API.";
+        public const string ERR_GENERIC_API_FETCH_FAILURE = "An error occurred while performing an HTTP request.";
+
     }
 }

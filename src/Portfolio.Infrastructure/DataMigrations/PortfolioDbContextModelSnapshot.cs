@@ -17,6 +17,112 @@ namespace Portfolio.Infrastructure.DataMigrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
+            modelBuilder.Entity("CoinInfo", b =>
+                {
+                    b.Property<string>("CoinId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("Ath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("AthChangePercentage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("AthDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("Atl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("AtlChangePercentage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("AtlDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("CirculatingSupply")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("CurrentPrice")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("FullyDilutedValuation")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("High24h")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastUpdated")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("Low24h")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("MarketCap")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("MarketCapChange24h")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("MarketCapChangePercentage24h")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("MarketCapRank")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal?>("MaxSupply")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("PriceChange24h")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("PriceChangePercentage24h")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("TotalSupply")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("TotalVolume")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CoinId");
+
+                    b.HasIndex("Symbol");
+
+                    b.ToTable("CoinInfos", (string)null);
+                });
+
+            modelBuilder.Entity("HttpRequestLogEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RequestUri")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HttpRequestLogEntries", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")

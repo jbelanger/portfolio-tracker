@@ -7,7 +7,6 @@ using Portfolio.Domain.Entities;
 using Portfolio.Domain.ValueObjects;
 using Portfolio.Infrastructure.Data.Configurations;
 using Portfolio.Infrastructure.Identity;
-using Portfolio.Infrastructure.Persistence.Configurations;
 
 namespace Portfolio.Infrastructure
 {
@@ -26,6 +25,8 @@ namespace Portfolio.Infrastructure
         public DbSet<AssetHolding> AssetHoldings { get; set; }
         public DbSet<FinancialTransaction> Transactions { get; set; }
         public DbSet<PriceRecord> PriceHistoryRecords { get; set; }
+        public DbSet<CoinInfo> CoinInfos { get; set; }
+        public DbSet<HttpRequestLogEntry> HttpRequestLogEntries { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -59,6 +60,8 @@ namespace Portfolio.Infrastructure
             modelBuilder.ApplyConfiguration(new PortfolioConfiguration());
             modelBuilder.ApplyConfiguration(new FinancialEventConfiguration());
             modelBuilder.ApplyConfiguration(new PriceRecordConfiguration());
+            modelBuilder.ApplyConfiguration(new CoinInfoConfiguration());
+            modelBuilder.ApplyConfiguration(new HttpRequestLogEntryConfiguration());
         }
     }
 }
