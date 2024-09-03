@@ -8,6 +8,7 @@ using Portfolio.App.HistoricalPrice.CoinGecko;
 using Portfolio.App.Services;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Infrastructure;
+using Portfolio.Infrastructure.HistoricalPrice;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
@@ -43,7 +44,7 @@ namespace Portfolio.Api
             {
                 options.AddPolicy("AllowSpecificOrigin",
                     builder => builder
-                        .WithOrigins("http://localhost:3000") // Replace with your React app's URL
+                        .WithOrigins("http://localhost:3000", "https://localhost:3000") // Replace with your React app's URL
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials()); // Add this if you're using cookies or authentication
@@ -53,7 +54,7 @@ namespace Portfolio.Api
             builder.Services.AddHttpContextAccessor();
 
             // Add services to the container.
-            builder.Services.AddAuthorization();
+            //builder.Services.AddAuthorization();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -89,12 +90,13 @@ namespace Portfolio.Api
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.MapWalletEndpoints();
             app.MapPortfolioEndpoints();
             app.MapHoldingEndpoints();
             app.MapTransactionEndpoints();
+            app.MapAuthenticationEndpoints();
 
 
             app.Run();

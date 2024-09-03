@@ -1,21 +1,24 @@
+using CSharpFunctionalExtensions;
+using Microsoft.EntityFrameworkCore;
+using Portfolio.App.Common.Interfaces;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.ValueObjects;
-using Portfolio.Infrastructure;
+using Serilog;
 
-namespace Portfolio.App.HistoricalPrice
+namespace Portfolio.Infrastructure.HistoricalPrice
 {
     /// <summary>
     /// Provides an implementation of <see cref="IPriceHistoryStorageService"/> that uses Entity Framework Core for storing and retrieving historical cryptocurrency price data.
     /// </summary>
     public class DbContextPriceHistoryStorageService : IPriceHistoryStorageService
     {
-        private readonly PortfolioDbContext _dbContext;
+        private readonly IApplicationDbContext _dbContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DbContextPriceHistoryStorageService"/> class with the specified DbContext.
         /// </summary>
         /// <param name="dbContext">The DbContext used to access the database.</param>
-        public DbContextPriceHistoryStorageService(PortfolioDbContext dbContext)
+        public DbContextPriceHistoryStorageService(IApplicationDbContext dbContext)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }

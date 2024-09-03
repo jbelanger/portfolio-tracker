@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Domain.ValueObjects;
 using Portfolio.App.Common.Interfaces;
+using Portfolio.Domain.Entities;
 using Portfolio.Infrastructure.Data.Configurations;
 
 public class ApplicationDbContextInMemory : DbContext, IApplicationDbContext
@@ -10,8 +11,17 @@ public class ApplicationDbContextInMemory : DbContext, IApplicationDbContext
     {
     }
 
-    public DbSet<PriceRecord> PriceHistoryRecords { get; set; }
-    public DbSet<CoinInfo> CoinInfos { get; set; }
+    public DbSet<PriceRecord> PriceHistoryRecords { get; }
+    public DbSet<CoinInfo> CoinInfos { get; }
+    public DbSet<HttpRequestLogEntry> HttpRequestLogEntries { get; }
+
+    public DbSet<UserPortfolio> Portfolios => throw new NotImplementedException();
+
+    public DbSet<Wallet> Wallets => throw new NotImplementedException();
+
+    public DbSet<AssetHolding> AssetHoldings => throw new NotImplementedException();
+
+    public DbSet<FinancialTransaction> Transactions => throw new NotImplementedException();
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

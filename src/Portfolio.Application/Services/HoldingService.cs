@@ -1,15 +1,15 @@
+using Portfolio.App.Common.Interfaces;
 using Portfolio.App.DTOs;
 using Portfolio.Domain.Interfaces;
-using Portfolio.Infrastructure;
 
 namespace Portfolio.App.Services
 {
     public class HoldingService : IHoldingService
     {
-        private readonly PortfolioDbContext _dbContext;
+        private readonly IApplicationDbContext _dbContext;
         private readonly IPriceHistoryService _priceHistoryService;
 
-        public HoldingService(PortfolioDbContext dbContext, IPriceHistoryService priceHistoryService)
+        public HoldingService(IApplicationDbContext dbContext, IPriceHistoryService priceHistoryService)
         {
             _dbContext = dbContext;
             _priceHistoryService = priceHistoryService;
