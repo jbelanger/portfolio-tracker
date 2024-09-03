@@ -1,18 +1,18 @@
 using Portfolio.App;
+using Portfolio.App.Common.Interfaces;
 using Portfolio.App.DTOs;
 using Portfolio.Domain.Entities;
 using Portfolio.Domain.Enums;
 using Portfolio.Domain.ValueObjects;
-using Portfolio.Infrastructure;
 using Portfolio.Transactions.Importers.Csv.Kraken;
 
 namespace Portfolio.Api.Services
 {
     public partial class CryptoTransactionService : ICryptoTransactionService
     {
-        private readonly PortfolioDbContext _dbContext;
+        private readonly IApplicationDbContext _dbContext;
 
-        public CryptoTransactionService(PortfolioDbContext dbContext)
+        public CryptoTransactionService(IApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }

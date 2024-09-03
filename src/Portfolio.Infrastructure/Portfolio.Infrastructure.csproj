@@ -11,6 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.8" />
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+  <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.8" />
+  <PackageReference Include="Microsoft.AspNetCore.Authorization.Policy" Version="2.2.0" />
+   <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,4 +28,10 @@
     </PackageReference>
   </ItemGroup>
   
+    <ItemGroup>
+    <ProjectReference Include="..\Portfolio.Application\Portfolio.Application.csproj" />
+    <!-- <ProjectReference Include="..\Portfolio.Infrastructure\Portfolio.Infrastructure.csproj" /> -->
+
+  </ItemGroup>
+
 </Project>

@@ -28,8 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Portfolio.Kraken\portfolio-kraken-parser.csproj" />
-    <ProjectReference Include="..\..\src\Portfolio.Application\Portfolio.App.csproj" />
+    <ProjectReference Include="..\..\src\Portfolio.Application\Portfolio.Application.csproj" />
+    <ProjectReference Include="..\..\src\Portfolio.Infrastructure\Portfolio.Infrastructure.csproj" />
+
   </ItemGroup>
 
   <ItemGroup>

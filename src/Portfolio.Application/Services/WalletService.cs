@@ -1,14 +1,14 @@
+using Portfolio.App.Common.Interfaces;
 using Portfolio.App.DTOs;
 using Portfolio.Domain.Entities;
-using Portfolio.Infrastructure;
 
 namespace Portfolio.App.Services
 {
     public class WalletService : IWalletService
     {
-        private readonly PortfolioDbContext _dbContext;
+        private readonly IApplicationDbContext _dbContext;
 
-        public WalletService(PortfolioDbContext dbContext)
+        public WalletService(IApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }

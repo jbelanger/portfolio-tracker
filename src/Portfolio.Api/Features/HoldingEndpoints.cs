@@ -17,7 +17,7 @@ namespace Portfolio.Api.Features
                     return Results.Ok(result.Value);
                 }
                 return Results.NotFound(result.Error);
-            });
+            }).RequireAuthorization();
 
             group.MapGet("/{holdingId:long}", async (IHoldingService holdingService, long portfolioId, long holdingId) =>
             {
