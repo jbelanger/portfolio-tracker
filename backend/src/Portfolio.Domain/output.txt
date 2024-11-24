@@ -1,0 +1,1602 @@
+using System;
+using System.Reflection;
+[assembly: global::System.Runtime.Versioning.TargetFrameworkAttribute(".NETCoreApp,Version=v8.0", FrameworkDisplayName = ".NET 8.0")]
+global using global::System;
+global using global::System.Collections.Generic;
+global using global::System.IO;
+global using global::System.Linq;
+global using global::System.Net.Http;
+global using global::System.Threading;
+global using global::System.Threading.Tasks;
+
+using System;
+using System.Reflection;
+
+[assembly: System.Reflection.AssemblyCompanyAttribute("Portfolio.Domain")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b939afd4dad8882c516038f6d4d9b6d835809e0d")]
+[assembly: System.Reflection.AssemblyProductAttribute("Portfolio.Domain")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Portfolio.Domain")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Portfolio.Domain.Tests")]
+
+
+global using global::System;
+global using global::System.Collections.Generic;
+global using global::System.IO;
+global using global::System.Linq;
+global using global::System.Net.Http;
+global using global::System.Threading;
+global using global::System.Threading.Tasks;
+
+using System;
+using System.Reflection;
+
+[assembly: System.Reflection.AssemblyCompanyAttribute("Portfolio.Shared")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9cb887642bcb17c71c06f2d64730127665cdee41")]
+[assembly: System.Reflection.AssemblyProductAttribute("Portfolio.Shared")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Portfolio.Shared")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+
+
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+
+namespace Portfolio.Domain.Strategies.CostBasis
+{
+    public class LifoCostBasisCalculationStrategy : ICostBasisCalculationStrategy
+    {
+        public Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx)
+        {
+            var sortedRecords = holding.PurchaseRecords.OrderByDescending(r => r.PurchaseDate).ToList();
+            return CalculateCostFromRecords(sortedRecords, tx);
+        }
+
+        private Result<decimal> CalculateCostFromRecords(List<PurchaseRecord> sortedRecords, FinancialTransaction tx)
+        {
+            decimal totalCost = 0m;
+            decimal amountToMatch = tx.SentAmount.Amount;
+
+            foreach (var record in sortedRecords)
+            {
+                if (amountToMatch <= 0)
+                    break;
+
+                var matchAmount = Math.Min(record.Amount, amountToMatch);
+                totalCost += matchAmount * record.PricePerUnit;
+                amountToMatch -= matchAmount;
+            }
+
+            if (amountToMatch > 0)
+            {
+                tx.ErrorType = ErrorType.InsufficientFunds;
+                tx.ErrorMessage = $"Insufficient holdings to match the transaction amount. Unable to match {amountToMatch} {tx.SentAmount.CurrencyCode}.";
+                return Result.Failure<decimal>($"Insufficient holdings to match the transaction amount. Unable to match {amountToMatch} {tx.SentAmount.CurrencyCode}.");
+            }
+
+            return totalCost;
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+
+namespace Portfolio.Domain.Strategies.CostBasis
+{
+    public class AcbCostBasisCalculationStrategy : ICostBasisCalculationStrategy
+    {
+        public Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx)
+        {
+            return holding.AverageBoughtPrice * tx.SentAmount.Amount;
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.Domain.Entities
+{
+    public interface ICostBasisCalculationStrategy
+    {
+        Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx);
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+
+namespace Portfolio.Domain.Strategies.CostBasis
+{
+    public class FifoCostBasisCalculationStrategy : ICostBasisCalculationStrategy
+    {
+        public Result<decimal> CalculateCostBasis(AssetHolding holding, FinancialTransaction tx)
+        {
+            var sortedRecords = holding.PurchaseRecords.OrderBy(r => r.PurchaseDate).ToList();
+            return CalculateCostFromRecords(sortedRecords, tx);
+        }
+
+        private Result<decimal> CalculateCostFromRecords(List<PurchaseRecord> sortedRecords, FinancialTransaction tx)        
+        {
+            decimal totalCost = 0m;
+            decimal amountToMatch = tx.SentAmount.Amount;
+
+            foreach (var record in sortedRecords)
+            {
+                if (amountToMatch <= 0)
+                    break;
+
+                var matchAmount = Math.Min(record.Amount, amountToMatch);
+                totalCost += matchAmount * record.PricePerUnit;
+                amountToMatch -= matchAmount;
+            }
+
+            if (amountToMatch > 0)
+            {
+                tx.ErrorType = ErrorType.InsufficientFunds;
+                tx.ErrorMessage = $"Insufficient holdings to match the transaction amount. Unable to match {amountToMatch} {tx.SentAmount.CurrencyCode}.";
+                return Result.Failure<decimal>($"Insufficient holdings to match the transaction amount. Unable to match {amountToMatch} {tx.SentAmount.CurrencyCode}.");
+            }
+
+            return totalCost;
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Strategies.Transactions
+{
+    public class WithdrawalTransactionStrategy : ITransactionStrategy
+    {
+        public async Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
+            if (!EnsureAboveZeroAmount(tx, false)) return Result.Failure(tx.ErrorMessage);
+
+            var sender = portfolio.GetOrCreateHolding(tx.SentAmount.CurrencyCode);
+            var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
+
+            decimal price;
+            if (priceResult.IsSuccess)
+            {
+                price = priceResult.Value;
+            }
+            else
+            {
+                tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+                tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
+                price = sender.AverageBoughtPrice;// Fallback to average bought price                
+            }
+
+            tx.ValueInDefaultCurrency = new Money(tx.SentAmount.Amount * price, portfolio.DefaultCurrency);
+
+            portfolio.RecordFinancialEvent(tx, sender, price);            
+
+            UpdateBalance(tx, sender);
+            HandleFees(tx, portfolio, priceHistoryService);
+
+            return Result.Success();
+        }
+
+        private async void HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
+            if (tx.FeeAmount != Money.Empty)
+            {
+                var fees = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
+                fees.Balance -= tx.FeeAmount.Amount;
+
+                if (tx.FeeAmount.CurrencyCode == portfolio.DefaultCurrency)
+                {
+                    tx.FeeValueInDefaultCurrency = tx.FeeAmount;
+                }
+                else
+                {
+                    var feePriceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.FeeAmount.CurrencyCode, tx.DateTime);
+                    if (feePriceResult.IsSuccess)
+                    {
+                        decimal feePrice = feePriceResult.Value;
+                        tx.FeeValueInDefaultCurrency = new Money(tx.FeeAmount.Amount * feePrice, portfolio.DefaultCurrency);
+                    }
+                    else
+                    {
+                        tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+                        tx.ErrorMessage = $"Could not get price history for {fees.Asset} fees. Fees calculations will be incorrect.";
+                    }
+                }
+
+                EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
+            }
+        }
+
+        private static void UpdateBalance(FinancialTransaction tx, AssetHolding sender)
+        {
+            sender.Balance -= tx.SentAmount.Amount;
+            if (sender.Balance == 0)
+                sender.AverageBoughtPrice = 0m;
+
+            EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
+        }
+
+        private static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
+        {
+            if (tx.SentAmount.Amount <= 0)
+            {
+                tx.ErrorMessage = $"Sent amount is zero or negative in withdrawal transaction: {tx.TransactionIds}";
+                tx.ErrorType = ErrorType.InvalidCurrency;
+                return false;
+            }
+            return true;
+        }
+
+        private static void EnsureBalanceNotNegative(FinancialTransaction tx, string asset, decimal balance)
+        {
+            if (balance < 0)
+            {
+                tx.ErrorType = ErrorType.InsufficientFunds;
+                tx.ErrorMessage = $"{asset} balance is under zero: {balance}";
+            }
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Events;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Strategies.Transactions
+{
+    public class TradeTransactionStrategy : ITransactionStrategy
+    {
+        public async Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
+            if (!EnsureAboveZeroAmount(tx)) return Result.Failure(tx.ErrorMessage);
+            if (!EnsureAboveZeroAmount(tx, false)) return Result.Failure(tx.ErrorMessage);
+
+            var receiver = portfolio.GetOrCreateHolding(tx.ReceivedAmount.CurrencyCode);
+            var sender = portfolio.GetOrCreateHolding(tx.SentAmount.CurrencyCode);
+            var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.SentAmount.CurrencyCode, tx.DateTime);
+
+            decimal price;
+            if (priceResult.IsSuccess)
+            {
+                price = priceResult.Value;
+            }
+            else
+            {
+                tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+                tx.ErrorMessage = $"Could not get price history for {sender.Asset}. Average price will be incorrect.";
+                price = sender.AverageBoughtPrice;// Fallback to average bought price
+            }
+
+            var tradedCostInUsd = CalculateTradedCostInUsd(tx, portfolio, price);
+            tx.ValueInDefaultCurrency = new Money(tradedCostInUsd, portfolio.DefaultCurrency);
+
+            UpdateReceiverAverageBoughtPrice(tx, receiver);
+
+            portfolio.RecordFinancialEvent(tx, sender, price);
+
+            UpdateBalances(tx, receiver, sender);
+            HandleFees(tx, portfolio, priceHistoryService);
+
+            return Result.Success();
+        }
+
+        private static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
+        {
+            if (incoming && tx.ReceivedAmount.Amount <= 0 || !incoming && tx.SentAmount.Amount <= 0)
+            {
+                tx.ErrorMessage = $"Amount is zero or negative in trade transaction: {tx.TransactionIds}";
+                tx.ErrorType = ErrorType.InvalidCurrency;
+                return false;
+            }
+            return true;
+        }
+
+        private decimal CalculateTradedCostInUsd(FinancialTransaction tx, UserPortfolio portfolio, decimal price)
+        {
+            if (tx.ReceivedAmount.CurrencyCode == portfolio.DefaultCurrency)
+            {
+                return tx.ReceivedAmount.Amount;
+            }
+            else if (tx.SentAmount.CurrencyCode == portfolio.DefaultCurrency)
+            {
+                return tx.SentAmount.Amount;
+            }
+            else
+            {
+                return tx.SentAmount.Amount * price;
+            }
+        }
+
+        private static void UpdateReceiverAverageBoughtPrice(FinancialTransaction tx, AssetHolding receiver)
+        {
+            receiver.AverageBoughtPrice = (receiver.AverageBoughtPrice * receiver.Balance + tx.ValueInDefaultCurrency.Amount) / (receiver.Balance + tx.ReceivedAmount.Amount);
+        }
+
+        private static void UpdateBalances(FinancialTransaction tx, AssetHolding receiver, AssetHolding sender)
+        {
+            receiver.Balance += tx.ReceivedAmount.Amount;
+            sender.Balance -= tx.SentAmount.Amount;
+
+            if (sender.Balance == 0)
+                sender.AverageBoughtPrice = 0m;
+
+            EnsureBalanceNotNegative(tx, sender.Asset, sender.Balance);
+        }
+
+        private async void HandleFees(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
+            if (tx.FeeAmount == Money.Empty) return;
+
+            var fees = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
+
+            bool shouldDeductFeesFromBalance = tx.FeeAmount.CurrencyCode != tx.ReceivedAmount.CurrencyCode;
+            if (shouldDeductFeesFromBalance)
+                fees.Balance -= tx.FeeAmount.Amount;
+
+            if (tx.FeeAmount.CurrencyCode == portfolio.DefaultCurrency)
+            {
+                tx.FeeValueInDefaultCurrency = tx.FeeAmount;
+            }
+            else
+            {
+                var feePriceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.FeeAmount.CurrencyCode, tx.DateTime);
+                if (feePriceResult.IsSuccess)
+                {
+                    decimal feePrice = feePriceResult.Value;
+                    tx.FeeValueInDefaultCurrency = new Money(tx.FeeAmount.Amount * feePrice, portfolio.DefaultCurrency);
+                }
+                else
+                {
+                    tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+                    tx.ErrorMessage = $"Could not get price history for {fees.Asset} fees. Fees calculations will be incorrect.";
+                }
+            }
+
+            EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
+        }
+
+        private static void EnsureBalanceNotNegative(FinancialTransaction tx, string asset, decimal balance)
+        {
+            if (balance < 0)
+            {
+                tx.ErrorType = ErrorType.InsufficientFunds;
+                tx.ErrorMessage = $"{asset} balance is under zero: {balance}";
+            }
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Strategies.Transactions
+{
+    public class DepositTransactionStrategy : ITransactionStrategy
+    {
+        public async Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
+            if (!EnsureAboveZeroAmount(tx)) return Result.Failure(tx.ErrorMessage);
+
+            var receiver = portfolio.GetOrCreateHolding(tx.ReceivedAmount.CurrencyCode);
+            receiver.Balance += tx.ReceivedAmount.Amount;
+
+            if (tx.ReceivedAmount.CurrencyCode == portfolio.DefaultCurrency)
+            {
+                receiver.AverageBoughtPrice = 1;
+                receiver.AddPurchase(tx.ReceivedAmount.Amount, 1, tx.DateTime);
+                tx.ValueInDefaultCurrency = new Money(tx.ReceivedAmount.Amount, portfolio.DefaultCurrency);
+            }
+            else
+            {
+                var priceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.ReceivedAmount.CurrencyCode, tx.DateTime);
+                if (priceResult.IsSuccess)
+                {
+                    decimal price = priceResult.Value;
+                    tx.ValueInDefaultCurrency = new Money(tx.ReceivedAmount.Amount * price, portfolio.DefaultCurrency);
+                    receiver.AverageBoughtPrice = (receiver.AverageBoughtPrice * (receiver.Balance - tx.ReceivedAmount.Amount) + tx.ValueInDefaultCurrency.Amount) / receiver.Balance;
+                    receiver.AddPurchase(tx.ReceivedAmount.Amount, price, tx.DateTime);
+                }
+                else
+                {
+                    tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+                    tx.ErrorMessage = $"Could not get price history for {receiver.Asset}. Average price will be incorrect.";
+                }
+            }
+
+            await FeeHandlingUtils.HandleFeesAsync(tx, portfolio, priceHistoryService);
+
+            return Result.Success();
+        }
+
+        private static bool EnsureAboveZeroAmount(FinancialTransaction tx)
+        {
+            if (tx.ReceivedAmount.Amount <= 0)
+            {
+                tx.ErrorMessage = $"Received amount is zero or negative in deposit transaction: {tx.TransactionIds}";
+                tx.ErrorType = ErrorType.InvalidCurrency;
+                return false;
+            }
+            return true;
+        }
+    }
+}
+﻿namespace Portfolio.Domain.Constants
+{
+    public abstract class Roles
+    {
+        public const string Administrator = nameof(Administrator);
+    }
+}﻿namespace Portfolio.Domain.Constants
+{
+    public abstract class Policies
+    {
+        public const string CanPurge = nameof(CanPurge);
+    }
+}namespace Portfolio.Domain.Constants
+{
+    public class Strings
+    {
+        public const string DATE_FORMAT = "yyyy-MM-dd";
+        public const string CURRENCY_USD = "USD";
+    }
+
+    public class Errors
+    {
+        public const string ERR_SAME_SYMBOLS = "Symbols must be of different currency/coin ({0}-{1}).";
+        public const string ERR_YAHOO_API_FETCH_FAILURE = "An error occurred while fetching from Yahoo Finance API.";
+    }
+}namespace Portfolio.Domain.Enums
+{
+    public enum ErrorType
+    {
+        None, // No error
+        PriceHistoryUnavailable, // Price history could not be retrieved
+        InsufficientFunds, // Attempted to trade or withdraw more than available
+        InvalidCurrency, // Currency code not recognized
+        DataCorruption, // General data issues, possibly due to external factors
+        ManualReviewRequired, // Generic case where user needs to inspect the transaction
+        EventCreationFailed // When error creating tax event
+    }
+}
+namespace Portfolio.Domain.Enums
+{
+    public enum TransactionType
+    {
+        Undefined,
+
+        Trade,
+
+        Deposit,
+
+        Withdrawal,
+
+        Fee
+    }
+}
+
+public static class DateTimeExtensions
+{
+    public static DateTime TruncateToSecond(this DateTime dateTime)
+    {
+        return new DateTime(
+            dateTime.Year,
+            dateTime.Month,
+            dateTime.Day,
+            dateTime.Hour,
+            dateTime.Minute,
+            dateTime.Second,
+            0, // Milliseconds set to 0
+            dateTime.Kind); // Preserve the original DateTimeKind (Local, UTC, or Unspecified)
+    }
+}
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Portfolio.Domain.Common
+{
+    public abstract class AggregateRoot : BaseAuditableEntity
+    {
+        private readonly List<BaseEvent> _domainEvents = new();
+
+        [NotMapped]
+        public IReadOnlyCollection<BaseEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+        public void AddDomainEvent(BaseEvent domainEvent)
+        {
+            _domainEvents.Add(domainEvent);
+        }
+
+        public void RemoveDomainEvent(BaseEvent domainEvent)
+        {
+            _domainEvents.Remove(domainEvent);
+        }
+
+        public void ClearDomainEvents()
+        {
+            _domainEvents.Clear();
+        }
+    }
+}﻿namespace Portfolio.Domain.Common
+{
+    public abstract class BaseEntity
+    {
+        public long Id { get; set; }
+    }
+}
+﻿using MediatR;
+
+namespace Portfolio.Domain.Common
+{
+    public abstract class BaseEvent : INotification
+    {
+    }
+}
+﻿namespace Portfolio.Domain.Common
+{
+    public abstract class BaseAuditableEntity : BaseEntity
+    {
+        public DateTimeOffset Created { get; set; }
+
+        public string? CreatedBy { get; set; }
+
+        public DateTimeOffset LastModified { get; set; }
+
+        public string? LastModifiedBy { get; set; }
+    }
+}
+using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain
+{
+    public static class TransactionValidationUtils
+    {
+        public static bool EnsureAboveZeroAmount(FinancialTransaction tx, bool incoming = true)
+        {
+            if (incoming && tx.ReceivedAmount.Amount <= 0)
+            {
+                tx.ErrorMessage = $"Received amount is zero or negative in transaction: {tx.TransactionIds}";
+                tx.ErrorType = ErrorType.InvalidCurrency;
+                return false;
+            }
+
+            if (!incoming && tx.SentAmount.Amount <= 0)
+            {
+                tx.ErrorMessage = $"Sent amount is zero or negative in transaction: {tx.TransactionIds}";
+                tx.ErrorType = ErrorType.InvalidCurrency;
+                return false;
+            }
+
+            if (tx.FeeAmount.Amount < 0)
+            {
+                tx.ErrorMessage = $"Fee amount is negative in transaction: {tx.TransactionIds}";
+                tx.ErrorType = ErrorType.InvalidCurrency;
+                return false;
+            }
+
+            return true;
+        }
+
+        public static void EnsureBalanceNotNegative(FinancialTransaction tx, string asset, decimal balance)
+        {
+            if (balance < 0)
+            {
+                tx.ErrorType = ErrorType.InsufficientFunds;
+                tx.ErrorMessage = $"{asset} balance is under zero: {balance}";
+            }
+        }
+    }
+
+
+    public static class FeeHandlingUtils
+    {
+        public static async Task HandleFeesAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
+            if (tx.FeeAmount == Money.Empty) return;
+
+            var fees = portfolio.GetOrCreateHolding(tx.FeeAmount.CurrencyCode);
+
+            bool shouldDeductFeesFromBalance = ShouldDeductFeesFromBalance(tx);
+            if (shouldDeductFeesFromBalance)
+                fees.Balance -= tx.FeeAmount.Amount;
+
+            if (tx.FeeAmount.CurrencyCode == portfolio.DefaultCurrency)
+            {
+                tx.FeeValueInDefaultCurrency = tx.FeeAmount;
+            }
+            else
+            {
+                var feePriceResult = await priceHistoryService.GetPriceAtCloseTimeAsync(tx.FeeAmount.CurrencyCode, tx.DateTime);
+                if (feePriceResult.IsSuccess)
+                {
+                    decimal feePrice = feePriceResult.Value;
+                    tx.FeeValueInDefaultCurrency = new Money(tx.FeeAmount.Amount * feePrice, portfolio.DefaultCurrency);
+                }
+                else
+                {
+                    tx.ErrorType = ErrorType.PriceHistoryUnavailable;
+                    tx.ErrorMessage = $"Could not get price history for {fees.Asset} fees. Fees calculations will be incorrect.";
+                }
+            }
+
+            TransactionValidationUtils.EnsureBalanceNotNegative(tx, fees.Asset, fees.Balance);
+        }
+
+        private static bool ShouldDeductFeesFromBalance(FinancialTransaction tx)
+        {
+            return tx.FeeAmount.CurrencyCode != tx.ReceivedAmount.CurrencyCode || tx.Type == TransactionType.Withdrawal;
+        }
+    }
+}
+using Portfolio.Domain.Common;
+using Portfolio.Domain.Entities;
+
+namespace Portfolio.Domain.Events
+{
+    public class FinancialEventAdded : BaseEvent
+    {
+        public FinancialTransaction Transaction { get; }
+        public AssetHolding Holding { get; }
+        public decimal MarketPricePerUnit { get; }
+        public string ErrorMessage { get; }
+
+        public FinancialEventAdded(
+            FinancialTransaction transaction,
+            AssetHolding holding,
+            decimal marketPricePerUnit,
+            string errorMessage = "")
+        {
+            Transaction = transaction ?? throw new ArgumentNullException(nameof(transaction));
+            Holding = holding ?? throw new ArgumentNullException(nameof(holding));
+            MarketPricePerUnit = marketPricePerUnit;
+            ErrorMessage = errorMessage ?? string.Empty;
+        }
+
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.Strategies.Transactions;
+
+namespace Portfolio.Domain.Services
+{
+    public class TransactionProcessor
+    {
+        private readonly Dictionary<TransactionType, ITransactionStrategy> _transactionStrategies;
+
+        public TransactionProcessor()
+        {
+            _transactionStrategies = new Dictionary<TransactionType, ITransactionStrategy>
+            {
+                { TransactionType.Deposit, new DepositTransactionStrategy() },
+                { TransactionType.Withdrawal, new WithdrawalTransactionStrategy() },
+                { TransactionType.Trade, new TradeTransactionStrategy() }
+            };
+        }
+
+        public async Task<Result> ProcessTransactionsAsync(IEnumerable<FinancialTransaction> transactions, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        {
+            foreach (var tx in transactions)
+            {
+                if (_transactionStrategies.TryGetValue(tx.Type, out var strategy))
+                {
+                    var result = await strategy.ProcessTransactionAsync(tx, portfolio, priceHistoryService);
+                    if (result.IsFailure)
+                    {
+                        return result; // Optionally stop processing on failure
+                    }
+                }
+                else
+                {
+                    return Result.Failure($"No strategy found for transaction type: {tx.Type}");
+                }
+            }
+
+            return Result.Success();
+        }
+    }
+}
+using Portfolio.Domain.Common;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Entities
+{
+    public abstract class CryptoCurrencyTransaction : BaseAuditableEntity, ICryptoCurrencyTransaction
+    {
+        public Money UnitValue { get; set; }
+        
+        public DateTime DateTime { get; set; }
+
+        public TransactionType Type { get; set; }
+
+        public Money? FeeAmount { get; set; } = null!;
+
+        public string Account { get; set; } = string.Empty;
+
+        public string Note { get; set; } = string.Empty;
+
+        public IEnumerable<string> TransactionIds { get; set; } = new List<string>();
+
+        public Money Amount { get; set; }
+
+        public object State { get; set; }
+
+        protected CryptoCurrencyTransaction()
+        { }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Common;
+using Portfolio.Domain.Constants;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.Events;
+using Portfolio.Domain.Interfaces;
+using Portfolio.Domain.Services;
+using Portfolio.Domain.Strategies.CostBasis;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Entities
+{
+    public class UserPortfolio : AggregateRoot
+    {
+        private readonly TransactionProcessor _transactionProcessor;
+        private List<AssetHolding> _holdings = new();
+        private List<Wallet> _wallets = new();
+        private List<FinancialEvent> _financialEvents = new();
+        private ICostBasisCalculationStrategy _costBasisStrategy = null!;
+        private readonly Dictionary<string, ICostBasisCalculationStrategy> _costBasisStrategies = new()
+        {
+            { "AVG", new AcbCostBasisCalculationStrategy() },
+            { "FIFO", new FifoCostBasisCalculationStrategy() },
+            { "LIFO", new LifoCostBasisCalculationStrategy() }
+        };
+
+        public string DefaultCurrency { get; private set; } = Strings.CURRENCY_USD;
+
+        public IReadOnlyCollection<Wallet> Wallets => _wallets.AsReadOnly();
+        public IReadOnlyCollection<AssetHolding> Holdings => _holdings.AsReadOnly();
+        public IReadOnlyCollection<FinancialEvent> FinancialEvents => _financialEvents.AsReadOnly();
+
+        public UserPortfolio()
+        {
+            _transactionProcessor = new TransactionProcessor();
+            SetCostBasisStrategy("AVG"); // Default to AVG
+        }
+
+        public void SetCostBasisStrategy(string strategy)
+        {
+            if (_costBasisStrategies.ContainsKey(strategy))
+            {
+                _costBasisStrategy = _costBasisStrategies[strategy];
+            }
+            else
+            {
+                throw new ArgumentException($"Cost basis strategy {strategy} not supported.");
+            }
+        }
+
+        public Result AddWallet(Wallet wallet)
+        {
+            if (wallet == null)
+                throw new ArgumentNullException(nameof(wallet));
+
+            if (_wallets.Any(w => w.Name == wallet.Name))
+                return Result.Failure("Wallet already exists.");
+
+            _wallets.Add(wallet);
+
+            return Result.Success();
+        }
+
+        public Result SetDefaultCurrency(string currencyCode)
+        {
+            currencyCode = currencyCode.ToUpper();
+            if (!FiatCurrency.All.Any(f => f == currencyCode))
+                return Result.Failure("Currency code unknown.");
+
+            DefaultCurrency = currencyCode;
+
+            return Result.Success();
+        }
+
+        public async Task<Result> CalculateTradesAsync(IPriceHistoryService priceHistoryService)
+        {
+            if (!Wallets.Any())
+                return Result.Failure("No wallets to process. Start by adding a wallet.");
+
+            var transactions = GetTransactionsFromAllWallets();
+            var result = await _transactionProcessor.ProcessTransactionsAsync(transactions, this, priceHistoryService);
+
+            if (result.IsFailure)
+            {
+                return result;
+            }
+
+            return Result.Success();
+        }
+
+        internal AssetHolding GetOrCreateHolding(string currencyCode)
+        {
+            var holding = _holdings.SingleOrDefault(h => h.Asset == currencyCode);
+            if (holding == null)
+            {
+                holding = new AssetHolding(currencyCode);
+                _holdings.Add(holding);
+            }
+            return holding;
+        }
+
+        internal void RecordFinancialEvent(
+            FinancialTransaction transaction,
+            AssetHolding holding,
+            decimal marketPricePerUnit
+        )
+        {           
+            if(transaction.Type == TransactionType.Deposit)
+                return;
+
+            if (transaction.SentAmount.IsFiatCurrency)
+            {
+                return;
+            }
+
+            Result result = Result.Success();
+
+            var costBasisPerUnitResult = _costBasisStrategy.CalculateCostBasis(holding, transaction);
+            if (costBasisPerUnitResult.IsFailure)
+                result = Result.Failure(costBasisPerUnitResult.Error);
+            else
+            {
+                var costBasisPerUnit = costBasisPerUnitResult.Value / transaction.SentAmount.Amount;
+
+                var financialEventResult = FinancialEvent.Create(
+                    transaction.DateTime,
+                    transaction.SentAmount.CurrencyCode,
+                    costBasisPerUnit,
+                    marketPricePerUnit,
+                    transaction.SentAmount.Amount,
+                    DefaultCurrency
+                );
+
+                if (financialEventResult.IsSuccess)
+                {
+                    _financialEvents.Add(financialEventResult.Value);
+                }
+                else
+                {
+                    transaction.ErrorMessage = "Could not create financial event for this transaction.";
+                    transaction.ErrorType = ErrorType.EventCreationFailed;
+                    result = financialEventResult;
+                }
+            }
+
+            AddDomainEvent(new FinancialEventAdded(transaction, holding, marketPricePerUnit, result.IsFailure ? result.Error: string.Empty));                    
+        }
+
+        private IEnumerable<FinancialTransaction> GetTransactionsFromAllWallets()
+        {
+            return _wallets.SelectMany(w => w.Transactions).OrderBy(t => t.DateTime).ToList();
+        }
+    }
+}using Portfolio.Domain.Common;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Entities
+{
+    public class AssetHolding : BaseAuditableEntity
+    {
+        public string Asset { get; private set; }
+
+        public decimal Balance { get; set; }
+
+        public decimal AverageBoughtPrice { get; set; }
+
+        public Money CurrentPrice { get; set; } = Money.Empty;
+
+        public ErrorType ErrorType { get; set; } = ErrorType.None;
+
+        public string ErrorMessage { get; set; } = string.Empty;
+
+        public List<PurchaseRecord> PurchaseRecords { get; private set; } = new();
+
+        public AssetHolding(string asset)
+        {
+            Asset = asset;
+            Balance = 0;
+            AverageBoughtPrice = 0;
+        }
+
+        public void AddPurchase(decimal amount, decimal pricePerUnit, DateTime purchaseDate)
+        {
+            PurchaseRecords.Add(new PurchaseRecord(amount, pricePerUnit, purchaseDate));            
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Common;
+using Portfolio.Domain.Enums;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Entities
+{
+    public class FinancialTransaction : BaseAuditableEntity
+    {
+        public long WalletId { get; private set; }
+
+        public DateTime DateTime { get; private set; }
+
+        public TransactionType Type { get; init; }
+
+        public Money ReceivedAmount { get; private set; } = Money.Empty;
+
+        public Money SentAmount { get; private set; } = Money.Empty;
+
+        public Money FeeAmount { get; private set; } = Money.Empty;
+
+        public string Account { get; init; } = string.Empty;
+
+        public string Note { get; private set; } = string.Empty;
+
+        public IEnumerable<string>? TransactionIds { get; init; }
+
+        public ErrorType ErrorType { get; set; } = ErrorType.None;
+
+        public string ErrorMessage { get; set; } = string.Empty;
+
+        public Money ValueInDefaultCurrency { get; set; } = Money.Empty;
+
+        public Money FeeValueInDefaultCurrency { get; set; } = Money.Empty;
+
+        public string CsvLinesJson { get; set; } = string.Empty;
+
+        internal FinancialTransaction() { }
+
+        public static Result<FinancialTransaction> CreateDeposit(
+            DateTime date,
+            Money receivedAmount,
+            Money? feeAmount,
+            string account,
+            IEnumerable<string>? transactionIds,
+            string note = "")
+        {
+            if (string.IsNullOrWhiteSpace(account))
+                return Result.Failure<FinancialTransaction>($"Account cannot be null or whitespace.");
+
+            var transaction = new FinancialTransaction()
+            {
+                Type = TransactionType.Deposit,
+                Account = account,
+                TransactionIds = transactionIds
+            };
+
+            return Result.Success(transaction)
+                .Check(t => t.SetTransactionDate(date))
+                .Check(t => t.SetNote(note))
+                .Check(t => t.SetTransactionAmounts(receivedAmount, Money.Empty, feeAmount ?? Money.Empty));
+        }
+
+        public static Result<FinancialTransaction> CreateWithdraw(
+            DateTime date,
+            Money sentAmount,
+            Money? feeAmount,
+            string account,
+            IEnumerable<string>? transactionIds,
+            string note = "")
+        {
+            if (string.IsNullOrWhiteSpace(account))
+                return Result.Failure<FinancialTransaction>($"Account cannot be null or whitespace.");
+
+            var transaction = new FinancialTransaction()
+            {
+                Type = TransactionType.Withdrawal,
+                Account = account,
+                TransactionIds = transactionIds
+            };
+
+            return Result.Success(transaction)
+                .Check(t => t.SetTransactionDate(date))
+                .Check(t => t.SetNote(note))
+                .Check(t => t.SetTransactionAmounts(Money.Empty, sentAmount, feeAmount ?? Money.Empty));
+        }
+
+        public static Result<FinancialTransaction> CreateTrade(
+            DateTime date,
+            Money receivedAmount,
+            Money sentAmount,
+            Money? feeAmount,
+            string account,
+            IEnumerable<string>? transactionIds,
+            string note = "")
+        {
+            if (string.IsNullOrWhiteSpace(account))
+                return Result.Failure<FinancialTransaction>("Account cannot be null or whitespace.");
+
+            var transaction = new FinancialTransaction()
+            {
+                Type = TransactionType.Trade,
+                Account = account,
+                TransactionIds = transactionIds
+            };
+
+            return Result.Success(transaction)
+                .Check(t => t.SetTransactionDate(date))
+                .Check(t => t.SetNote(note))
+                .Check(t => t.SetTransactionAmounts(receivedAmount, sentAmount, feeAmount ?? Money.Empty));
+        }
+
+        public Result SetTransactionAmounts(Money receivedAmount, Money sentAmount, Money feeAmount)
+        {
+            receivedAmount = receivedAmount ?? Money.Empty;
+            sentAmount = sentAmount ?? Money.Empty;
+            feeAmount = feeAmount ?? Money.Empty;
+
+            if ((receivedAmount == Money.Empty || receivedAmount.Amount <= 0) && (Type == TransactionType.Deposit || Type == TransactionType.Trade))
+                return Result.Failure<FinancialTransaction>($"Received amount must be greater than zero.");
+            else if (receivedAmount.Amount > 0 && Type == TransactionType.Withdrawal)
+                return Result.Failure($"Received amount cannot be set on a 'withdrawal' transaction.");
+
+            if ((sentAmount == Money.Empty || sentAmount.Amount <= 0) && (Type == TransactionType.Withdrawal || Type == TransactionType.Trade))
+                return Result.Failure<FinancialTransaction>($"Sent amount must be greater than zero.");
+            else if (sentAmount.Amount > 0 && Type == TransactionType.Deposit)
+                return Result.Failure($"Sent amount cannot be set on a 'deposit' transaction.");
+
+            ReceivedAmount = receivedAmount;
+            SentAmount = sentAmount;
+            FeeAmount = feeAmount;
+
+            return Result.Success();
+        }
+
+        public Result SetTransactionDate(DateTime date)
+        {
+            if (date == null || date == DateTime.MinValue)
+                return Result.Failure("Transaction date is invalid.");
+
+            DateTime = date.TruncateToSecond();
+
+            return Result.Success();
+        }
+
+        public Result SetNote(string note)
+        {
+            if (note?.Length > 500)
+                return Result.Failure("Note cannot be longer than 500 characters.");
+            Note = note ?? string.Empty;
+
+            return Result.Success();
+        }
+
+        public Money GetRelevantTransactionAmount()
+        {
+            return Type switch
+            {
+                TransactionType.Deposit => ReceivedAmount,
+                TransactionType.Withdrawal => SentAmount,
+                TransactionType.Trade => SentAmount, // Typically, SentAmount is used for trade cost basis
+                _ => throw new NotSupportedException($"Transaction type {Type} is not supported.")
+            };
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Entities
+{
+    public class CryptoCurrencyWithdrawTransaction : CryptoCurrencyTransaction
+    {
+        private CryptoCurrencyWithdrawTransaction()
+        { }
+
+        public static Result<CryptoCurrencyWithdrawTransaction> Create(
+            DateTime date,
+            Money amount,
+            Money feeAmount,
+            string account,
+            IEnumerable<string> transactionIds,
+            string note = "")
+        {
+            if (amount == null)
+                return Result.Failure<CryptoCurrencyWithdrawTransaction>("Sent amount cannot be null for a withdrawal.");
+
+            if (feeAmount == null)
+                feeAmount = new Money(0, amount.CurrencyCode);
+            else if (feeAmount.CurrencyCode != amount.CurrencyCode)
+                return Result.Failure<CryptoCurrencyWithdrawTransaction>($"Fees are not in the same currency as the withdraw currency.");
+
+            if (string.IsNullOrWhiteSpace(account))
+                return Result.Failure<CryptoCurrencyWithdrawTransaction>("Account cannot be null or whitespace.");
+
+            if (transactionIds == null || !transactionIds.Any())
+                return Result.Failure<CryptoCurrencyWithdrawTransaction>("Transaction IDs cannot be null or empty.");
+
+            var withdrawal = new CryptoCurrencyWithdrawTransaction()
+            {
+                DateTime = date,
+                Amount = amount.ToAbsoluteAmountMoney(),
+                FeeAmount = feeAmount.ToAbsoluteAmountMoney(),
+                Account = account,
+                TransactionIds = transactionIds,
+                Note = note
+            };
+
+            return withdrawal;
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Common;
+
+namespace Portfolio.Domain.Entities
+{
+    public class FinancialEvent : BaseAuditableEntity
+    {
+        public DateTime EventDate { get; private set; }
+
+        public decimal CostBasisPerUnit { get; private set; }
+
+        public decimal MarketPricePerUnit { get; private set; }
+
+        public decimal FairMarketValue => MarketPricePerUnit * Amount;
+
+        public decimal CapitalGain => FairMarketValue - (CostBasisPerUnit * Amount);
+
+        public decimal Amount { get; private set; }
+
+        public string AssetSymbol { get; set; } = string.Empty;
+
+        public string BaseCurrency { get; set; } = string.Empty;
+
+        private FinancialEvent() { }
+
+        public static Result<FinancialEvent> Create(
+            DateTime eventDate,
+            string assetSymbol,
+            decimal costBasisPerUnit,
+            decimal marketPricePerUnit,
+            decimal amount,
+            string baseCurrency)
+        {        
+            return new FinancialEvent()
+            {
+                EventDate = eventDate,
+                AssetSymbol = assetSymbol,
+                CostBasisPerUnit = costBasisPerUnit,
+                MarketPricePerUnit = marketPricePerUnit,            
+                Amount = amount,
+                BaseCurrency = baseCurrency
+            };
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Entities
+{
+    public class CryptoCurrencyDepositTransaction : CryptoCurrencyTransaction
+    {
+        private CryptoCurrencyDepositTransaction()
+        { }
+
+        public static Result<CryptoCurrencyDepositTransaction> Create(
+            DateTime date,
+            Money receivedAmount,
+            Money feeAmount,
+            string account,
+            IEnumerable<string> transactionIds,
+            string note = "")
+        {
+            if (receivedAmount == null)
+                return Result.Failure<CryptoCurrencyDepositTransaction>($"Received amount cannot be null for a deposit.");
+
+            if (feeAmount == null)
+                feeAmount = new Money(0, receivedAmount.CurrencyCode);
+            else if (feeAmount.CurrencyCode != receivedAmount.CurrencyCode)
+                return Result.Failure<CryptoCurrencyDepositTransaction>($"Fees are not in the same currency as the deposit currency.");
+
+            if (string.IsNullOrWhiteSpace(account))
+                return Result.Failure<CryptoCurrencyDepositTransaction>($"Account cannot be null or whitespace.");
+
+            if (transactionIds == null || !transactionIds.Any())
+                return Result.Failure<CryptoCurrencyDepositTransaction>($"Transaction IDs cannot be null or empty.");
+
+            var deposit = new CryptoCurrencyDepositTransaction()
+            {
+                DateTime = date,
+                Amount = receivedAmount.ToAbsoluteAmountMoney(),
+                FeeAmount = feeAmount.ToAbsoluteAmountMoney(),
+                Account = account,
+                TransactionIds = transactionIds,
+                Note = note
+            };
+            return deposit;
+        }
+    }
+}
+using Portfolio.Domain.Common;
+
+namespace Portfolio.Domain.Entities
+{
+    public class PurchaseRecord : BaseAuditableEntity
+    {
+        public decimal Amount { get; private set; }
+
+        public decimal PricePerUnit { get; private set; }
+
+        public DateTime PurchaseDate { get; private set; }
+
+        public PurchaseRecord(decimal amount, decimal pricePerUnit, DateTime purchaseDate)
+        {
+            Amount = amount;
+            PricePerUnit = pricePerUnit;
+            PurchaseDate = purchaseDate;
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Common;
+
+namespace Portfolio.Domain.Entities
+{
+    public class Wallet : BaseAuditableEntity
+    {
+        public string Name { get; init; } = string.Empty;
+        public long PortfolioId { get; set; }
+        private readonly List<FinancialTransaction> _transactions = new();
+        public IReadOnlyCollection<FinancialTransaction> Transactions => _transactions.AsReadOnly();
+
+        private Wallet() { }
+
+        public static Result<Wallet> Create(string walletName)
+        {
+            if (string.IsNullOrWhiteSpace(walletName)) return Result.Failure<Wallet>("Name cannot be empty.");
+
+            return new Wallet
+            {
+                Name = walletName
+            };
+        }
+
+        public Result AddTransaction(FinancialTransaction transaction)
+        {
+            if (transaction == null)
+                return Result.Failure("Transaction cannot be null.");
+
+            if (_transactions.Any(t => IsSameTransaction(t, transaction)))// || !_transactions.Add(transaction))
+                return Result.Failure("Transaction already exists in this holding.");
+            _transactions.Add(transaction);
+            return Result.Success();
+        }
+
+        public Result RemoveTransaction(FinancialTransaction transaction)
+        {
+            if (transaction == null)
+                return Result.Failure("Transaction cannot be null.");
+
+            if (!_transactions.Remove(transaction))
+            {
+                return Result.Failure("Transaction not found in this holding.");
+            }
+
+            return Result.Success();
+        }
+
+        public bool IsSameTransaction(FinancialTransaction obj, FinancialTransaction other)
+        {
+            return obj.DateTime.TruncateToSecond() == other.DateTime.TruncateToSecond() &&
+                   obj.Type == other.Type &&
+                   Equals(obj.ReceivedAmount, other.ReceivedAmount) &&
+                   Equals(obj.SentAmount, other.SentAmount) &&
+                   Equals(obj.FeeAmount, other.FeeAmount);
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Entities
+{
+    public class CryptoCurrencyTradeTransaction : CryptoCurrencyTransaction
+    {
+        public Money TradeAmount { get; set; } = null!;
+
+        private CryptoCurrencyTradeTransaction()
+        { }
+
+        public static Result<CryptoCurrencyTradeTransaction> Create(
+            DateTime date,
+            Money receivedAmount,
+            Money sentAmount,
+            Money feeAmount,
+            string account,
+            IEnumerable<string> transactionIds,
+            string note = "")
+        {
+            if (receivedAmount == null)
+                return Result.Failure<CryptoCurrencyTradeTransaction>("Received amount cannot be null for a trade transaction.");
+
+            if (sentAmount == null)
+                return Result.Failure<CryptoCurrencyTradeTransaction>("Sent amount cannot be null for a trade transaction.");
+
+            if (string.IsNullOrWhiteSpace(account))
+                return Result.Failure<CryptoCurrencyTradeTransaction>("Account cannot be null or whitespace.");
+
+            if (transactionIds == null || !transactionIds.Any())
+                return Result.Failure<CryptoCurrencyTradeTransaction>("Transaction IDs cannot be null or empty.");
+
+            if (feeAmount == null)
+                feeAmount = new Money(0, receivedAmount.CurrencyCode);
+
+            var trade = new CryptoCurrencyTradeTransaction()
+            {
+                DateTime = date,
+                Amount = receivedAmount.ToAbsoluteAmountMoney(),
+                TradeAmount = sentAmount.ToAbsoluteAmountMoney(),
+                FeeAmount = feeAmount.ToAbsoluteAmountMoney(),
+                Account = account,
+                TransactionIds = transactionIds,
+                Note = note
+            };
+            return trade;
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Interfaces
+{
+    public interface IPriceHistoryApi
+    {
+        string DetermineTradingPair(string fromSymbol, string toSymbol);
+
+        Task<Result<IEnumerable<PriceRecord>>> FetchPriceHistoryAsync(string symbol, DateTime startDate, DateTime endDate);
+    }
+}
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Interfaces
+{
+    public interface ICryptoCurrencyTransaction
+    {
+        public DateTime DateTime { get; set; }
+
+        public Money Amount { get; set; }
+
+        public Money FeeAmount { get; set; }
+
+        public string Account { get; set; }
+
+        public string Note { get; set; }
+
+        public IEnumerable<string> TransactionIds { get; set; }
+
+        public object State { get; set; }
+
+
+    }
+}
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.Domain.Interfaces
+{
+    public interface IPriceHistoryService
+    {
+        string DefaultCurrency { get; set; }
+
+        Task<Result<decimal>> GetPriceAtCloseTimeAsync(string symbol, DateTime date);
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.ValueObjects;
+
+namespace Portfolio.Domain.Interfaces
+{
+    public interface IPriceHistoryStorageService
+    {
+        Task<Result<IEnumerable<PriceRecord>>> LoadHistoryAsync(string symbol);
+
+        Task<Result> SaveHistoryAsync(string symbol, IEnumerable<PriceRecord> priceHistory);
+    }
+}
+using CSharpFunctionalExtensions;
+using Portfolio.Domain.Entities;
+
+namespace Portfolio.Domain.Interfaces
+{
+    public interface ITransactionStrategy
+    {
+        Task<Result> ProcessTransactionAsync(FinancialTransaction tx, UserPortfolio portfolio, IPriceHistoryService priceHistoryService);
+    }
+}﻿namespace Portfolio.Domain.Interfaces
+{
+    public interface IUser
+    {
+        string? Id { get; }
+    }
+}
+using System.ComponentModel.DataAnnotations.Schema;
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.Domain.ValueObjects
+{
+    public class Money : ValueObject
+    {
+        public static Money Empty => new Money(0, string.Empty);
+
+        [NotMapped]
+        public decimal Amount { get; private set; }//{ get => _amount ?? 0; private set => _amount = value == 0 ? new decimal?() : value; }
+
+        public string CurrencyCode { get; private set; } = string.Empty;
+
+        public bool IsFiatCurrency => FiatCurrency.All.Any(c => c == CurrencyCode);
+
+        public decimal AbsoluteAmount => Math.Abs(Amount);
+
+        public Money(decimal amount, string currencyCode)
+        {
+            Amount = amount;
+            CurrencyCode = currencyCode ?? throw new ArgumentNullException(nameof(currencyCode));
+        }
+
+        public static Maybe<Money> Create(decimal? amount, string currencyCode)
+        {
+            if ((amount ?? 0) == 0 || string.IsNullOrWhiteSpace(currencyCode))
+                return Maybe.None;
+            return new Money(amount.GetValueOrDefault(), currencyCode);
+        }
+
+        public Money ToAbsoluteAmountMoney()
+        {
+            return new Money(AbsoluteAmount, CurrencyCode);
+        }
+
+        public Money Add(Money? other)
+        {
+            if (other == null)
+                return this;
+
+            if (CurrencyCode != other.CurrencyCode)
+                throw new InvalidOperationException("Cannot add amounts in different currencies.");
+
+            return new Money(Amount + other.Amount, CurrencyCode);
+        }
+
+        public Money Subtract(Money? other)
+        {
+            if (other == null)
+                return this;
+
+            if (CurrencyCode != other.CurrencyCode)
+                throw new InvalidOperationException("Cannot subtract amounts in different currencies.");
+
+            return new Money(Amount - other.Amount, CurrencyCode);
+        }
+
+        public override string ToString()
+        {
+            return $"{Amount:0.##} {CurrencyCode}";
+        }
+
+        protected override IEnumerable<IComparable> GetEqualityComponents()
+        {
+            yield return Amount;
+            yield return CurrencyCode;
+        }
+    }
+}
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.Domain.ValueObjects
+{
+    public class FiatCurrency : EnumValueObject<FiatCurrency>
+    {
+        public static readonly FiatCurrency USD = new FiatCurrency("USD");
+        public static readonly FiatCurrency EUR = new FiatCurrency("EUR");
+        public static readonly FiatCurrency JPY = new FiatCurrency("JPY");
+        public static readonly FiatCurrency GBP = new FiatCurrency("GBP");
+        public static readonly FiatCurrency AUD = new FiatCurrency("AUD");
+        public static readonly FiatCurrency CAD = new FiatCurrency("CAD");
+        public static readonly FiatCurrency CHF = new FiatCurrency("CHF");
+        public static readonly FiatCurrency CNY = new FiatCurrency("CNY");
+        public static readonly FiatCurrency SEK = new FiatCurrency("SEK");
+        public static readonly FiatCurrency NZD = new FiatCurrency("NZD");
+        public static readonly FiatCurrency MXN = new FiatCurrency("MXN");
+        public static readonly FiatCurrency SGD = new FiatCurrency("SGD");
+        public static readonly FiatCurrency HKD = new FiatCurrency("HKD");
+        public static readonly FiatCurrency NOK = new FiatCurrency("NOK");
+        public static readonly FiatCurrency KRW = new FiatCurrency("KRW");
+        public static readonly FiatCurrency TRY = new FiatCurrency("TRY");
+        public static readonly FiatCurrency RUB = new FiatCurrency("RUB");
+        public static readonly FiatCurrency INR = new FiatCurrency("INR");
+        public static readonly FiatCurrency BRL = new FiatCurrency("BRL");
+        public static readonly FiatCurrency ZAR = new FiatCurrency("ZAR");
+        public static readonly FiatCurrency AOA = new FiatCurrency("AOA");
+        public static readonly FiatCurrency ARS = new FiatCurrency("ARS");
+        public static readonly FiatCurrency BND = new FiatCurrency("BND");
+        public static readonly FiatCurrency BZD = new FiatCurrency("BZD");
+        public static readonly FiatCurrency CLP = new FiatCurrency("CLP");
+        public static readonly FiatCurrency COP = new FiatCurrency("COP");
+        public static readonly FiatCurrency CRC = new FiatCurrency("CRC");
+        public static readonly FiatCurrency CZK = new FiatCurrency("CZK");
+        public static readonly FiatCurrency DJF = new FiatCurrency("DJF");
+        public static readonly FiatCurrency DKK = new FiatCurrency("DKK");
+        public static readonly FiatCurrency DOP = new FiatCurrency("DOP");
+        public static readonly FiatCurrency FJD = new FiatCurrency("FJD");
+        public static readonly FiatCurrency FKP = new FiatCurrency("FKP");
+        public static readonly FiatCurrency GEL = new FiatCurrency("GEL");
+        public static readonly FiatCurrency GTQ = new FiatCurrency("GTQ");
+        public static readonly FiatCurrency HNL = new FiatCurrency("HNL");
+        public static readonly FiatCurrency HUF = new FiatCurrency("HUF");
+        public static readonly FiatCurrency IDR = new FiatCurrency("IDR");
+        public static readonly FiatCurrency ILS = new FiatCurrency("ILS");
+        public static readonly FiatCurrency ISK = new FiatCurrency("ISK");
+        public static readonly FiatCurrency KES = new FiatCurrency("KES");
+        public static readonly FiatCurrency KGS = new FiatCurrency("KGS");
+        public static readonly FiatCurrency KMF = new FiatCurrency("KMF");
+        public static readonly FiatCurrency KZT = new FiatCurrency("KZT");
+        public static readonly FiatCurrency MDL = new FiatCurrency("MDL");
+        public static readonly FiatCurrency MGA = new FiatCurrency("MGA");
+        public static readonly FiatCurrency MRU = new FiatCurrency("MRU");
+        public static readonly FiatCurrency MWK = new FiatCurrency("MWK");
+        public static readonly FiatCurrency MYR = new FiatCurrency("MYR");
+        public static readonly FiatCurrency OMR = new FiatCurrency("OMR");
+        public static readonly FiatCurrency PEN = new FiatCurrency("PEN");
+        public static readonly FiatCurrency PGK = new FiatCurrency("PGK");
+        public static readonly FiatCurrency PHP = new FiatCurrency("PHP");
+        public static readonly FiatCurrency PLN = new FiatCurrency("PLN");
+        public static readonly FiatCurrency PYG = new FiatCurrency("PYG");
+        public static readonly FiatCurrency RON = new FiatCurrency("RON");
+        public static readonly FiatCurrency RWF = new FiatCurrency("RWF");
+        public static readonly FiatCurrency SBD = new FiatCurrency("SBD");
+        public static readonly FiatCurrency SCR = new FiatCurrency("SCR");
+        public static readonly FiatCurrency SRD = new FiatCurrency("SRD");
+        public static readonly FiatCurrency STN = new FiatCurrency("STN");
+        public static readonly FiatCurrency SZL = new FiatCurrency("SZL");
+        public static readonly FiatCurrency TJS = new FiatCurrency("TJS");
+        public static readonly FiatCurrency TMT = new FiatCurrency("TMT");
+        public static readonly FiatCurrency TOP = new FiatCurrency("TOP");
+        public static readonly FiatCurrency UYU = new FiatCurrency("UYU");
+        public static readonly FiatCurrency VND = new FiatCurrency("VND");
+        public static readonly FiatCurrency XCD = new FiatCurrency("XCD");
+
+        private FiatCurrency(string code) : base(code) { }
+    }
+}
+using CSharpFunctionalExtensions;
+
+namespace Portfolio.Domain.ValueObjects
+{
+    public class PriceRecord : ValueObject
+    {
+        public string CurrencyPair { get; set; } = string.Empty;
+
+        public DateTime CloseDate { get; set; }
+
+        public decimal ClosePrice { get; set; }
+
+        protected override IEnumerable<IComparable> GetEqualityComponents()
+        {
+            yield return CurrencyPair;
+            yield return CloseDate;
+            yield return ClosePrice;
+        }
+    }
+}
