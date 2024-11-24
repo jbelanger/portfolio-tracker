@@ -19,7 +19,7 @@
     "LocalizationProvider": "link:@mui/x-date-pickers/LocalizationProvider",
     "dayjs": "^1.11.13",
     "neverthrow": "^7.1.0",
-    "next": "14.2.7",
+    "next": "14.2.10",
     "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18"
