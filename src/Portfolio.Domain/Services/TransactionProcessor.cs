@@ -44,7 +44,10 @@ namespace Portfolio.Domain.Services
         /// A Result indicating the success or failure of the transaction processing.
         /// The processing stops on the first encountered failure.
         /// </returns>
-        public async Task<Result> ProcessTransactionsAsync(IEnumerable<FinancialTransaction> transactions, UserPortfolio portfolio, IPriceHistoryService priceHistoryService)
+        public async Task<Result> ProcessTransactionsAsync(
+            IEnumerable<FinancialTransaction> transactions,
+            UserPortfolio portfolio,
+            IPriceHistoryService priceHistoryService)
         {
             foreach (var tx in transactions)
             {

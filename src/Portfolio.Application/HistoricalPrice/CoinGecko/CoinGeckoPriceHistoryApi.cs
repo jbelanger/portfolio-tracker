@@ -14,7 +14,7 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
     {
         private readonly HttpClient _httpClient;
         private readonly MemoryCache _cache;
-        private readonly IApplicationDbContext dbContext;
+        private readonly IApplicationDbContext _dbContext;
         private readonly RateLimiter _rateLimiter;
         private CoinGeckoCoinListApi _coinGeckoCoinListApi;
         private int RetryAfter => 60 / _rateLimiter.RequestsPerMinute;
@@ -29,7 +29,7 @@ namespace Portfolio.App.HistoricalPrice.CoinGecko
         {
             _httpClient = httpClientFactory.CreateClient("CoinGeckoClient") ?? throw new InvalidOperationException(nameof(httpClientFactory.CreateClient));
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            this._dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _rateLimiter = new RateLimiter(15); // Default to 15 requests per minute
 
             _coinGeckoCoinListApi = new CoinGeckoCoinListApi(httpClientFactory, cache, dbContext) { RequestsPerMinute = RequestsPerMinute };
