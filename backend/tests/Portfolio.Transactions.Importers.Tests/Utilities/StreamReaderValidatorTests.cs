@@ -1,12 +1,13 @@
+using System.IO;
 using FluentAssertions;
 using Portfolio.Transactions.Importers.Utilities;
+using Xunit;
 
 namespace Portfolio.Transactions.Importers.Tests.Utilities
 {
-    [TestFixture]
     public class StreamReaderValidatorTests
     {
-        [Test]
+        [Fact]
         public void ValidateStreamReader_ShouldReturnFailure_WhenStreamReaderIsNull()
         {
             // Arrange
@@ -20,7 +21,7 @@ namespace Portfolio.Transactions.Importers.Tests.Utilities
             result.Error.Should().Be("StreamReader cannot be null.");
         }
 
-        [Test]
+        [Fact]
         public void ValidateStreamReader_ShouldReturnFailure_WhenBaseStreamIsEmpty()
         {
             // Arrange
@@ -35,7 +36,7 @@ namespace Portfolio.Transactions.Importers.Tests.Utilities
             result.Error.Should().Be("StreamReader's BaseStream is empty.");
         }
 
-        [Test]
+        [Fact]
         public void ValidateStreamReader_ShouldReturnFailure_WhenSampleReadFails()
         {
             // Arrange
@@ -57,7 +58,7 @@ namespace Portfolio.Transactions.Importers.Tests.Utilities
             result.Error.Should().StartWith("StreamReader's BaseStream cannot be read.");
         }
 
-        [Test]
+        [Fact]
         public void ValidateStreamReader_ShouldReturnSuccess_WhenStreamReaderIsValid()
         {
             // Arrange

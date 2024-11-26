@@ -1,27 +1,79 @@
 using System.Globalization;
+using System.Text.Json;
+using CSharpFunctionalExtensions;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Portfolio.Domain.Entities;
-using Portfolio.Domain.Interfaces;
+using Portfolio.Transactions.Importers.Utilities;
 using Serilog;
 
 namespace Portfolio.Transactions.Importers.Csv.Coinbase
 {
     public class CoinbaseCsvParser
     {
-        private string _filename;
+        public static readonly string EXPECTED_FILE_HEADER = "ID,Timestamp,Transaction Type,Asset,Quantity Transacted,Price Currency,Price at Transaction,Subtotal,Total (inclusive of fees and/or spread),Fees and/or Spread,Notes";
+        private readonly IEnumerable<CoinbaseCsvEntry> _csvLines;
+        private readonly IEnumerable<string>? _refidsToIgnore = new List<string>();
 
-        public CoinbaseCsvParser(string filename)
+        public static Result<CoinbaseCsvParser> Create(StreamReader streamReader, IEnumerable<string>? ignoreRefIds = null)
         {
-            _filename = filename ?? throw new ArgumentNullException("The file path cannot be null or empty.");
+            var streamValidResult = StreamReaderValidator.ValidateStreamReader(streamReader);
+            if (streamValidResult.IsFailure)
+                return Result.Failure<CoinbaseCsvParser>(streamValidResult.Error);
+
+            try
+            {
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true,
+                    IgnoreBlankLines = true,
+                    PrepareHeaderForMatch = args => args.Header.Trim().ToLower()
+                };
+
+                // Skip lines until the header is reached
+                //var headerResult = SkipToHeader(streamReader, EXPECTED_FILE_HEADER);
+                //if (headerResult.IsFailure)
+                //    return Result.Failure<CoinbaseCsvParser>(headerResult.Error);
+
+                using (var csv = new CsvReader(streamReader, config))
+                {
+                    // Skip lines until the expected header is found
+                    bool headerFound = false;
+                    while (csv.Read())
+                    {
+                        if (csv.Parser.Record != null && string.Join(",", csv.Parser.Record).Trim().ToLower().StartsWith(EXPECTED_FILE_HEADER.ToLower()))
+                        {
+                            headerFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!headerFound)
+                    {
+                        return Result.Failure<CoinbaseCsvParser>("The expected header was not found in the CSV file.");
+                    }
+                    csv.ReadHeader();
+                    csv.Context.RegisterClassMap<CoinbaseCsvLineMap>();
+                    var records = csv.GetRecords<CoinbaseCsvEntry>();
+                    return new CoinbaseCsvParser(records.ToList(), ignoreRefIds);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure<CoinbaseCsvParser>($"Failed to import transactions from CSV: {ex.Message}");
+            }
         }
 
-        public IEnumerable<ICryptoCurrencyTransaction> ExtractTransactions()
+        private CoinbaseCsvParser(IEnumerable<CoinbaseCsvEntry> csvLines, IEnumerable<string>? ignoreRefIds = null)
         {
-            var csvLines = ReadCsvFile();
+            _csvLines = csvLines?.OrderBy(x => x.Date) ?? throw new ArgumentNullException(nameof(csvLines));
+            _refidsToIgnore = ignoreRefIds;
+        }
 
-            var rawLedger = csvLines.OrderBy(x => x.Date).ToList();
-            var transactions = new List<ICryptoCurrencyTransaction>();
+        public IEnumerable<FinancialTransaction> ExtractTransactions()
+        {
+            var rawLedger = _csvLines.Where(x => _refidsToIgnore == null || !_refidsToIgnore.Any() || !_refidsToIgnore.Contains(x.TransactionId)).OrderBy(x => x.Date).ToList();
+            var transactions = new List<FinancialTransaction>();
 
             // Deposits
             var deposits = ProcessDeposits(rawLedger);
@@ -46,40 +98,17 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
             return transactions;
         }
 
-        private List<CoinbaseCsvEntry> ReadCsvFile()
+        private static IEnumerable<FinancialTransaction> ProcessWithdrawals(IEnumerable<CoinbaseCsvEntry> rawLedger)
         {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = true
-            };
-
-            using (var reader = new StreamReader(_filename))
-            {
-                // Headers are on row 4
-                reader.ReadLine();
-                reader.ReadLine();
-                reader.ReadLine();
-
-                using (var csv = new CsvReader(reader, config))
-                {
-                    csv.Context.RegisterClassMap<CoinbaseCsvLineMap>();
-                    var records = csv.GetRecords<CoinbaseCsvEntry>();
-                    return records.ToList();
-                }
-            }
-        }
-
-        private static IEnumerable<ICryptoCurrencyTransaction> ProcessWithdrawals(IEnumerable<CoinbaseCsvEntry> rawLedger)
-        {
-            var transactions = new List<ICryptoCurrencyTransaction>();
+            var transactions = new List<FinancialTransaction>();
             var processedRefIds = new HashSet<string>();
             var sentMoneyTxs = rawLedger.Where(x => x.Type == "Send");
 
             foreach (var withdraw in sentMoneyTxs)
             {
-                var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
+                var withdrawResult = FinancialTransaction.CreateWithdraw(
                     date: withdraw.Date,
-                    amount: withdraw.Amount.ToAbsoluteAmountMoney(),
+                    sentAmount: withdraw.Amount.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
                     "coinbase",
                     transactionIds: [withdraw.TransactionId]);
@@ -87,7 +116,7 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
                 if (withdrawResult.IsFailure)
                     throw new ArgumentException(withdrawResult.Error);
 
-                withdrawResult.Value.State = new CoinbaseCsvEntry[] { withdraw };
+                withdrawResult.Value.CsvLinesJson = JsonSerializer.Serialize(new CoinbaseCsvEntry[] { withdraw });
 
                 transactions.Add(withdrawResult.Value);
             }
@@ -95,9 +124,9 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
             var withdrawals = rawLedger.Where(x => x.Type == "Withdrawal");
             foreach (var withdraw in withdrawals)
             {
-                var withdrawResult = CryptoCurrencyWithdrawTransaction.Create(
+                var withdrawResult = FinancialTransaction.CreateWithdraw(
                     date: withdraw.Date,
-                    amount: withdraw.Subtotal.ToAbsoluteAmountMoney(),
+                    sentAmount: withdraw.Subtotal.ToAbsoluteAmountMoney(),
                     feeAmount: withdraw.Fee.ToAbsoluteAmountMoney(),
                     "coinbase",
                     transactionIds: [withdraw.TransactionId]);
@@ -105,7 +134,7 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
                 if (withdrawResult.IsFailure)
                     throw new ArgumentException(withdrawResult.Error);
 
-                withdrawResult.Value.State = new CoinbaseCsvEntry[] { withdraw };
+                withdrawResult.Value.CsvLinesJson = JsonSerializer.Serialize(new CoinbaseCsvEntry[] { withdraw });
 
                 transactions.Add(withdrawResult.Value);
             }
@@ -113,14 +142,14 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
             return transactions;
         }
 
-        private static IEnumerable<ICryptoCurrencyTransaction> ProcessDeposits(IEnumerable<CoinbaseCsvEntry> rawLedger)
+        private static IEnumerable<FinancialTransaction> ProcessDeposits(IEnumerable<CoinbaseCsvEntry> rawLedger)
         {
-            var transactions = new List<ICryptoCurrencyTransaction>();
+            var transactions = new List<FinancialTransaction>();
             var deposits = rawLedger.Where(x => x.Type == "Deposit");
 
             foreach (var deposit in deposits)
             {
-                var depositResult = CryptoCurrencyDepositTransaction.Create(
+                var depositResult = FinancialTransaction.CreateDeposit(
                     date: deposit.Date,
                     receivedAmount: deposit.Subtotal.ToAbsoluteAmountMoney(),
                     feeAmount: deposit.Fee.ToAbsoluteAmountMoney(),
@@ -130,7 +159,7 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
                 if (depositResult.IsFailure)
                     throw new ArgumentException(depositResult.Error);
 
-                depositResult.Value.State = new CoinbaseCsvEntry[] { deposit };
+                depositResult.Value.CsvLinesJson = JsonSerializer.Serialize(new CoinbaseCsvEntry[] { deposit });
 
                 transactions.Add(depositResult.Value);
             }
@@ -151,9 +180,9 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
         /// <param name="depotTransactions"></param>
         /// <param name="accountTransactions"></param>
         /// <returns></returns>
-        private static IEnumerable<ICryptoCurrencyTransaction> ProcessStaking(IEnumerable<CoinbaseCsvEntry> rawLedger)
+        private static IEnumerable<FinancialTransaction> ProcessStaking(IEnumerable<CoinbaseCsvEntry> rawLedger)
         {
-            var transactions = new List<ICryptoCurrencyTransaction>();
+            var transactions = new List<FinancialTransaction>();
             var stakes = rawLedger.Where(x => x.Type == "DELEGATE");
 
             foreach (var stake in stakes)
@@ -170,14 +199,14 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
         /// <param name="rawLedger"></param>
         /// <returns></returns>
         /// <exception cref="InvalidDataException"></exception>
-        private static IEnumerable<ICryptoCurrencyTransaction> ProcessTrades(IEnumerable<CoinbaseCsvEntry> rawLedger)
+        private static IEnumerable<FinancialTransaction> ProcessTrades(IEnumerable<CoinbaseCsvEntry> rawLedger)
         {
-            var transactions = new List<ICryptoCurrencyTransaction>();
+            var transactions = new List<FinancialTransaction>();
             var trades = rawLedger.Where(x => x.Type == "Buy");
 
             foreach (var trade in trades)
             {
-                var tradeResult = CryptoCurrencyTradeTransaction.Create(
+                var tradeResult = FinancialTransaction.CreateTrade(
                     date: trade.Date,
                     receivedAmount: trade.Amount.ToAbsoluteAmountMoney(),
                     sentAmount: trade.Subtotal.ToAbsoluteAmountMoney(),
@@ -188,7 +217,7 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
                 if (tradeResult.IsFailure)
                     throw new ArgumentException(tradeResult.Error);
 
-                tradeResult.Value.State = new CoinbaseCsvEntry[] { trade };
+                tradeResult.Value.CsvLinesJson = JsonSerializer.Serialize(new CoinbaseCsvEntry[] { trade });
 
                 transactions.Add(tradeResult.Value);
             }
@@ -196,7 +225,7 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
             var advTrades = rawLedger.Where(x => x.Type == "Advance Trade Sell");
             foreach (var trade in advTrades)
             {
-                var tradeResult = CryptoCurrencyTradeTransaction.Create(
+                var tradeResult = FinancialTransaction.CreateTrade(
                     date: trade.Date,
                     receivedAmount: trade.Subtotal.ToAbsoluteAmountMoney(),
                     sentAmount: trade.Amount.ToAbsoluteAmountMoney(),
@@ -208,12 +237,26 @@ namespace Portfolio.Transactions.Importers.Csv.Coinbase
                 if (tradeResult.IsFailure)
                     throw new ArgumentException(tradeResult.Error);
 
-                tradeResult.Value.State = new CoinbaseCsvEntry[] { trade };
+                tradeResult.Value.CsvLinesJson = JsonSerializer.Serialize(new CoinbaseCsvEntry[] { trade });
 
                 transactions.Add(tradeResult.Value);
             }
 
             return transactions;
+        }
+
+        private static Result SkipToHeader(StreamReader streamReader, string expectedHeader)
+        {
+            string? line;
+            while ((line = streamReader.ReadLine()) != null)
+            {
+                if (line.Trim().Equals(expectedHeader, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Result.Success();
+                }
+            }
+
+            return Result.Failure("The expected header was not found in the CSV file.");
         }
     }
 }

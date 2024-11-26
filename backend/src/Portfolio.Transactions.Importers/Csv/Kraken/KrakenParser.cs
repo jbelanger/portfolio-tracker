@@ -59,9 +59,9 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
             transactions.AddRange(trades);
 
             // Staking
-            // var stakes = ProcessStaking(rawLedger.Where(x => !processedRefIds.Contains(x.ReferenceId)));
-            // processedRefIds.AddRange(stakes.SelectMany(x => x.TransactionIds).ToList());
-            // transactions.AddRange(stakes);
+            var stakes = ProcessStaking(rawLedger.Where(x => !processedRefIds.Contains(x.ReferenceId)));
+            processedRefIds.AddRange(stakes.SelectMany(x => x.TransactionIds).ToList());
+            transactions.AddRange(stakes);
 
             // Deposits
             var deposits = ProcessDeposits(rawLedger.Where(x => !processedRefIds.Contains(x.ReferenceId)));
@@ -160,22 +160,22 @@ namespace Portfolio.Transactions.Importers.Csv.Kraken
         /// <param name="depotTransactions"></param>
         /// <param name="accountTransactions"></param>
         /// <returns></returns>
-        // private static IEnumerable<CryptoCurrencyTransaction> ProcessStaking(IEnumerable<KrakenCsvEntry> rawLedger)
-        // {
-        //     var stakes = new List<CryptoCurrencyTransaction>();
+        private static IEnumerable<FinancialTransaction> ProcessStaking(IEnumerable<KrakenCsvEntry> rawLedger)
+        {
+            var stakes = new List<FinancialTransaction>();
 
-        //     // Get all trades that are of the same amount, at the same time
-        //     var assetAmountDateGroups = rawLedger
-        //         .GroupBy(x => new { x.Asset, x.Amount, Date = x.Date.Date })
-        //         .Where(group => group.Count() > 1);
+            // Get all trades that are of the same amount, at the same time
+            var assetAmountDateGroups = rawLedger
+                .GroupBy(x => new { x.Asset, x.Amount, Date = x.Date.Date })
+                .Where(group => group.Count() > 1);
 
-        //     foreach (var group in assetAmountDateGroups)
-        //     {
-        //         Log.Warning($"Skipping staking transactions {string.Join("|", group.Select(x => x.ReferenceId))}, not supported at this time ");
-        //     }
+            foreach (var group in assetAmountDateGroups)
+            {
+                Log.Warning($"Skipping staking transactions {string.Join("|", group.Select(x => x.ReferenceId))}, not supported at this time ");
+            }
 
-        //     return stakes;
-        // }
+            return stakes;
+        }
 
         /// <summary>
         /// 
