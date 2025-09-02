@@ -1,6 +1,13 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
+// Extend the Session type to include apiToken
+declare module "next-auth" {
+  interface Session {
+    apiToken?: string;
+  }
+}
+
 const handler = NextAuth({
   pages: {
     signIn: '/auth/signin',
@@ -71,7 +78,7 @@ const handler = NextAuth({
       // Send properties to the client, like an access_token from a provider.
       // session.accessToken = token.accessToken;
       // session.idToken = token.idToken;
-      session.apiToken = token.apiToken;
+      session.apiToken = typeof token.apiToken === "string" ? token.apiToken : undefined;
 
       return session
     }
