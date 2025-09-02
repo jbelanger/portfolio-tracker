@@ -1,0 +1,82 @@
+name: Git History Secret Scan (One-Time)
+
+on:
+  workflow_dispatch:
+    # Manual trigger only - run this once to scan entire git history
+
+jobs:
+  complete-history-scan:
+    name: Complete Git History Secret Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout full repository history
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Get complete history
+        
+    - name: Install TruffleHog
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+        
+    - name: Scan entire Git history with TruffleHog
+      run: |
+        echo "🔍 Scanning entire Git history for secrets..."
+        trufflehog git file://. --only-verified --json > trufflehog-results.json || true
+        
+    - name: Display TruffleHog results summary
+      run: |
+        if [ -s trufflehog-results.json ]; then
+          echo "⚠️ TruffleHog found potential secrets in Git history:"
+          cat trufflehog-results.json | jq -r '.SourceMetadata.Data.Git.commit + " - " + .DetectorName + ": " + .Raw' || cat trufflehog-results.json
+        else
+          echo "✅ No secrets found in Git history"
+        fi
+        
+    - name: Run Gitleaks on full history
+      run: |
+        echo "🔍 Running Gitleaks on full Git history..."
+        docker run --rm -v $(pwd):/repo zricethezav/gitleaks:latest detect --source /repo --verbose || echo "Gitleaks scan completed"
+        
+    - name: Scan for hardcoded patterns with grep
+      run: |
+        echo "🔍 Scanning for hardcoded secret patterns in commits..."
+        git log --all --full-history -p | grep -i -E "(password|secret|token|key|api[_-]?key)" | head -50 || echo "✅ No obvious secret patterns found in commit history"
+        
+    - name: Check for accidentally committed files
+      run: |
+        echo "🔍 Checking for accidentally committed sensitive files..."
+        git log --all --name-only --pretty=format: | sort | uniq | grep -E "\.(env|key|pem|p12|pfx|jks)$" || echo "✅ No sensitive file extensions found in history"
+        
+    - name: Check for large files that might contain secrets
+      run: |
+        echo "🔍 Checking for unusually large files in history (potential data dumps)..."
+        git rev-list --objects --all | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | awk '/^blob/ {if($3 > 1000000) print $4 " (" $3 " bytes)"}' || echo "✅ No unusually large files found"
+        
+    - name: Search for email addresses and potential PII
+      run: |
+        echo "🔍 Scanning for email addresses and potential PII..."
+        git log --all --full-history -p | grep -E -o '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b' | sort | uniq | head -20 || echo "✅ No email addresses found in commit content"
+        
+    - name: Upload scan results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: git-history-scan-results-${{ github.run_number }}
+        path: |
+          trufflehog-results.json
+        retention-days: 30
+        
+    - name: Final summary
+      if: always()
+      run: |
+        echo "🎯 Git history scan completed!"
+        echo "📊 Summary:"
+        echo "   - TruffleHog scanned for verified secrets"
+        echo "   - Gitleaks scanned entire git history"
+        echo "   - Pattern matching for common secret formats"
+        echo "   - File extension checks for sensitive files"
+        echo "   - Large file analysis"
+        echo "   - PII scanning"
+        echo ""
+        echo "📁 Results uploaded as artifact for detailed review"
