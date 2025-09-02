@@ -1,6 +1,8 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Portfolio.App.Common.Behaviours;
+using FluentValidation;
+using MediatR;
 
 namespace Portfolio.App
 {
@@ -8,7 +10,7 @@ namespace Portfolio.App
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(cfg => {}, Assembly.GetExecutingAssembly());
 
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
