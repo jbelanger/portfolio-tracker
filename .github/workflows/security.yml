@@ -1,0 +1,126 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    # Allow manual triggering of the workflow
+
+jobs:
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for comprehensive scanning
+        
+    - name: Run Gitleaks
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Run TruffleHog OSS
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        include:
+          - path: backend
+            language: dotnet
+          - path: frontend/web_next
+            language: node
+          - path: frontend/portfolio-web
+            language: node
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET (for backend)
+      if: matrix.language == 'dotnet'
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Setup Node.js (for frontend)
+      if: matrix.language == 'node'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Restore .NET dependencies
+      if: matrix.language == 'dotnet'
+      working-directory: ${{ matrix.path }}
+      run: dotnet restore
+      
+    - name: Install Node.js dependencies
+      if: matrix.language == 'node'
+      working-directory: ${{ matrix.path }}
+      run: npm ci
+      
+    - name: Run .NET security audit
+      if: matrix.language == 'dotnet'
+      working-directory: ${{ matrix.path }}
+      run: |
+        dotnet list package --vulnerable --include-transitive
+        dotnet list package --deprecated
+        
+    - name: Run npm security audit
+      if: matrix.language == 'node'
+      working-directory: ${{ matrix.path }}
+      run: npm audit --audit-level=moderate
+
+  codeql:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp', 'javascript' ]
+        
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        
+    - name: Setup .NET
+      if: matrix.language == 'csharp'
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Build .NET projects
+      if: matrix.language == 'csharp'
+      working-directory: backend
+      run: dotnet build --configuration Release
+      
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{ matrix.language }}"
