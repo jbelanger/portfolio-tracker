@@ -3,7 +3,7 @@
 'use client';
 
 import React from 'react';
-import { TextField, MenuItem, Select, InputLabel, FormControl, Button, Grid } from '@mui/material';
+import { TextField, MenuItem, Select, InputLabel, FormControl, Button, Box } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,8 +19,8 @@ interface TransactionFormProps {
 
 const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange, onSave, isEditing }) => (
   <>
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={6}>
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+      <Box>
         <FormControl fullWidth margin="dense">
           <InputLabel>Transaction Type</InputLabel>
           <Select
@@ -41,7 +41,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid xs={12} sm={6}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateTimePicker
             label="Transaction Date"
@@ -56,7 +56,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           />
         </LocalizationProvider>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid xs={12} sm={6}>
         <TextField
           fullWidth
           margin="dense"
@@ -68,7 +68,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           disabled={transaction?.type === "Withdrawal"}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid xs={12} sm={6}>
         <TextField
           fullWidth
           margin="dense"
@@ -79,7 +79,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           disabled={transaction?.type === "Withdrawal"}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid xs={12} sm={6}>
         <TextField
           fullWidth
           margin="dense"
@@ -91,7 +91,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           disabled={transaction?.type === "Deposit"}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid xs={12} sm={6}>
         <TextField
           fullWidth
           margin="dense"
@@ -102,7 +102,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           disabled={transaction?.type === "Deposit"}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid xs={12} sm={6}>
         <TextField
           fullWidth
           margin="dense"
@@ -113,7 +113,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           InputProps={{ style: { fontSize: '0.875rem' } }}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid xs={12} sm={6}>
         <TextField
           fullWidth
           margin="dense"
@@ -123,7 +123,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           InputProps={{ style: { fontSize: '0.875rem' } }}
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid xs={12} sm={6}>
         <TextField
           fullWidth
           margin="dense"
@@ -133,7 +133,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onChange
           InputProps={{ style: { fontSize: '0.875rem' } }}
         />
       </Grid>
-      <Grid item xs={12}>
+      <Grid xs={12}>
         <TextField
           multiline
           rows={5}
