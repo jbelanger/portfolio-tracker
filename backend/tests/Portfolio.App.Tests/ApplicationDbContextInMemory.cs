@@ -11,9 +11,9 @@ public class ApplicationDbContextInMemory : DbContext, IApplicationDbContext
     {
     }
 
-    public DbSet<PriceRecord> PriceHistoryRecords { get; }
-    public DbSet<CoinInfo> CoinInfos { get; }
-    public DbSet<HttpRequestLogEntry> HttpRequestLogEntries { get; }
+    public DbSet<PriceRecord> PriceHistoryRecords { get; set; } = null!;
+    public DbSet<CoinInfo> CoinInfos { get; set; } = null!;
+    public DbSet<HttpRequestLogEntry> HttpRequestLogEntries { get; set; } = null!;
 
     public DbSet<UserPortfolio> Portfolios => throw new NotImplementedException();
 
