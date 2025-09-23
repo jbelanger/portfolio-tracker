@@ -189,8 +189,8 @@ public class PriceHistoryServiceTests
         var symbols = new[] { "BTC", "ETH", "LTC" };
         var fetchedPrices = new List<PriceRecord>
         {
-            new PriceRecord { CurrencyPair = "BTC-USD", CloseDate = DateTime.UtcNow, ClosePrice = 50000m },
-            new PriceRecord { CurrencyPair = "ETH-USD", CloseDate = DateTime.UtcNow, ClosePrice = 3000m }
+            new PriceRecord { CurrencyPair = "BTC/USD", CloseDate = DateTime.UtcNow, ClosePrice = 50000m },
+            new PriceRecord { CurrencyPair = "ETH/USD", CloseDate = DateTime.UtcNow, ClosePrice = 3000m }
         };
 
         _priceHistoryApiMock.Setup(a => a.FetchCurrentPriceAsync(symbols, Strings.CURRENCY_USD))
@@ -223,8 +223,8 @@ public class PriceHistoryServiceTests
         _priceHistoryApiMock.Setup(a => a.FetchCurrentPriceAsync(symbols, Strings.CURRENCY_USD))
             .ReturnsAsync(Result.Success(new List<PriceRecord>
             {
-                new PriceRecord { CurrencyPair = "BTC-USD", CloseDate = DateTime.UtcNow, ClosePrice = 50000m },
-                new PriceRecord { CurrencyPair = "ETH-USD", CloseDate = DateTime.UtcNow, ClosePrice = 3000m }
+                new PriceRecord { CurrencyPair = "BTC/USD", CloseDate = DateTime.UtcNow, ClosePrice = 50000m },
+                new PriceRecord { CurrencyPair = "ETH/USD", CloseDate = DateTime.UtcNow, ClosePrice = 3000m }
             }.AsEnumerable()));
 
         // Act

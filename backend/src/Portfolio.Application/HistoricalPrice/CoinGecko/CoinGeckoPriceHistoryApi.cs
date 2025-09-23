@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 using Portfolio.App.Common.Interfaces;
+using Portfolio.App.HistoricalPrice;
 using Portfolio.Domain.Constants;
 using Portfolio.Domain.Interfaces;
 using Portfolio.Domain.ValueObjects;

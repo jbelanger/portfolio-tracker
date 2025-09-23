@@ -34,7 +34,8 @@ public class CoinGeckoPriceHistoryApiTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString()) // Use a unique name for each test
             .Options;
 
-        _dbContext = new ApplicationDbContextInMemory(options);        
+        _dbContext = new ApplicationDbContextInMemory(options);
+        await ((DbContext)_dbContext).Database.EnsureCreatedAsync();
 
         _coinGeckoApi = new CoinGeckoPriceHistoryApi(_httpClientFactory, new Microsoft.Extensions.Caching.Memory.MemoryCache(new MemoryCacheOptions()), _dbContext)
         {
