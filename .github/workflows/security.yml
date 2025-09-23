@@ -62,7 +62,7 @@ jobs:
     
     strategy:
       matrix:
-        path: ['frontend/web_next', 'frontend/portfolio-web']
+        path: ['frontend/web_next']
     
     steps:
     - name: Checkout code
