@@ -71,7 +71,7 @@ const WalletsPage: React.FC = () => {
 
       <Grid container spacing={3}>
         {wallets.map(wallet => (
-          <Grid item xs={12} md={6} lg={4} key={wallet.id}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }} key={wallet.id}>
             <Paper elevation={3} sx={{ padding: '20px', position: 'relative' }}>
               <Typography variant="h6">{wallet.name}</Typography>
               <Divider sx={{ marginY: '10px' }} />

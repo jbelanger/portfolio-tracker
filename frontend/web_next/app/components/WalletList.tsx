@@ -304,7 +304,7 @@ const WalletList: React.FC<WalletListProps> = ({ portfolioId, allWallets = false
                                 autoHeight
                                 disableRowSelectionOnClick
                                 checkboxSelection
-                                onRowSelectionModelChange={(newSelection) => setSelectedTransactions(newSelection as number[])}
+                                onRowSelectionModelChange={(newSelection) => setSelectedTransactions(Array.from(newSelection.ids) as number[])}
                             />
                         </div>
                     </div>
