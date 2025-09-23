@@ -7,6 +7,9 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
+    ignore:
+      - dependency-name: "Microsoft.*"
+        versions: ["9.x"]
     open-pull-requests-limit: 10
     reviewers:
       - "jbelanger"
