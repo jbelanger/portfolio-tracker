@@ -23,7 +23,7 @@
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageVersion Include="MediatR" Version="13.0.0" />
-    <PackageVersion Include="AutoMapper" Version="15.0.1" />
+    <PackageVersion Include="AutoMapper" Version="15.1.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="RestSharp" Version="112.1.0" />
     <PackageVersion Include="Google.Apis.Auth" Version="1.71.0" />
